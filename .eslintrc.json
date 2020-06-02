@@ -1,0 +1,15 @@
+{
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es6": true,
+		"jquery": true
+	},
+	"globals": {
+		"WRTC_Room": "readonly",
+		"WRTC": "readonly",
+		"clientVars": "readonly",
+		"pad": "readonly",
+		"io": "readonly"
+	}
+}

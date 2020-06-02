@@ -1,0 +1,86 @@
+/* Comment right side container */
+#comments {
+	width: 260px;
+	order: 3;
+	position: relative;
+}
+#comments:not(.active) {
+	display: none;
+}
+@media (max-width: 900px) {
+	#comments {
+		display: none !important;
+	}
+}
+
+/* WRTC Heading */
+
+.wbrtc_roomBox {
+	background: transparent;
+	border-radius: 3px;
+	position: absolute;
+	width: 100%;
+	font-family: Quicksand;
+	font-style: normal;
+	font-weight: bold;
+	font-size: 12px;
+	line-height: 15px;
+	margin-left: 14px;
+}
+
+.wbrtc_roomBox > .wbrtc_roomBoxHeader {
+	padding: 8px;
+}
+
+.wbrtc_roomBox.active {
+	background: #ffffff;
+}
+
+.wbrtc_roomBox > .wbrtc_roomBoxHeader b {
+	display: none;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.wbrtc_roomBox > .wbrtc_roomBoxHeader span {
+	width: 18px;
+	display: inherit;
+	float: left;
+	margin-right: 10px;
+}
+
+.wbrtc_roomBox > .wbrtc_roomBoxFooter {
+	padding: 8px;
+	display: none;
+}
+.wbrtc_roomBoxBody {
+	padding: 8px;
+	border-top: 1px solid #f2f3f4;
+	border-bottom: 1px solid #f2f3f4;
+	display: none;
+}
+
+.wbrtc_roomBoxBody ul {
+	list-style-type: decimal;
+}
+
+.wbrtc_roomBoxBody ul > li {
+	border-right: 6px solid transparent;
+	margin-bottom: 4px;
+}
+
+.wbrtc_roomBox > .wbrtc_roomBoxFooter > button.active {
+	background: #64d29b;
+	color: #ffffff;
+}
+
+.wbrtc_roomBox > .wbrtc_roomBoxFooter > button {
+	border-radius: 3px;
+	font-family: Quicksand;
+	font-style: normal;
+	font-weight: bold;
+	font-size: 10px;
+	line-height: 9px;
+	outline: none;
+}

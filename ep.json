@@ -1,0 +1,29 @@
+{
+	"parts": [
+		{
+			"name": "wrtc_heading",
+			"pre": ["ep_etherpad-lite/webaccess", "ep_page_view/page_view"],
+			"post": ["ep_etherpad-lite/static"],
+			"client_hooks": {
+				"postAceInit": "ep_wrtc_heading/static/js/index",
+				"collectContentPre": "ep_wrtc_heading/static/js/shared",
+				"aceAttribsToClasses": "ep_wrtc_heading/static/js/index",
+				"aceEditorCSS": "ep_wrtc_heading/static/js/index",
+				"aceEditEvent": "ep_wrtc_heading/static/js/index",
+				"aceSetAuthorStyle": "ep_wrtc_heading/static/js/index",
+				"userLeave": "ep_wrtc_heading/static/js/index",
+				"handleClientMessage_RTC_MESSAGE": "ep_wrtc_heading/static/js/index",
+				"aceSelectionChanged": "ep_wrtc_heading/static/js/index"
+			},
+			"hooks": {
+				"socketio": "ep_wrtc_heading/index",
+				"eejsBlock_scripts": "ep_wrtc_heading/index",
+				"eejsBlock_mySettings": "ep_wrtc_heading/index",
+				"eejsBlock_styles": "ep_wrtc_heading/index",
+				"eejsBlock_editorContainerBox": "ep_wrtc_heading/index",
+				"clientVars": "ep_wrtc_heading/index",
+				"handleMessage": "ep_wrtc_heading/index"
+			}
+		}
+	]
+}
