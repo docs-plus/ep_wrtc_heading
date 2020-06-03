@@ -2,20 +2,14 @@
 	"name": "ep_wrtc_heading",
 	"description": "Video Headings Plugin for Etherpad",
 	"version": "0.1.0",
-  "author": {
-    "name": "Hossein Marzban",
-    "email": "marzban98@gmail.com"
-  },
-	"scripts": {
-		"lint": "prettier-standard --lint **/*.js",
-		"pretty": "prettier --write **/*.js"
+	"author": {
+		"name": "Hossein Marzban",
+		"email": "marzban98@gmail.com"
 	},
-	"devDependencies": {
-		"prettier": "^2.0.5",
-		"prettier-standard": "^16.3.0"
-	},
+	"scripts": {},
+	"devDependencies": {},
 	"repository": {
-    "type": "git",
-    "url": "https://github.com/HMarzban/ep_wrtc_heading"
-  }
+		"type": "git",
+		"url": "https://github.com/HMarzban/ep_wrtc_heading"
+	}
 }
