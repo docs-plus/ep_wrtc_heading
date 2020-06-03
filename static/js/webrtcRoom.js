@@ -139,7 +139,7 @@ window.WRTC_Room = (function () {
 				// if the new heading does not exists
 				if (target.find("#" + el.headingTagId).length <= 0) {
 					var box = $("#wertc_roomBox").tmpl(data);
-					target.find("#comments").append(box);
+					target.find("#wbrtc_chatBox").append(box);
 				}
 			});
 

@@ -9,8 +9,8 @@
 	height: auto;
 	overflow: auto;
 }
-@media (min-width: 1000px) {
-	padding: 20px 0;
+#rtcbox.active{
+	display: flex;
 }
 
 #rtcbox .error-msg {
@@ -94,7 +94,6 @@
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	background-color: ;
 }
 #rtcbox .video-container.local-user {
 	order: -1; /* first position */

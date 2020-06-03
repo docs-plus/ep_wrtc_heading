@@ -78,7 +78,7 @@ window.WRTC = (function () {
 
 		// END OF API HOOKS
 		show: function show() {
-			$("#rtcbox").css("display", "flex");
+			$("#rtcbox").addClass("active");
 		},
 		showUserMediaError: function showUserMediaError(err) {
 			// show an error returned from getUserMedia

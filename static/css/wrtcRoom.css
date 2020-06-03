@@ -1,31 +1,31 @@
 /* Comment right side container */
-#comments {
-	width: 260px;
-	order: 3;
+#wbrtc_chatBox {
+	order: 1;
 	position: relative;
 }
-#comments:not(.active) {
+#wbrtc_chatBox:not(.active) {
 	display: none;
 }
 @media (max-width: 900px) {
-	#comments {
+	#wbrtc_chatBox {
 		display: none !important;
 	}
 }
 
 /* WRTC Heading */
-
 .wbrtc_roomBox {
 	background: transparent;
 	border-radius: 3px;
 	position: absolute;
-	width: 100%;
 	font-family: Quicksand;
 	font-style: normal;
 	font-weight: bold;
 	font-size: 12px;
 	line-height: 15px;
 	margin-left: 14px;
+	width: 100%;
+	max-width: 360px;
+	min-width: 230px;
 }
 
 .wbrtc_roomBox > .wbrtc_roomBoxHeader {

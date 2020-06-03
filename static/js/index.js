@@ -27,13 +27,13 @@ ep_wrtcHeading.prototype.init = function () {
 	});
 
 	function enableWrtcHeading() {
-		_self.padOuter.find("#comments").addClass("active");
-		console.log("enableWrtcHeading");
+		_self.padOuter.find("#wbrtc_chatBox").addClass("active");
+		$("#rtcbox").addClass("active")
 	}
 
 	function disableWrtcHeading() {
-		_self.padOuter.find("#comments").removeClass("active");
-		console.log("disableWrtcHeading");
+		_self.padOuter.find("#wbrtc_chatBox").removeClass("active");
+		$("#rtcbox").removeClass("active")
 	}
 
 	$("#options-wrtc-heading").trigger("change");
@@ -60,9 +60,9 @@ ep_wrtcHeading.prototype.findContainers = function () {
 ep_wrtcHeading.prototype.insertContainers = function () {
 	var $target = this.outerBody;
 	// if ep_comments plugin eneable don't append container again
-	if ($target.find("#comments").length > 0) return false;
+	if ($target.find("#wbrtc_chatBox").length > 0) return false;
 	// Add comments side bar container
-	$target.prepend('<div id="comments"></div>');
+	$target.prepend('<div id="wbrtc_chatBox"></div>');
 };
 
 // Set all video_heading to be inline with their target REP
