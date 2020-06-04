@@ -59,9 +59,7 @@ ep_wrtcHeading.prototype.findContainers = function () {
 
 ep_wrtcHeading.prototype.insertContainers = function () {
 	var $target = this.outerBody;
-	// if ep_comments plugin eneable don't append container again
 	if ($target.find("#wbrtc_chatBox").length > 0) return false;
-	// Add comments side bar container
 	$target.prepend('<div id="wbrtc_chatBox"></div>');
 };
 
@@ -77,12 +75,13 @@ ep_wrtcHeading.prototype.setYofHeadingBox = function () {
 		var $headingEl = $padOuter.find("iframe").contents().find("#innerdocbody").find("." + hClassId);
 
 		// if the H tags does not find remove chatBox
+		// TODO: and kick out the user form the chat room
 		if ($headingEl.length <= 0) {
 			$(this).remove();
 			return false;
 		}
 
-		var offsetTop = $headingEl.offset().top + aceOuterPadding;
+		var offsetTop = Math.floor($headingEl.offset().top + aceOuterPadding);
 
 		$(this).css({ top: offsetTop + "px" });
 	});
@@ -93,7 +92,6 @@ ep_wrtcHeading.prototype.setYofHeadingBox = function () {
 /************************************************************************/
 var hooks = {
 	postAceInit: function postAceInit(hook, context) {
-		WRTC.postAceInit(hook, context);
 		if (!pad.plugins) pad.plugins = {};
 		var WRTCHeading = new ep_wrtcHeading(context);
 		this.WRTCHeading = WRTCHeading;
@@ -108,35 +106,39 @@ var hooks = {
 			});
 		}
 
-		$(window).resize(_.debounce(function () {
-			WRTCHeading.setYofHeadingBox();
-		}, 100));
-
+		WRTC.postAceInit(hook, context);
 		WRTCHeading.init();
 		WRTC_Room.init(context);
 
-		// if ep_comments_page active this delay needed.
-		setTimeout(function () {
-			WRTC_Room.findTags();
-		}, 150);
+		$("#editorcontainer iframe").ready(function() {
+			setTimeout(function () {
+				WRTC_Room.findTags();
+			}, 150);
+		})
+
+		$(window).resize(_.debounce(function () {
+			WRTCHeading.setYofHeadingBox();
+		}, 100));
+	
 	},
 
 	aceEditEvent: function aceEditEvent(hook, context) {
-		// first check if some text is being marked/unmarked to add comment to it
 		var eventType = context.callstack.editEvent.eventType;
 
-		// if user create a new heading
 		// if in insert heading mode or when press key with new line
 		if ("setup,importText,setBaseText,setWraps".includes(eventType)) return;
 
 		// some times on init ep_wrtc_heading is not yet on the plugin list
-		if (context.callstack.docTextChanged) pad.plugins.ep_wrtc_heading.setYofHeadingBox();
+		if (context.callstack.docTextChanged && pad.plugins.ep_wrtc_heading) pad.plugins.ep_wrtc_heading.setYofHeadingBox();
+
+		// apply changes to the other user
 		if (eventType === "applyChangesToBase" && context.callstack.selectionAffected) {
 			setTimeout(function () {
 				WRTC_Room.findTags();
 			}, 200);
 		}
 
+		// if user create a new heading, depend on ep_headings2
 		if (eventType === "insertheading") {
 			// unfortunately "setAttributesRange" takes a little time to set attribute
 			// also ep_headings2 plugin has setTimeout about 250 ms to set and update H tag

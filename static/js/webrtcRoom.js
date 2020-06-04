@@ -113,7 +113,7 @@ window.WRTC_Room = (function () {
 			$(hTags).each(function () {
 				var lineNumber = $(this).parent().prevAll().length;
 				var tag = this.nodeName.toLowerCase();
-				var newY = $(this).context.offsetTop + aceOuterPadding;
+				var newY = Math.floor($(this).context.offsetTop + aceOuterPadding);
 				var linkText = $(this).text();
 				var headingTagId = $(this).find("span").attr("class");
 				headingTagId = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(headingTagId);

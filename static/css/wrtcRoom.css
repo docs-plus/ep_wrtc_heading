@@ -2,6 +2,7 @@
 #wbrtc_chatBox {
 	order: 1;
 	position: relative;
+	z-index: 9;
 }
 #wbrtc_chatBox:not(.active) {
 	display: none;
@@ -34,6 +35,7 @@
 
 .wbrtc_roomBox.active {
 	background: #ffffff;
+	z-index: 2;
 }
 
 .wbrtc_roomBox > .wbrtc_roomBoxHeader b {
