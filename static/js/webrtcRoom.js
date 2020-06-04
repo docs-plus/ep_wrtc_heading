@@ -154,15 +154,7 @@ window.WRTC_Room = (function () {
 			});
 		},
 		activeEventListenr: function activeEventListenr() {
-			var padOuter = $('iframe[name="ace_outer"]').contents();
-			var padInner = padOuter.find('iframe[name="ace_inner"]');
-
 			var _self = this;
-			console.log("activeEventListenr");
-
-			padInner.contents().on("updateCommentLinePosition", function (e) {
-				console.log("comment position change");
-			});
 
 			_self.$body_ace_outer().on("mouseover", ".wbrtc_roomBox", function () {
 				$(this).addClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").show();

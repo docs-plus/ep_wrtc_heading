@@ -83,8 +83,8 @@
 	top: 0;
 	left: 5px; /* border-width */
 	right: 0;
-	opacity: 0;
-	background-color: rgba(255, 255, 255, 0.35);
+	opacity: 1;
+	background-color: rgba(255, 255, 255, 0.8);
 	font-weight: bold;
 	line-height: 20px;
 	padding-left: 8px;
@@ -101,7 +101,7 @@
 #rtcbox .video-container:hover .interface-btn,
 #rtcbox .video-container:hover .user-name,
 #rtcbox .video-container.local-user .interface-btn {
-	background-color: rgba(255, 255, 255, 0.65);
+	background-color: rgba(255, 255, 255, 1);
 	opacity: 1;
 }
 #rtcbox .video-container:hover .user-name {

@@ -75,7 +75,7 @@ ep_wrtcHeading.prototype.setYofHeadingBox = function () {
 		var $headingEl = $padOuter.find("iframe").contents().find("#innerdocbody").find("." + hClassId);
 
 		// if the H tags does not find remove chatBox
-		// TODO: and kick out the user form the chat room
+		// TODO: and kick out the user form the chatBox
 		if ($headingEl.length <= 0) {
 			$(this).remove();
 			return false;
@@ -121,7 +121,6 @@ var hooks = {
 		}, 100));
 	
 	},
-
 	aceEditEvent: function aceEditEvent(hook, context) {
 		var eventType = context.callstack.editEvent.eventType;
 
@@ -162,8 +161,8 @@ var hooks = {
 				return user.userId === context.author;
 			});
 			if (user) {
-				var padOuter = $('iframe[name="ace_outer"]').contents();
-				padOuter.find(".wbrtc_roomBoxBody ul li[data-id='" + user.userId + "']").css({ "border-color": user.colorId }).text(user.name);
+				var $padOuter = $('iframe[name="ace_outer"]').contents();
+				$padOuter.find(".wbrtc_roomBoxBody ul li[data-id='" + user.userId + "']").css({ "border-color": user.colorId }).text(user.name);
 			}
 		}
 		WRTC.aceSetAuthorStyle(hook, context, callback);
