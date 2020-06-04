@@ -84,25 +84,25 @@ exports.eejsBlock_editorContainerBox = function (hookName, args, cb) {
 
 exports.clientVars = function (hook, context, callback) {
 	var enabled = true
-	if (settings.ep_webrtc && settings.ep_webrtc.enabled === false) {
-		enabled = settings.ep_webrtc.enabled
+	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.enabled === false) {
+		enabled = settings.ep_wrtc_heading.enabled
 	}
 
 	var iceServers = [{ url: "stun:stun.l.google.com:19302" }]
-	if (settings.ep_webrtc && settings.ep_webrtc.iceServers) {
-		iceServers = settings.ep_webrtc.iceServers
+	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.iceServers) {
+		iceServers = settings.ep_wrtc_heading.iceServers
 	}
 
 	var listenClass = false
-	if (settings.ep_webrtc && settings.ep_webrtc.listenClass) {
-		listenClass = settings.ep_webrtc.listenClass
+	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.listenClass) {
+		listenClass = settings.ep_wrtc_heading.listenClass
 	}
 
 	var video = { sizes: {} }
-	if (settings.ep_webrtc && settings.ep_webrtc.video && settings.ep_webrtc.video.sizes) {
+	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.video && settings.ep_wrtc_heading.video.sizes) {
 		video.sizes = {
-			large: settings.ep_webrtc.video.sizes.large,
-			small: settings.ep_webrtc.video.sizes.small,
+			large: settings.ep_wrtc_heading.video.sizes.large,
+			small: settings.ep_wrtc_heading.video.sizes.small,
 		}
 	}
 
@@ -133,9 +133,9 @@ exports.handleMessage = function (hook, context, callback) {
 
 function handleErrorStatMessage (statName) {
 	if (statErrorNames.indexOf(statName) !== -1) {
-		stats.meter("ep_webrtc_err_" + statName).mark()
+		stats.meter("ep_wrtc_heading_err_" + statName).mark()
 	} else {
-		statsLogger.warn("Invalid ep_webrtc error stat: " + statName)
+		statsLogger.warn("Invalid ep_wrtc_heading error stat: " + statName)
 	}
 }
 
