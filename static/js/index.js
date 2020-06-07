@@ -34,6 +34,7 @@ ep_wrtcHeading.prototype.init = function () {
 	function disableWrtcHeading() {
 		_self.padOuter.find("#wbrtc_chatBox").removeClass("active");
 		$("#rtcbox").removeClass("active")
+		WRTC_Room.hangupAll()
 	}
 
 	$("#options-wrtc-heading").trigger("change");

@@ -59,12 +59,7 @@ window.WRTC = (function () {
 				}
 			}
 		},
-		userJoinOrUpdate: function userJoinOrUpdate(hook, context) {
-			/*
-      var userId = context.userInfo.userId;
-      console.log('userJoinOrUpdate', context, context.userInfo.userId, pc[userId]);
-      */
-		},
+		userJoinOrUpdate: function userJoinOrUpdate(hook, context) {},
 		userLeave: function userLeave(hook, context, callback) {
 			var userId = context.userInfo.userId;
 			if (userId && pc[userId]) {
@@ -344,9 +339,9 @@ window.WRTC = (function () {
 				console.log("unknown message", data);
 			}
 		},
-		hangupAll: function hangupAll(_hangupAll) {
+		hangupAll: function hangupAll(_headingId) {
 			Object.keys(pc).forEach(function (userId) {
-				self.hangup(userId, true, _hangupAll);
+				self.hangup(userId, true, _headingId);
 			});
 		},
 		getUserId: function getUserId() {

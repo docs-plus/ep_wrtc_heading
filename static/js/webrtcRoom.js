@@ -5,8 +5,16 @@ window.WRTC_Room = (function () {
 	var port = loc.port === "" ? loc.protocol === "https:" ? 443 : 80 : loc.port;
 	var url = loc.protocol + "//" + loc.hostname + ":" + port + "/" + "heading_chat_room";
 	var socket = io.connect(url);
+	var currentUserRoom = {}
 
 	var WRTC_Room = {
+		isUserMediaAvailable: function (){
+			return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true})
+				.catch(function (err) {
+					WRTC.showUserMediaError(err);
+					console.error(err)
+				});
+		},
 		initSocketJoin: function initSocketJoin(param) {
 			socket.emit("joinPadRooms", clientVars.padId, function () {});
 		},
@@ -59,10 +67,12 @@ window.WRTC_Room = (function () {
 			if (data.userId === clientVars.userId) {
 				WRTC.deactivate(data.userId, data.headingId);
 				window.headingId = null;
+				currentUserRoom = {}
 				$headingRoom.find(".wbrtc_roomBoxFooter button").html("<b></b>(</span class='userCoutn'>" + userCount + "</span>)").attr({
 					"data-userId": data.userId,
 					"data-action": "JOIN",
-					"class": "active"
+					"class": "active",
+					"disabled": false
 				}).find("b").text("JOIN");
 			}
 		},
@@ -90,12 +100,13 @@ window.WRTC_Room = (function () {
 			if (data.userId === clientVars.userId) {
 				window.headingId = data.headingId;
 				WRTC.activate(data.headingId, user.userId);
-
+				currentUserRoom = data
 				var $button = $headingRoom.find(".wbrtc_roomBoxFooter button");
 				$button.attr({
 					"data-userId": user.userId,
 					"data-action": "LEAVE",
-					"class": ""
+					"class": "",
+					"disabled": false
 				}).html("<b>LEAVE</b>");
 			}
 		},
@@ -175,10 +186,23 @@ window.WRTC_Room = (function () {
 					headingId: headingId
 				};
 
+				$(this).attr({"disabled": true})
+
 				if (actions === "JOIN") {
-					socket.emit("userJoin", data, function (_data) {
-						_self.addUserToRoom(_data);
-					});
+					_self.isUserMediaAvailable().then(function(){
+						if(currentUserRoom.userId){
+							socket.emit("userLeave", currentUserRoom, function (_data) {
+								_self.removeUserFromRoom(_data);
+								socket.emit("userJoin", data, function (_data) {
+									_self.addUserToRoom(_data);
+								});
+							});
+						} else {
+							socket.emit("userJoin", data, function (_data) {
+								_self.addUserToRoom(_data);
+							});
+						}
+					})
 				} else {
 					socket.emit("userLeave", data, function (_data) {
 						_self.removeUserFromRoom(_data);

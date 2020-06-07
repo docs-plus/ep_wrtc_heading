@@ -93,11 +93,6 @@ exports.clientVars = function (hook, context, callback) {
 		iceServers = settings.ep_wrtc_heading.iceServers
 	}
 
-	var listenClass = false
-	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.listenClass) {
-		listenClass = settings.ep_wrtc_heading.listenClass
-	}
-
 	var video = { sizes: {} }
 	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.video && settings.ep_wrtc_heading.video.sizes) {
 		video.sizes = {
@@ -110,7 +105,6 @@ exports.clientVars = function (hook, context, callback) {
 		webrtc: {
 			iceServers: iceServers,
 			enabled: enabled,
-			listenClass: listenClass,
 			video: video,
 		},
 	}
