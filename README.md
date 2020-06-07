@@ -1,7 +1,11 @@
 # ep_wrtc_heading
 Video Headings Plugin for Etherpad
 
+## Installing
 
+```bash
+$ npm install ep_wrtc_heading
+```
 
 ## Settings
 To set a custom stun server, set ep_wrtc_heading.iceServer in your settings.json:
@@ -38,13 +42,6 @@ To ensure reliable connectivity we recommend setting both a STUN and TURN server
 }
 ```
 
-To set an element or class to listen for an init event set ep_wrtc_heading.listenClass in your settings.json. This is often stabled with "enabled":false and a button to provide a button to begin video sessions
-
-```json
-"ep_wrtc_heading" : {
-    "listenClass": "#chatLabel"
-}
-```
 To set a custom small and/or large size in pixels, for the video displays, set one or both of the following in your settings.json:
 ```json
 "ep_wrtc_heading": {
@@ -59,3 +56,16 @@ To set a custom small and/or large size in pixels, for the video displays, set o
 
 ## Metrics
 You can see metrics for various errors that users have when attempting to connect their camera/microphone:
+
+* `ep_webrtc_err_Hardware`: Some sort of hardware-related connection problem on the users' computer.
+* `ep_webrtc_err_NotFound`: Could not find user's camera/microphone.
+* `ep_webrtc_err_Abort`: Some sort of other, non-hardware related connection problem on the user's computer.
+* `ep_webrtc_err_NotSupported`: User's environment does not support webrtc.
+* `ep_webrtc_err_Permission`: User did not grant permission to their camera/microphone
+* `ep_webrtc_err_SecureConnection`: Etherpad is not set up on a secure connection, which is requried for webrtc
+* `ep_webrtc_err_Unknown`: Some other unspecified error. Perhaps a bug in this plugin.
+
+## License
+Yjs is licensed under the [MIT License](./LICENSE).
+
+<marzban98@gmail.com>
