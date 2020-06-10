@@ -1,5 +1,7 @@
 # ep_wrtc_heading
-Video Headings Plugin for Etherpad
+Video Headings Plugin for Etherpad.
+
+WebRTC video/audio, a dedicated chat room for each headlines (h tags).  
 
 ## Installing
 
@@ -18,8 +20,6 @@ To set a custom stun server, set ep_wrtc_heading.iceServer in your settings.json
 ```
 
 To ensure reliable connectivity we recommend setting both a STUN and TURN server. We don't set this by default and below are just example servers, you should ensure you use reliable STUN and TURN servers.
-
-
 ```json
 "ep_wrtc_heading" : {
   "iceServers":[
@@ -65,7 +65,12 @@ You can see metrics for various errors that users have when attempting to connec
 * `ep_webrtc_err_SecureConnection`: Etherpad is not set up on a secure connection, which is requried for webrtc
 * `ep_webrtc_err_Unknown`: Some other unspecified error. Perhaps a bug in this plugin.
 
-## License
-Yjs is licensed under the [MIT License](./LICENSE).
 
+
+## License
+This project is licensed under the [MIT License](./LICENSE).
+
+> Inspired and use by [ep_webrtc](https://github.com/ether/ep_webrtc)
+
+If you have any further questions, please don’t hesitate to contact us.
 <marzban98@gmail.com>
