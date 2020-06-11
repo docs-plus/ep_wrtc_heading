@@ -12,7 +12,7 @@ var collectContentPre = function (hook, context) {
 	}
 
 	// when copy header form clipboard, trige headingTagId to set
-	if (tagIndex >= 0 && context.styl.length > 10 || (jsx && jsx[1]) ) {
+	if (tagIndex >= 0 && (context.styl && context.styl.length > 10) || (jsx && jsx[1]) ) {
 			context.cc.doAttrib(context.state, "headingTagId::" + randomString(16))
 	}
 	setTimeout(function () {
