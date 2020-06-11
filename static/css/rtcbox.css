@@ -17,12 +17,13 @@
 	order: -1;
 	margin: 20px 4px 10px 4px;
 	padding: 6px 10px;
+	max-width: 240px;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
 	background: #fff;
-	border-radius: 8px;
-	box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+	border-radius: 8px 6px 6px 8px;
+	/* box-shadow: 1px 1px 3px rgba(0,0,0,0.1); */
 }
 
 #rtcbox .error-msg {
