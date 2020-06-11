@@ -1,25 +1,23 @@
-"use strict";
-
-window.WRTC_Room = (function () {
+var WRTC_Room = (function () {
 	var loc = document.location;
 	var port = loc.port === "" ? loc.protocol === "https:" ? 443 : 80 : loc.port;
 	var url = loc.protocol + "//" + loc.hostname + ":" + port + "/" + "heading_chat_room";
 	var socket = io.connect(url);
 	var currentUserRoom = {};
 
-	var WRTC_Room = {
+	var self = {
 		isUserMediaAvailable: function isUserMediaAvailable() {
 			return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true })["catch"](function (err) {
 				WRTC.showUserMediaError(err);
 				console.error(err);
 			});
 		},
-		initSocketJoin: function initSocketJoin(param) {
+		initSocketJoin: function initSocketJoin() {
 			socket.emit("joinPadRooms", clientVars.padId, function () {});
 		},
 		init: function init() {
 			var _self = this;
-			this._pad = pad || window.pad;
+			this._pad = window.pad;
 			socket.on("userJoin", function (data) {
 				_self.addUserToRoom(data);
 			});
@@ -214,5 +212,5 @@ window.WRTC_Room = (function () {
 		}
 	};
 
-	return WRTC_Room;
+	return self;
 })();

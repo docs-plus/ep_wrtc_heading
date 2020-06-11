@@ -83,8 +83,6 @@ var EPwrtcHeading = (function () {
 /************************************************************************/
 var hooks = {
 	postAceInit: function postAceInit(hook, context) {
-		if (!pad.plugins) pad.plugins = {};
-		pad.plugins.ep_wrtc_heading = EPwrtcHeading;
 
 		if (!$("#editorcontainerbox").hasClass("flex-layout")) {
 			$.gritter.add({
@@ -116,7 +114,7 @@ var hooks = {
 		if ("handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps".includes(eventType)) return;
 
 		// some times init ep_wrtc_heading is not yet in the plugin list
-		if (context.callstack.docTextChanged && pad.plugins.ep_wrtc_heading) pad.plugins.ep_wrtc_heading.setYofHeadingBox();
+		if (context.callstack.docTextChanged ) EPwrtcHeading.setYofHeadingBox();
 
 		// apply changes to the other user
 		if (eventType === "applyChangesToBase" && context.callstack.selectionAffected) {
@@ -127,7 +125,6 @@ var hooks = {
 
 		// if user create a new heading, depend on ep_headings2
 		if (eventType === "insertheading") {
-			console.log(eventType,"===============")
 			// unfortunately "setAttributesRange" takes a little time to set attribute
 			// also ep_headings2 plugin has setTimeout about 250 ms to set and update H tag
 			// more info: https://github.com/ether/ep_headings2/blob/6827f1f0b64d99c3f3082bc0477d87187073a74f/static/js/index.js#L71
@@ -166,9 +163,6 @@ var hooks = {
 
 		WRTC_Room.leaveSession(data);
 	},
-	userJoinOrUpdate: function userJoinOrUpdate(hook, context, callback) {
-		WRTC.userJoinOrUpdate(hook, context, callback);
-	},
 	handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context, callback) {
 		WRTC.handleClientMessage_RTC_MESSAGE(hook, context, callback);
 	},
@@ -187,6 +181,5 @@ exports.aceAttribsToClasses = hooks.aceAttribsToClasses;
 exports.aceEditEvent = hooks.aceEditEvent;
 exports.aceSetAuthorStyle = hooks.aceSetAuthorStyle;
 exports.userLeave = hooks.userLeave;
-exports.userJoinOrUpdate = hooks.userJoinOrUpdate;
 exports.handleClientMessage_RTC_MESSAGE = hooks.handleClientMessage_RTC_MESSAGE;
 exports.aceSelectionChanged = hooks.aceSelectionChanged;

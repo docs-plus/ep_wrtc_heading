@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-window.WRTC = (function () {
+var WRTC = (function () {
 	var videoSizes = { large: "260px", small: "160px" };
 	var pcConfig = {};
 	var pcConstraints = {
@@ -58,7 +58,6 @@ window.WRTC = (function () {
 				}
 			}
 		},
-		userJoinOrUpdate: function userJoinOrUpdate(hook, context) {},
 		userLeave: function userLeave(hook, context, callback) {
 			var userId = context.userInfo.userId;
 			if (userId && pc[userId]) {
@@ -129,7 +128,7 @@ window.WRTC = (function () {
 			self.hide();
 		},
 		hide: function hide(userId) {
-			if(!userId) return false
+			if(!userId) return false;
 			userId = userId.split(".")[1];
 			$("#rtcbox").find("#video_a_" + userId).parent().remove();
 		},
@@ -180,7 +179,7 @@ window.WRTC = (function () {
 			return user;
 		},
 		setStream: function setStream(userId, stream) {
-			if(!userId) return false
+			if(!userId) return false;
 			var isLocal = userId === self.getUserId();
 			var videoId = "video_" + userId.replace(/\./g, "_");
 			var video = $("#" + videoId)[0];
@@ -219,13 +218,13 @@ window.WRTC = (function () {
 			}
 		},
 		addInterface: function addInterface(userId) {
-			if(!userId) return false
+			if(!userId) return false;
 			var isLocal = userId === self.getUserId();
 			var videoId = "video_" + userId.replace(/\./g, "_");
 			var $video = $("#" + videoId);
 
 			var $mute = $("<span class='interface-btn audio-btn buttonicon'>").attr("title", "Mute").on({
-				click: function click(event) {
+				click: function click() {
 					var muted;
 					if (isLocal) {
 						muted = self.toggleMuted();
@@ -238,7 +237,7 @@ window.WRTC = (function () {
 			});
 			var videoEnabled = true;
 			var $disableVideo = isLocal ? $("<span class='interface-btn video-btn buttonicon'>").attr("title", "Disable video").on({
-				click: function click(event) {
+				click: function click() {
 					self.toggleVideo();
 					videoEnabled = !videoEnabled;
 					$disableVideo.attr("title", videoEnabled ? "Disable video" : "Enable video").toggleClass("off", !videoEnabled);
@@ -247,7 +246,7 @@ window.WRTC = (function () {
 
 			var videoEnlarged = false;
 			var $largeVideo = $("<span class='interface-btn enlarge-btn buttonicon'>").attr("title", "Make video larger").on({
-				click: function click(event) {
+				click: function click() {
 					videoEnlarged = !videoEnlarged;
 
 					if (videoEnlarged) {
@@ -355,7 +354,8 @@ window.WRTC = (function () {
 				self.setStream(userId, "");
 				pc[userId].close();
 				delete pc[userId];
-				notify && self.sendMessage(userId, { type: "hangup", headingId: headingId });
+				if(notify)
+					self.sendMessage(userId, { type: "hangup", headingId: headingId });
 			}
 		},
 		call: function call(userId, headingId) {
@@ -403,7 +403,7 @@ window.WRTC = (function () {
 				remoteStream[userId] = event.stream;
 				self.setStream(userId, event.stream);
 			};
-			pc[userId].onremovestream = function (event) {
+			pc[userId].onremovestream = function () {
 				self.setStream(userId, "");
 			};
 		},
@@ -459,11 +459,12 @@ window.WRTC = (function () {
 	// Set Opus as the default audio codec if it's present.
 	function preferOpus(sdp) {
 		var sdpLines = sdp.split("\r\n");
+		var mLineIndex = null;
 
 		// Search for m line.
 		for (var i = 0; i < sdpLines.length; i++) {
 			if (sdpLines[i].search("m=audio") !== -1) {
-				var mLineIndex = i;
+				mLineIndex = i;
 				break;
 			}
 		}
