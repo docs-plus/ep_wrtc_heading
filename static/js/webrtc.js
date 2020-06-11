@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-"use strict";
 
 window.WRTC = (function () {
 	var videoSizes = { large: "260px", small: "160px" };
@@ -53,7 +52,7 @@ window.WRTC = (function () {
 			if (context.author) {
 				var user = self.getUserFromId(context.author);
 				if (user) {
-					$("#video_" + context.author.replace(/\./g, "_")).css({
+					$("#video_" + user.userId.replace(/\./g, "_")).css({
 						"border-color": user.colorId
 					}).siblings(".user-name").text(user.name);
 				}
@@ -130,6 +129,7 @@ window.WRTC = (function () {
 			self.hide();
 		},
 		hide: function hide(userId) {
+			if(!userId) return false
 			userId = userId.split(".")[1];
 			$("#rtcbox").find("#video_a_" + userId).parent().remove();
 		},
@@ -180,6 +180,8 @@ window.WRTC = (function () {
 			return user;
 		},
 		setStream: function setStream(userId, stream) {
+			if(!userId) return false
+			console.log(userId,"2322222")
 			var isLocal = userId === self.getUserId();
 			var videoId = "video_" + userId.replace(/\./g, "_");
 			var video = $("#" + videoId)[0];
@@ -218,7 +220,9 @@ window.WRTC = (function () {
 			}
 		},
 		addInterface: function addInterface(userId) {
+			if(!userId) return false
 			var isLocal = userId === self.getUserId();
+			console.log(userId,"======================?")
 			var videoId = "video_" + userId.replace(/\./g, "_");
 			var $video = $("#" + videoId);
 

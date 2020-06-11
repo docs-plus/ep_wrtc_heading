@@ -5,15 +5,14 @@ window.WRTC_Room = (function () {
 	var port = loc.port === "" ? loc.protocol === "https:" ? 443 : 80 : loc.port;
 	var url = loc.protocol + "//" + loc.hostname + ":" + port + "/" + "heading_chat_room";
 	var socket = io.connect(url);
-	var currentUserRoom = {}
+	var currentUserRoom = {};
 
 	var WRTC_Room = {
-		isUserMediaAvailable: function (){
-			return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true})
-				.catch(function (err) {
-					WRTC.showUserMediaError(err);
-					console.error(err)
-				});
+		isUserMediaAvailable: function isUserMediaAvailable() {
+			return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true })["catch"](function (err) {
+				WRTC.showUserMediaError(err);
+				console.error(err);
+			});
 		},
 		initSocketJoin: function initSocketJoin(param) {
 			socket.emit("joinPadRooms", clientVars.padId, function () {});
@@ -67,13 +66,14 @@ window.WRTC_Room = (function () {
 			if (data.userId === clientVars.userId) {
 				WRTC.deactivate(data.userId, data.headingId);
 				window.headingId = null;
-				currentUserRoom = {}
+				currentUserRoom = {};
 				$headingRoom.find(".wbrtc_roomBoxFooter button").html("<b></b>(</span class='userCoutn'>" + userCount + "</span>)").attr({
 					"data-userId": data.userId,
 					"data-action": "JOIN",
 					"class": "active",
 					"disabled": false
 				}).find("b").text("JOIN");
+				$("#rtcbox .chatTitle").remove();
 			}
 		},
 		addUserToRoom: function addUserToRoom(data) {
@@ -100,7 +100,7 @@ window.WRTC_Room = (function () {
 			if (data.userId === clientVars.userId) {
 				window.headingId = data.headingId;
 				WRTC.activate(data.headingId, user.userId);
-				currentUserRoom = data
+				currentUserRoom = data;
 				var $button = $headingRoom.find(".wbrtc_roomBoxFooter button");
 				$button.attr({
 					"data-userId": user.userId,
@@ -108,6 +108,8 @@ window.WRTC_Room = (function () {
 					"class": "",
 					"disabled": false
 				}).html("<b>LEAVE</b>");
+				var headerText = $headingRoom.find(".wbrtc_roomBoxHeader b").text();
+				$("#rtcbox").prepend('<h4 class="chatTitle">' + headerText + '</h4>');
 			}
 		},
 		$body_ace_outer: function $body_ace_outer() {
@@ -123,7 +125,7 @@ window.WRTC_Room = (function () {
 
 			$(hTags).each(function () {
 				var lineNumber = $(this).parent().prevAll().length;
-				var tag = this.nodeName.toLowerCase();
+				var tag = $(this).prop("tagName").toLowerCase();
 				var newY = Math.floor($(this).context.offsetTop + aceOuterPadding);
 				var linkText = $(this).text();
 				var headingTagId = $(this).find("span").attr("class");
@@ -186,11 +188,11 @@ window.WRTC_Room = (function () {
 					headingId: headingId
 				};
 
-				$(this).attr({"disabled": true})
+				$(this).attr({ "disabled": true });
 
 				if (actions === "JOIN") {
-					_self.isUserMediaAvailable().then(function(){
-						if(currentUserRoom.userId){
+					_self.isUserMediaAvailable().then(function () {
+						if (currentUserRoom.userId) {
 							socket.emit("userLeave", currentUserRoom, function (_data) {
 								_self.removeUserFromRoom(_data);
 								socket.emit("userJoin", data, function (_data) {
@@ -202,7 +204,7 @@ window.WRTC_Room = (function () {
 								_self.addUserToRoom(_data);
 							});
 						}
-					})
+					});
 				} else {
 					socket.emit("userLeave", data, function (_data) {
 						_self.removeUserFromRoom(_data);
