@@ -5,6 +5,7 @@ var log4js = require("ep_etherpad-lite/node_modules/log4js")
 var sessioninfos = require("ep_etherpad-lite/node/handler/PadMessageHandler").sessioninfos
 var statsLogger = log4js.getLogger("stats")
 var stats = require("ep_etherpad-lite/node/stats")
+var packageJson = require('./package.json');
 
 // Make sure any updates to this are reflected in README
 const statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
@@ -65,10 +66,10 @@ exports.eejsBlock_mySettings = function (hookName, args, cb) {
 
 exports.eejsBlock_scripts = function (hookName, args, cb) {
 	args.content = args.content + eejs.require("ep_wrtc_heading/templates/webrtcComponent.html", {}, module)
-	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/adapter.js'></script>"
-	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/getUserMediaPolyfill.js'></script>"
-	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtc.js'></script>"
-	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtcRoom.js'></script>"
+	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/adapter.js?v=" + packageJson.version + "'></script>"
+	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/getUserMediaPolyfill.js?v=" + packageJson.version + "'></script>"
+	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtc.js?v=" + packageJson.version + "'></script>"
+	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtcRoom.js?v=" + packageJson.version + "'></script>"
 	return cb()
 }
 
