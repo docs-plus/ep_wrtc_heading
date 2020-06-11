@@ -181,7 +181,6 @@ window.WRTC = (function () {
 		},
 		setStream: function setStream(userId, stream) {
 			if(!userId) return false
-			console.log(userId,"2322222")
 			var isLocal = userId === self.getUserId();
 			var videoId = "video_" + userId.replace(/\./g, "_");
 			var video = $("#" + videoId)[0];
@@ -222,7 +221,6 @@ window.WRTC = (function () {
 		addInterface: function addInterface(userId) {
 			if(!userId) return false
 			var isLocal = userId === self.getUserId();
-			console.log(userId,"======================?")
 			var videoId = "video_" + userId.replace(/\./g, "_");
 			var $video = $("#" + videoId);
 
