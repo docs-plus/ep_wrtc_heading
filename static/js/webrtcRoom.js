@@ -74,7 +74,7 @@ var WRTC_Room = (function () {
 			$headingRoom.find(".userCoutn").text(userCount);
 
 			if (data.userId === clientVars.userId) {
-				// WRTC.deactivate(data.userId, data.headingId);
+				WRTC.deactivate(data.userId, data.headingId);
 				window.headingId = null;
 				currentUserRoom = {};
 				$headingRoom.find(".wbrtc_roomBoxFooter button").html("<b></b>(</span class='userCoutn'>" + userCount + "</span>)").attr({
@@ -109,7 +109,7 @@ var WRTC_Room = (function () {
 
 			if (data.userId === clientVars.userId) {
 				window.headingId = data.headingId;
-				// WRTC.activate(data.headingId, user.userId);
+				WRTC.activate(data.headingId, user.userId);
 				currentUserRoom = data;
 				var $button = $headingRoom.find(".wbrtc_roomBoxFooter button");
 				$button.attr({
