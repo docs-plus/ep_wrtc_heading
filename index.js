@@ -8,13 +8,16 @@ var stats = require("ep_etherpad-lite/node/stats")
 var packageJson = require('./package.json');
 
 // Make sure any updates to this are reflected in README
-const statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
+var statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
+var VIDEOCHATLIMIT = 10
+
 
 exports.socketio = function (hookName, args, cb) {
 	socketio = args.io
 	var io = args.io
 	var rooms = []
 	io.of("/heading_chat_room").on("connect", function (socket) {
+		
 		socket.on("joinPadRooms", function (padId, callback) {
 			socket.join(padId)
 		})
@@ -22,7 +25,7 @@ exports.socketio = function (hookName, args, cb) {
 		socket.on("userJoin", function (data, callback) {
 			// find user in current pad, user can only join in one heading room in each pad section
 			var findUserInPad = rooms.find(x => x.padId === data.padId && x.userId === data.userId)
-			if (findUserInPad) return false
+			if (findUserInPad) return false;
 			rooms.push(data)
 
 			var userInCurrentRoom = rooms.filter(x => x.headingId === data.headingId && x.padId === data.padId)
@@ -61,7 +64,7 @@ exports.socketio = function (hookName, args, cb) {
 
 exports.eejsBlock_mySettings = function (hookName, args, cb) {
 	args.content = args.content + eejs.require("ep_wrtc_heading/templates/settings.ejs")
-	return cb()
+	return cb();
 }
 
 exports.eejsBlock_scripts = function (hookName, args, cb) {
@@ -70,17 +73,17 @@ exports.eejsBlock_scripts = function (hookName, args, cb) {
 	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/getUserMediaPolyfill.js?v=" + packageJson.version + "'></script>"
 	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtc.js?v=" + packageJson.version + "'></script>"
 	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtcRoom.js?v=" + packageJson.version + "'></script>"
-	return cb()
+	return cb();
 }
 
 exports.eejsBlock_styles = function (hookName, args, cb) {
 	args.content = args.content + eejs.require("ep_wrtc_heading/templates/styles.html", {}, module)
-	return cb()
+	return cb();
 }
 
 exports.eejsBlock_editorContainerBox = function (hookName, args, cb) {
 	args.content = args.content + eejs.require("ep_wrtc_heading/templates/webrtc.ejs", {}, module)
-	return cb()
+	return cb();
 }
 
 exports.clientVars = function (hook, context, callback) {
@@ -102,15 +105,20 @@ exports.clientVars = function (hook, context, callback) {
 		}
 	}
 
+	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoChatlimit) {
+		VIDEOCHATLIMIT = settings.ep_wrtc_heading.videoChatlimit
+	}
+
 	var result = {
 		webrtc: {
+			videoChatlimit: VIDEOCHATLIMIT,
 			iceServers: iceServers,
 			enabled: enabled,
 			video: video,
 		},
 	}
 
-	return callback(result)
+	return callback(result);
 }
 
 exports.handleMessage = function (hook, context, callback) {

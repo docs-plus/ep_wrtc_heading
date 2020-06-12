@@ -72,7 +72,7 @@ You can see metrics for various errors that users have when attempting to connec
 ## License
 This project is licensed under the [MIT License](./LICENSE).
 
-> Inspired and used [ep_webrtc](https://github.com/ether/ep_webrtc)
+> Inspire and use [ep_webrtc](https://github.com/ether/ep_webrtc)
 
 If you have any further questions, please don’t hesitate to contact us.
 <marzban98@gmail.com>

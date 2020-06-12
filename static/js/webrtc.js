@@ -48,7 +48,7 @@ var WRTC = (function () {
 			}
 			self.init(context.pad);
 		},
-		aceSetAuthorStyle: function aceSetAuthorStyle(hook, context) {
+		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
 			if (context.author) {
 				var user = self.getUserFromId(context.author);
 				if (user) {

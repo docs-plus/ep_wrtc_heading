@@ -1,5 +1,3 @@
-"use strict";
-
 var $ = require("ep_etherpad-lite/static/js/rjquery").$;
 var _ = require("ep_etherpad-lite/static/js/underscore");
 var randomString = require("ep_etherpad-lite/static/js/pad_utils").randomString;
@@ -10,7 +8,6 @@ var cssFiles = ["ep_wrtc_heading/static/css/wrtcRoom.css"];
 /************************************************************************/
 
 var EPwrtcHeading = (function () {
-	var padId = clientVars.padId;
 	var padOuter = null;
 	var padInner = null;
 	var outerBody = null;
@@ -28,6 +25,9 @@ var EPwrtcHeading = (function () {
 
 	function init() {
 
+		// join the user to WRTC room
+		WRTC_Room.initSocketJoin();
+
 		// find containers
 		padOuter = $('iframe[name="ace_outer"]').contents();
 		padInner = padOuter.find('iframe[name="ace_inner"]');
@@ -35,7 +35,7 @@ var EPwrtcHeading = (function () {
 
 		// insert wbrtc containers
 		var $target = outerBody;
-		if ($target.find("#wbrtc_chatBox").length > 0) return false;
+		if ($target.find("#wbrtc_chatBox").length) return false;
 		$target.prepend('<div id="wbrtc_chatBox"></div>');
 
 		// module settings
@@ -45,18 +45,16 @@ var EPwrtcHeading = (function () {
 
 		$("#options-wrtc-heading").trigger("change");
 
-		WRTC_Room.initSocketJoin();
 	}
 
 	// Set all video_heading to be inline with their target REP
 	function setYofHeadingBox () {
-		var $padOuter = padOuter;
-		var $padInner = padInner;
-
+		var $padOuter = $('iframe[name="ace_outer"]').contents()
+		if(!$padOuter) return;
 		$padOuter.find(".wbrtc_roomBox").each(function (index) {
 			var $boxId = $(this).attr("id");
 			var hClassId = "headingTagId_" + $boxId.split("_")[2];
-			var aceOuterPadding = parseInt($padInner.css("padding-top"));
+			var aceOuterPadding = parseInt($padOuter.find('iframe[name="ace_inner"]').css("padding-top"));
 			var $headingEl = $padOuter.find("iframe").contents().find("#innerdocbody").find("." + hClassId);
 
 			// if the H tags does not find remove chatBox
@@ -106,6 +104,7 @@ var hooks = {
 		$(window).resize(_.debounce(function () {
 			EPwrtcHeading.setYofHeadingBox();
 		}, 100));
+
 	},
 	aceEditEvent: function aceEditEvent(hook, context) {
 		var eventType = context.callstack.editEvent.eventType;
@@ -141,30 +140,16 @@ var hooks = {
 	aceEditorCSS: function aceEditorCSS() {
 		return cssFiles;
 	},
-	aceSetAuthorStyle: function aceSetAuthorStyle(hook, context, callback) {
-		if (context.author) {
-			var user = pad.collabClient.getConnectedUsers().find(function (user) {
-				return user.userId === context.author;
-			});
-			if (user) {
-				var $padOuter = $('iframe[name="ace_outer"]').contents();
-				$padOuter.find(".wbrtc_roomBoxBody ul li[data-id='" + user.userId + "']").css({ "border-color": user.colorId }).text(user.name);
-			}
-		}
-		WRTC.aceSetAuthorStyle(hook, context, callback);
+	aceSetAuthorStyle: function aceSetAuthorStyle(hook, context) {
+		WRTC_Room.aceSetAuthorStyle(context);
+		WRTC.aceSetAuthorStyle(context);
 	},
 	userLeave: function userLeave(hook, context, callback) {
+		WRTC_Room.leaveSession(hook, context, callback);
 		WRTC.userLeave(hook, context, callback);
-		var userId = context.userInfo.userId;
-		var data = {
-			padId: clientVars.padId,
-			userId: userId
-		};
-
-		WRTC_Room.leaveSession(data);
 	},
-	handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context, callback) {
-		WRTC.handleClientMessage_RTC_MESSAGE(hook, context, callback);
+	handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
+		WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
 	},
 	aceSelectionChanged: function aceSelectionChanged(rep, context) {
 		if (context.callstack.type === "insertheading") {

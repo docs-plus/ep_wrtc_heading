@@ -6,6 +6,14 @@ var WRTC_Room = (function () {
 	var currentUserRoom = {};
 
 	var self = {
+		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
+			if (context.author) {
+				var user = self.getUserFromId(context.author);
+				if (user) {
+					self.$body_ace_outer().find(".wbrtc_roomBoxBody ul li[data-id='" + user.userId + "']").css({ "border-color": user.colorId }).text(user.name);
+				}
+			}
+		},
 		isUserMediaAvailable: function isUserMediaAvailable() {
 			return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true })["catch"](function (err) {
 				WRTC.showUserMediaError(err);
@@ -42,11 +50,15 @@ var WRTC_Room = (function () {
 			var user = result.length > 0 ? result[0] : null;
 			return user;
 		},
-		leaveSession: function leaveSession(data) {
-			var _self = this;
+		leaveSession: function leaveSession(hook, context, callback) {
+			var data = {
+				padId: clientVars.padId,
+				userId: context.userInfo.userId
+			};
 			socket.emit("leaveSession", data, function (user) {
-				_self.removeUserFromRoom(user);
+				self.removeUserFromRoom(user);
 			});
+			callback();
 		},
 		removeUserFromRoom: function removeUserFromRoom(data) {
 			if (!data) return false;
@@ -62,7 +74,7 @@ var WRTC_Room = (function () {
 			$headingRoom.find(".userCoutn").text(userCount);
 
 			if (data.userId === clientVars.userId) {
-				WRTC.deactivate(data.userId, data.headingId);
+				// WRTC.deactivate(data.userId, data.headingId);
 				window.headingId = null;
 				currentUserRoom = {};
 				$headingRoom.find(".wbrtc_roomBoxFooter button").html("<b></b>(</span class='userCoutn'>" + userCount + "</span>)").attr({
@@ -97,7 +109,7 @@ var WRTC_Room = (function () {
 
 			if (data.userId === clientVars.userId) {
 				window.headingId = data.headingId;
-				WRTC.activate(data.headingId, user.userId);
+				// WRTC.activate(data.headingId, user.userId);
 				currentUserRoom = data;
 				var $button = $headingRoom.find(".wbrtc_roomBoxFooter button");
 				$button.attr({
@@ -189,7 +201,7 @@ var WRTC_Room = (function () {
 				$(this).attr({ "disabled": true });
 
 				if (actions === "JOIN") {
-					_self.isUserMediaAvailable().then(function () {
+					// _self.isUserMediaAvailable().then(function () {
 						if (currentUserRoom.userId) {
 							socket.emit("userLeave", currentUserRoom, function (_data) {
 								_self.removeUserFromRoom(_data);
@@ -202,7 +214,7 @@ var WRTC_Room = (function () {
 								_self.addUserToRoom(_data);
 							});
 						}
-					});
+					// });
 				} else {
 					socket.emit("userLeave", data, function (_data) {
 						_self.removeUserFromRoom(_data);
