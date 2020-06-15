@@ -1,7 +1,7 @@
 var $ = require("ep_etherpad-lite/static/js/rjquery").$;
 var _ = require("ep_etherpad-lite/static/js/underscore");
 var randomString = require("ep_etherpad-lite/static/js/pad_utils").randomString;
-var cssFiles = ["ep_wrtc_heading/static/css/wrtcRoom.css"];
+
 
 /************************************************************************/
 /*                              Plugin                                  */
@@ -138,14 +138,20 @@ var hooks = {
 		}
 	},
 	aceEditorCSS: function aceEditorCSS() {
-		return cssFiles;
+		var version = clientVars.webrtc.version || 1
+		return ["ep_wrtc_heading/static/css/wrtcRoom.css?v=" + version + ""];
 	},
 	aceSetAuthorStyle: function aceSetAuthorStyle(hook, context) {
 		WRTC_Room.aceSetAuthorStyle(context);
 		WRTC.aceSetAuthorStyle(context);
 	},
 	userLeave: function userLeave(hook, context, callback) {
-		WRTC_Room.leaveSession(hook, context, callback);
+		var userId = context.userInfo.userId;
+		var data = {
+			padId: clientVars.padId,
+			userId: userId
+		};
+		WRTC_Room.leaveSession(data);
 		WRTC.userLeave(hook, context, callback);
 	},
 	handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {

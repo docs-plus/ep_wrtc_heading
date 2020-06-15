@@ -77,7 +77,7 @@ exports.eejsBlock_scripts = function (hookName, args, cb) {
 }
 
 exports.eejsBlock_styles = function (hookName, args, cb) {
-	args.content = args.content + eejs.require("ep_wrtc_heading/templates/styles.html", {}, module)
+	args.content += '<link rel="stylesheet" href="../static/plugins/ep_wrtc_heading/static/css/rtcbox.css?v=' + packageJson.version + '" type="text/css" />'
 	return cb();
 }
 
@@ -111,6 +111,7 @@ exports.clientVars = function (hook, context, callback) {
 
 	var result = {
 		webrtc: {
+			version: packageJson.version,
 			videoChatlimit: VIDEOCHATLIMIT,
 			iceServers: iceServers,
 			enabled: enabled,

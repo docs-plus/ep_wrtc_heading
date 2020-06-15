@@ -15,7 +15,8 @@ var WRTC_Room = (function () {
 			}
 		},
 		isUserMediaAvailable: function isUserMediaAvailable() {
-			return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true })["catch"](function (err) {
+			var videoOption = clientVars.webrtc.video || { audio: true, video: true };
+			return window.navigator.mediaDevices.getUserMedia(videoOption)["catch"](function (err) {
 				WRTC.showUserMediaError(err);
 				console.error(err);
 			});
@@ -50,15 +51,10 @@ var WRTC_Room = (function () {
 			var user = result.length > 0 ? result[0] : null;
 			return user;
 		},
-		leaveSession: function leaveSession(hook, context, callback) {
-			var data = {
-				padId: clientVars.padId,
-				userId: context.userInfo.userId
-			};
+		leaveSession: function leaveSession(data) {
 			socket.emit("leaveSession", data, function (user) {
 				self.removeUserFromRoom(user);
 			});
-			callback();
 		},
 		removeUserFromRoom: function removeUserFromRoom(data) {
 			if (!data) return false;
@@ -201,7 +197,7 @@ var WRTC_Room = (function () {
 				$(this).attr({ "disabled": true });
 
 				if (actions === "JOIN") {
-					// _self.isUserMediaAvailable().then(function () {
+					_self.isUserMediaAvailable().then(function () {
 						if (currentUserRoom.userId) {
 							socket.emit("userLeave", currentUserRoom, function (_data) {
 								_self.removeUserFromRoom(_data);
@@ -214,7 +210,7 @@ var WRTC_Room = (function () {
 								_self.addUserToRoom(_data);
 							});
 						}
-					// });
+					});
 				} else {
 					socket.emit("userLeave", data, function (_data) {
 						_self.removeUserFromRoom(_data);
