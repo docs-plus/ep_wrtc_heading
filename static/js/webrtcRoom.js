@@ -1,9 +1,13 @@
+"use strict";
+
 var WRTC_Room = (function () {
 	var loc = document.location;
 	var port = loc.port === "" ? loc.protocol === "https:" ? 443 : 80 : loc.port;
 	var url = loc.protocol + "//" + loc.hostname + ":" + port + "/" + "heading_chat_room";
 	var socket = io.connect(url);
 	var currentUserRoom = {};
+	var VIDEOCHATLIMIT = 0;
+	var $lastJoinButton = null;
 
 	var self = {
 		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
@@ -15,8 +19,7 @@ var WRTC_Room = (function () {
 			}
 		},
 		isUserMediaAvailable: function isUserMediaAvailable() {
-			var videoOption = clientVars.webrtc.video || { audio: true, video: true };
-			return window.navigator.mediaDevices.getUserMedia(videoOption)["catch"](function (err) {
+			return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true })["catch"](function (err) {
 				WRTC.showUserMediaError(err);
 				console.error(err);
 			});
@@ -27,8 +30,10 @@ var WRTC_Room = (function () {
 		init: function init() {
 			var _self = this;
 			this._pad = window.pad;
+			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
+
 			socket.on("userJoin", function (data) {
-				_self.addUserToRoom(data);
+				self.socketUserJoin(data, false);
 			});
 
 			socket.on("userLeave", function (data) {
@@ -195,28 +200,45 @@ var WRTC_Room = (function () {
 				};
 
 				$(this).attr({ "disabled": true });
+				$lastJoinButton = $(this);
 
 				if (actions === "JOIN") {
+
 					_self.isUserMediaAvailable().then(function () {
-						if (currentUserRoom.userId) {
-							socket.emit("userLeave", currentUserRoom, function (_data) {
-								_self.removeUserFromRoom(_data);
-								socket.emit("userJoin", data, function (_data) {
-									_self.addUserToRoom(_data);
-								});
-							});
-						} else {
-							socket.emit("userJoin", data, function (_data) {
-								_self.addUserToRoom(_data);
-							});
-						}
+						
+						if (!currentUserRoom.userId) return socket.emit("userJoin", data, self.socketUserJoin);
+
+						// if user join the video-chat before, first leave that chatroom
+						// then join to the new chatroom
+						socket.emit("userLeave", currentUserRoom, function (_data) {
+							self.socketUserLeave(_data);
+							socket.emit("userJoin", data, self.socketUserJoin);
+						});
+
 					});
 				} else {
-					socket.emit("userLeave", data, function (_data) {
-						_self.removeUserFromRoom(_data);
-					});
+					socket.emit("userLeave", data, self.socketUserLeave);
 				}
 			});
+		},
+		reachedChatRoomSize: function reachedChatRoomSize(present, showAlert) {
+			if (present < VIDEOCHATLIMIT) return true;
+			showAlert = showAlert || true;
+			if (showAlert) $.gritter.add({
+					title: "Video chat Limitation",
+					text: "The video-chat room has been reached its limitation. \r\n <br> The size of this video-chat room is " + VIDEOCHATLIMIT + ".",
+					sticky: false,
+					class_name: "error",
+					time: '6000'
+				});
+			$lastJoinButton.attr({ "disabled": false });
+			return false;
+		},
+		socketUserJoin: function socketUserJoin(data, showAlert) {
+			if (self.reachedChatRoomSize(data.users.present, showAlert)) self.addUserToRoom(data);
+		},
+		socketUserLeave: function socketUserLeave(data) {
+			self.removeUserFromRoom(data);
 		}
 	};
 

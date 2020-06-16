@@ -9,8 +9,7 @@ var packageJson = require('./package.json');
 
 // Make sure any updates to this are reflected in README
 var statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
-var VIDEOCHATLIMIT = 10
-
+var VIDEOCHATLIMIT = 4;
 
 exports.socketio = function (hookName, args, cb) {
 	socketio = args.io
@@ -26,12 +25,21 @@ exports.socketio = function (hookName, args, cb) {
 			// find user in current pad, user can only join in one heading room in each pad section
 			var findUserInPad = rooms.find(x => x.padId === data.padId && x.userId === data.userId)
 			if (findUserInPad) return false;
-			rooms.push(data)
 
-			var userInCurrentRoom = rooms.filter(x => x.headingId === data.headingId && x.padId === data.padId)
-			Object.assign(data, { userCount: userInCurrentRoom.length })
+			var usersInCurrentRoom = rooms.filter(x => x.headingId === data.headingId && x.padId === data.padId)
 
-			socket.broadcast.to(data.padId).emit("userJoin", data)
+			var users = {
+				present: usersInCurrentRoom.length,
+				list: usersInCurrentRoom
+			};
+
+			data = { ...data, users }
+
+			if(users.present < VIDEOCHATLIMIT){
+				rooms.push(data);
+				socket.broadcast.to(data.padId).emit("userJoin", data)
+			}
+
 			callback(data)
 		})
 
@@ -105,14 +113,14 @@ exports.clientVars = function (hook, context, callback) {
 		}
 	}
 
-	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoChatlimit) {
-		VIDEOCHATLIMIT = settings.ep_wrtc_heading.videoChatlimit
+	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoChatLimit) {
+		VIDEOCHATLIMIT = settings.ep_wrtc_heading.videoChatLimit
 	}
 
 	var result = {
 		webrtc: {
 			version: packageJson.version,
-			videoChatlimit: VIDEOCHATLIMIT,
+			videoChatLimit: VIDEOCHATLIMIT,
 			iceServers: iceServers,
 			enabled: enabled,
 			video: video,

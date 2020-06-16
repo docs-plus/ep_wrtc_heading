@@ -56,6 +56,13 @@ To set a custom small and/or large size in pixels, for the video displays, set o
 }
 ```
 
+To set Limitation for video-chat room:
+```json
+"ep_wrtc_heading": {
+  "videoChatLimit": 4 // default
+}
+```
+
 ## Metrics
 You can see metrics for various errors that users have when attempting to connect their camera/microphone:
 
