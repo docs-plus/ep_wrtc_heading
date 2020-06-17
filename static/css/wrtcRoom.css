@@ -76,6 +76,10 @@
 	background: #64d29b;
 	color: #ffffff;
 }
+.wbrtc_roomBox > .wbrtc_roomBoxFooter > button.deactivate{
+	background: #576273;
+}
+
 
 .wbrtc_roomBox > .wbrtc_roomBoxFooter > button {
 	border-radius: 3px;

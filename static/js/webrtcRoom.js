@@ -83,7 +83,7 @@ var WRTC_Room = (function () {
 					"data-action": "JOIN",
 					"class": "active",
 					"disabled": false
-				}).find("b").text("JOIN");
+				}).removeClass('deactivate').find("b").text("JOIN");
 				$("#rtcbox .chatTitle").remove();
 			}
 		},
@@ -108,6 +108,15 @@ var WRTC_Room = (function () {
 
 			$headingRoom.find(".userCoutn").text(userCount);
 
+			if(data.headingId === currentUserRoom.headingId && data.userId !== clientVars.userId)
+				$.gritter.add({
+					text: '<span class="author-name">' + user.name + '</span>' + 'has joined the video-chat, <b><i> "' + headerText + '"</b></i>',
+					sticky: false,
+					time: 3000,
+					position: 'bottom',
+					class_name: 'chat-gritter-msg'
+				});
+
 			if (data.userId === clientVars.userId) {
 				window.headingId = data.headingId;
 				WRTC.activate(data.headingId, user.userId);
@@ -118,8 +127,7 @@ var WRTC_Room = (function () {
 					"data-action": "LEAVE",
 					"class": "",
 					"disabled": false
-				}).html("<b>LEAVE</b>");
-				var headerText = $headingRoom.find(".wbrtc_roomBoxHeader b").text();
+				}).removeClass("deactivate").html("<b>LEAVE</b>");
 				$("#rtcbox").prepend('<h4 class="chatTitle">' + headerText + '</h4>');
 			}
 		},
@@ -199,7 +207,7 @@ var WRTC_Room = (function () {
 					headingId: headingId
 				};
 
-				$(this).attr({ "disabled": true });
+				$(this).addClass('deactivate').attr({ "disabled": true });
 				$lastJoinButton = $(this);
 
 				if (actions === "JOIN") {
@@ -229,9 +237,9 @@ var WRTC_Room = (function () {
 					text: "The video-chat room has been reached its limitation. \r\n <br> The size of this video-chat room is " + VIDEOCHATLIMIT + ".",
 					sticky: false,
 					class_name: "error",
-					time: '6000'
+					time: '5000'
 				});
-			$lastJoinButton.attr({ "disabled": false });
+			$lastJoinButton.addClass("deactivate").attr({ "disabled": false });
 			return false;
 		},
 		socketUserJoin: function socketUserJoin(data, showAlert) {
