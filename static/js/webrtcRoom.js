@@ -96,6 +96,8 @@ var WRTC_Room = (function () {
 			// some user may session does exist but the userinfo does not avilable in all over current pad
 			if (!user) return true;
 
+			var headerText = $headingRoom.find(".wbrtc_roomBoxHeader b").text();
+
 			// if user exist in the room do not add it any more
 			var IsUserInRooms = $headingRoom.find(".wbrtc_roomBoxBody ul li[data-id='" + user.userId + "']").text();
 			if (IsUserInRooms) return false;
