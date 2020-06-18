@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+"use strict";
 
 var WRTC = (function () {
 	var videoSizes = { large: "260px", small: "160px" };
@@ -128,7 +129,7 @@ var WRTC = (function () {
 			self.hide();
 		},
 		hide: function hide(userId) {
-			if(!userId) return false;
+			if (!userId) return false;
 			userId = userId.split(".")[1];
 			$("#rtcbox").find("#video_a_" + userId).parent().remove();
 		},
@@ -179,7 +180,7 @@ var WRTC = (function () {
 			return user;
 		},
 		setStream: function setStream(userId, stream) {
-			if(!userId) return false;
+			if (!userId) return false;
 			var isLocal = userId === self.getUserId();
 			var videoId = "video_" + userId.replace(/\./g, "_");
 			var video = $("#" + videoId)[0];
@@ -190,7 +191,7 @@ var WRTC = (function () {
 				var videoContainer = $("<div class='video-container'>").css({
 					width: videoSizes.small,
 					"max-height": videoSizes.small
-				}).appendTo($("#rtcbox"));
+				}).appendTo($("#rtcbox .videoWrapper"));
 
 				videoContainer.append($('<div class="user-name">').text(user.name));
 
@@ -218,7 +219,7 @@ var WRTC = (function () {
 			}
 		},
 		addInterface: function addInterface(userId) {
-			if(!userId) return false;
+			if (!userId) return false;
 			var isLocal = userId === self.getUserId();
 			var videoId = "video_" + userId.replace(/\./g, "_");
 			var $video = $("#" + videoId);
@@ -354,8 +355,7 @@ var WRTC = (function () {
 				self.setStream(userId, "");
 				pc[userId].close();
 				delete pc[userId];
-				if(notify)
-					self.sendMessage(userId, { type: "hangup", headingId: headingId });
+				if (notify) self.sendMessage(userId, { type: "hangup", headingId: headingId });
 			}
 		},
 		call: function call(userId, headingId) {

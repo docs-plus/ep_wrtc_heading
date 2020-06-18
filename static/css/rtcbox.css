@@ -1,14 +1,22 @@
 #rtcbox {
 	display: none;
+	padding: 0;
+	order: -1; /* on left side */
+
+}
+
+#rtcbox .videoWrapper{
+	display: flex;
 	flex-direction: column;
 	justify-content: start;
 	padding: 0;
-	order: -1; /* on left side */
 	box-sizing: border-box;
 	background-color: transparent;
 	height: auto;
 	overflow: auto;
+  flex-shrink: 0;
 }
+
 #rtcbox.active{
 	display: flex;
 }
@@ -21,8 +29,8 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
-	background: #fff;
-	border-radius: 8px 6px 6px 8px;
+	/* background: #fff; */
+	/* border-radius: 8px 6px 6px 8px; */
 	/* box-shadow: 1px 1px 3px rgba(0,0,0,0.1); */
 }
 
@@ -121,25 +129,43 @@
 	opacity: 1;
 }
 
-@media (max-width: 1400px) {
-	#rtcbox > .chatTitle{
-		width: 180px;
-	}
-}
-
-@media (max-width: 800px) {
-	#editorcontainerbox {
+@media (max-width: 1500px) {
+	 /* #editorcontainerbox {
 		flex-direction: column;
+	} */
+	#rtcbox > .chatTitle{
+		width: 280px;
+    position: absolute;
+		top: -38px;
+		margin: 0;
 	}
+
 	#rtcbox {
 		flex-direction: row;
 		flex-shrink: 0;
 		order: 2;
 		justify-content: start;
 		align-items: baseline;
+		display: flex;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: #eee;
 	}
 	#rtcbox .video-container:not(:first-child) {
 		margin-top: 0;
 		margin-left: 5px;
+	}
+	#rtcbox .videoWrapper{
+		flex-direction: row;
+	}
+}
+
+@media (min-width: 1500px) {
+	#rtcbox.active{
+		display: block;
+		position: relative;
+		left: 0;
+		top: 0;
 	}
 }

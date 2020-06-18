@@ -1,13 +1,24 @@
 /* Comment right side container */
 #wbrtc_chatBox {
-	order: 1;
+	order: -1;
 	position: relative;
-	z-index: 9;
+	z-index: 20;
+	/* left: -72px; */
+	overflow: hidden;
+	width: 66px;
 }
+
+
+@media (max-width: 1500px) {
+	#wbrtc_chatBox {
+		order: -1;
+	}
+}
+
 #wbrtc_chatBox:not(.active) {
 	display: none;
 }
-@media (max-width: 900px) {
+@media (max-width: 800px) {
 	#wbrtc_chatBox {
 		display: none !important;
 	}
@@ -23,19 +34,22 @@
 	font-weight: bold;
 	font-size: 12px;
 	line-height: 15px;
-	margin-left: 14px;
+	/* margin-left: 14px; */
 	width: 100%;
 	max-width: 360px;
 	min-width: 230px;
 }
 
 .wbrtc_roomBox > .wbrtc_roomBoxHeader {
-	padding: 8px;
+	padding: 6px;
+	overflow: hidden;
+	line-height: 15px;
 }
 
 .wbrtc_roomBox.active {
 	background: #ffffff;
 	z-index: 2;
+	border: 1px solid;
 }
 
 .wbrtc_roomBox > .wbrtc_roomBoxHeader b {
@@ -43,19 +57,40 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
+	float: left;
+	max-width: 124px;
+}
+
+.wbrtc_roomBox > .wbrtc_roomBoxHeader .btn_share{
+	width: 18px;
+	float: right;
+}
+
+.wbrtc_roomBox > .wbrtc_roomBoxHeader span.videoIcon{
+	width: 18px;
+	margin-right: 8px;
+}
+
+.wbrtc_roomBox > .wbrtc_roomBoxHeader span:last-of-type{
+	margin-right: 8px
 }
 
 .wbrtc_roomBox > .wbrtc_roomBoxHeader span {
-	width: 18px;
 	display: inherit;
 	float: left;
-	margin-right: 10px;
 }
 
 .wbrtc_roomBox > .wbrtc_roomBoxFooter {
 	padding: 8px;
 	display: none;
 }
+
+.wbrtc_roomBox > .wbrtc_roomBoxFooter .btn_share {
+	border: 1px solid;
+	padding: 5px 8px;
+	float: right;
+}
+
 .wbrtc_roomBoxBody {
 	padding: 8px;
 	border-top: 1px solid #f2f3f4;

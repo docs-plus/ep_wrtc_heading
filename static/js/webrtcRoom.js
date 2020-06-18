@@ -8,6 +8,7 @@ var WRTC_Room = (function () {
 	var currentUserRoom = {};
 	var VIDEOCHATLIMIT = 0;
 	var $lastJoinButton = null;
+	var prefixId = "wbrtc_roomBox_";
 
 	var self = {
 		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
@@ -47,6 +48,35 @@ var WRTC_Room = (function () {
 			});
 
 			_self.activeEventListenr();
+			setTimeout(function () {
+				self.joinByQueryString();
+			}, 400);
+		},
+		joinByQueryString: function joinByQueryString() {
+			var urlParams = new URLSearchParams(window.location.search);
+			var headingId = urlParams.get('heading');
+			var joinvideo = urlParams.get('joinvideo');
+			if (headingId && joinvideo === "true") {
+				var data = {
+					padId: clientVars.padId,
+					userId: clientVars.userId,
+					userName: clientVars.userName || "anonymous",
+					headingId: prefixId + headingId
+				};
+
+				self.isUserMediaAvailable().then(function () {
+
+					if (!currentUserRoom.userId) return socket.emit("userJoin", data, self.socketUserJoin);
+					// if user join the video-chat before, first leave that chatroom
+					// then join to the new chatroom
+					socket.emit("userLeave", currentUserRoom, function (_data) {
+						self.socketUserLeave(_data);
+						socket.emit("userJoin", data, self.socketUserJoin);
+					});
+				});
+
+				// self.socketUserJoin(data, true);
+			}
 		},
 		getUserFromId: function getUserFromId(userId) {
 			if (!this._pad || !this._pad.collabClient) return null;
@@ -78,12 +108,11 @@ var WRTC_Room = (function () {
 				WRTC.deactivate(data.userId, data.headingId);
 				window.headingId = null;
 				currentUserRoom = {};
-				$headingRoom.find(".wbrtc_roomBoxFooter button").html("<b></b>(</span class='userCoutn'>" + userCount + "</span>)").attr({
+				$headingRoom.find(".wbrtc_roomBoxFooter button.btn_door").html("<b></b>").attr({
 					"data-userId": data.userId,
 					"data-action": "JOIN",
-					"class": "active",
 					"disabled": false
-				}).removeClass('deactivate').find("b").text("JOIN");
+				}).addClass('active').removeClass('deactivate').find("b").text("JOIN");
 				$("#rtcbox .chatTitle").remove();
 			}
 		},
@@ -110,26 +139,24 @@ var WRTC_Room = (function () {
 
 			$headingRoom.find(".userCoutn").text(userCount);
 
-			if(data.headingId === currentUserRoom.headingId && data.userId !== clientVars.userId)
-				$.gritter.add({
-					text: '<span class="author-name">' + user.name + '</span>' + 'has joined the video-chat, <b><i> "' + headerText + '"</b></i>',
-					sticky: false,
-					time: 3000,
-					position: 'bottom',
-					class_name: 'chat-gritter-msg'
-				});
+			if (data.headingId === currentUserRoom.headingId && data.userId !== clientVars.userId) $.gritter.add({
+				text: '<span class="author-name">' + user.name + '</span>' + 'has joined the video-chat, <b><i> "' + headerText + '"</b></i>',
+				sticky: false,
+				time: 3000,
+				position: 'bottom',
+				class_name: 'chat-gritter-msg'
+			});
 
 			if (data.userId === clientVars.userId) {
 				window.headingId = data.headingId;
 				WRTC.activate(data.headingId, user.userId);
 				currentUserRoom = data;
-				var $button = $headingRoom.find(".wbrtc_roomBoxFooter button");
+				var $button = $headingRoom.find(".wbrtc_roomBoxFooter button.btn_door");
 				$button.attr({
 					"data-userId": user.userId,
 					"data-action": "LEAVE",
-					"class": "",
 					"disabled": false
-				}).removeClass("deactivate").html("<b>LEAVE</b>");
+				}).removeClass("deactivate active").html("<b>LEAVE</b>");
 				$("#rtcbox").prepend('<h4 class="chatTitle">' + headerText + '</h4>');
 			}
 		},
@@ -143,11 +170,13 @@ var WRTC_Room = (function () {
 			hElements = hElements.join(",");
 			var hTags = _self.$body_ace_outer().find("iframe").contents().find("#innerdocbody").children("div").children(hElements);
 			var aceOuterPadding = parseInt(_self.$body_ace_outer().find('iframe[name="ace_inner"]').css("padding-top"));
-
+			var aceInnerOffset = _self.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
 			$(hTags).each(function () {
 				var lineNumber = $(this).parent().prevAll().length;
 				var tag = $(this).prop("tagName").toLowerCase();
-				var newY = Math.floor($(this).context.offsetTop + aceOuterPadding);
+				var offset = $(this).offset();
+				var newY = Math.floor(offset.top + aceOuterPadding);
+				var newX = Math.floor(aceInnerOffset.left);
 				var linkText = $(this).text();
 				var headingTagId = $(this).find("span").attr("class");
 				headingTagId = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(headingTagId);
@@ -156,8 +185,10 @@ var WRTC_Room = (function () {
 					headingTagId: "wbrtc_roomBox_" + headingTagId[1],
 					tag: tag,
 					y: newY,
+					x: newX,
 					text: linkText,
-					lineNumber: lineNumber
+					lineNumber: lineNumber,
+					url: window.location.origin + window.location.pathname + "?heading=" + headingTagId[1] + "&joinvideo=true"
 				});
 			});
 
@@ -167,8 +198,11 @@ var WRTC_Room = (function () {
 				var data = {
 					lineNumber: el.lineNumber,
 					positionTop: el.y,
+					positionLeft: el.x,
 					headTitle: el.text,
-					headingTagId: el.headingTagId
+					headingTagId: el.headingTagId,
+					url: el.url,
+					videoChatLimit: VIDEOCHATLIMIT
 				};
 				// if the new heading does not exists
 				if (target.find("#" + el.headingTagId).length <= 0) {
@@ -188,17 +222,21 @@ var WRTC_Room = (function () {
 			});
 		},
 		activeEventListenr: function activeEventListenr() {
-			var _self = this;
 
-			_self.$body_ace_outer().on("mouseover", ".wbrtc_roomBox", function () {
-				$(this).addClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").show();
+			self.$body_ace_outer().on("mouseover", ".wbrtc_roomBox", function () {
+				var $this = $(this);
+				self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "inherit" }).animate({}, 10, function () {
+					$this.addClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").show('fast');
+				});
 			});
 
-			_self.$body_ace_outer().on("mouseleave", ".wbrtc_roomBox", function () {
-				$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").hide();
+			self.$body_ace_outer().on("mouseleave", ".wbrtc_roomBox", function () {
+				$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "none" }).animate({}, 10, function () {
+					self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "auto" });
+				});
 			});
 
-			_self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button", function () {
+			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_door", function () {
 				var parent = $(this).parent().parent();
 				var headingId = parent.attr("id");
 				var actions = $(this).attr("data-action");
@@ -214,8 +252,8 @@ var WRTC_Room = (function () {
 
 				if (actions === "JOIN") {
 
-					_self.isUserMediaAvailable().then(function () {
-						
+					self.isUserMediaAvailable().then(function () {
+
 						if (!currentUserRoom.userId) return socket.emit("userJoin", data, self.socketUserJoin);
 
 						// if user join the video-chat before, first leave that chatroom
@@ -224,23 +262,42 @@ var WRTC_Room = (function () {
 							self.socketUserLeave(_data);
 							socket.emit("userJoin", data, self.socketUserJoin);
 						});
-
 					});
 				} else {
 					socket.emit("userLeave", data, self.socketUserLeave);
 				}
+			});
+
+			function copyToClipboard(text) {
+				var $temp = $("<input>");
+				$("body").append($temp);
+				$temp.val(text).select();
+				document.execCommand("copy");
+				$temp.remove();
+				$.gritter.add({
+					title: "Copied",
+					text: "Join link copied to clip board",
+					sticky: false,
+					class_name: "copyToClipboard",
+					time: '3000'
+				});
+			}
+
+			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_share", function () {
+				var url = $(this).find("input").val();
+				copyToClipboard(url);
 			});
 		},
 		reachedChatRoomSize: function reachedChatRoomSize(present, showAlert) {
 			if (present < VIDEOCHATLIMIT) return true;
 			showAlert = showAlert || true;
 			if (showAlert) $.gritter.add({
-					title: "Video chat Limitation",
-					text: "The video-chat room has been reached its limitation. \r\n <br> The size of this video-chat room is " + VIDEOCHATLIMIT + ".",
-					sticky: false,
-					class_name: "error",
-					time: '5000'
-				});
+				title: "Video chat Limitation",
+				text: "The video-chat room has been reached its limitation. \r\n <br> The size of this video-chat room is " + VIDEOCHATLIMIT + ".",
+				sticky: false,
+				class_name: "error",
+				time: '5000'
+			});
 			$lastJoinButton.addClass("deactivate").attr({ "disabled": false });
 			return false;
 		},
