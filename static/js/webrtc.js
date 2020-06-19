@@ -38,6 +38,7 @@ var WRTC = (function () {
 	var self = {
 		// API HOOKS
 		postAceInit: function postAceInit(hook, context) {
+			$("#editorcontainer").append('<div id="rtcbox" class="thin-scrollbar"><div class="videoWrapper" class="thin-scrollbar"></div></div>')
 			pcConfig.iceServers = clientVars.webrtc && clientVars.webrtc.iceServers ? clientVars.webrtc.iceServers : [{
 				url: "stun:stun.l.google.com:19302"
 			}];

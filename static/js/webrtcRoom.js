@@ -225,14 +225,18 @@ var WRTC_Room = (function () {
 
 			self.$body_ace_outer().on("mouseover", ".wbrtc_roomBox", function () {
 				var $this = $(this);
-				self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "inherit" }).animate({}, 10, function () {
+				self.$body_ace_outer().find("#wbrtc_chatBox")
+				.css({ overflow: "inherit" })
+				.animate({}, 10, function () {
 					$this.addClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").show('fast');
 				});
 			});
 
 			self.$body_ace_outer().on("mouseleave", ".wbrtc_roomBox", function () {
-				$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "none" }).animate({}, 10, function () {
-					self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "auto" });
+				$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b")
+				.css({ display: "none" })
+				.animate({ display: "none" }, 10, function () {
+					self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "hidden" });
 				});
 			});
 

@@ -5,6 +5,19 @@
 
 }
 
+#editorcontainerbox #editorcontainer{
+	flex-direction: column;
+}
+
+#editorcontainerbox #editorcontainer iframe{
+	height: 100%;
+}
+
+#editorcontainer .editor_title{
+	display: none;
+}
+
+
 #rtcbox .videoWrapper{
 	display: flex;
 	flex-direction: column;
@@ -138,6 +151,7 @@
     position: absolute;
 		top: -38px;
 		margin: 0;
+		background: #f8f9fa;
 	}
 
 	#rtcbox {
@@ -147,7 +161,7 @@
 		justify-content: start;
 		align-items: baseline;
 		display: flex;
-    position: absolute;
+    position: relative;
     bottom: 0;
     width: 100%;
     background: #eee;
