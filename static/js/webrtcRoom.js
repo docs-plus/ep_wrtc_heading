@@ -74,8 +74,6 @@ var WRTC_Room = (function () {
 						socket.emit("userJoin", data, self.socketUserJoin);
 					});
 				});
-
-				// self.socketUserJoin(data, true);
 			}
 		},
 		getUserFromId: function getUserFromId(userId) {
@@ -139,13 +137,24 @@ var WRTC_Room = (function () {
 
 			$headingRoom.find(".userCoutn").text(userCount);
 
-			if (data.headingId === currentUserRoom.headingId && data.userId !== clientVars.userId) $.gritter.add({
-				text: '<span class="author-name">' + user.name + '</span>' + 'has joined the video-chat, <b><i> "' + headerText + '"</b></i>',
-				sticky: false,
-				time: 3000,
-				position: 'bottom',
-				class_name: 'chat-gritter-msg'
-			});
+			var msg = {
+				time: new Date(),
+				userId: user.userId,
+				text: "has joined the video-chat <b>" + headerText + "</b> <a class='txt_shareLink' href='" + self.createSahreLink(data.headingId) + "'>Join</a>",
+				userName: user.name
+			};
+			// notify a user join the video-chat room
+			self.addTextChatMessage(msg);
+
+			if (data.headingId === currentUserRoom.headingId && data.userId !== clientVars.userId) {
+				$.gritter.add({
+					text: '<span class="author-name">' + user.name + '</span>' + 'has joined the video-chat, <b><i> "' + headerText + '"</b></i>',
+					sticky: false,
+					time: 3000,
+					position: 'bottom',
+					class_name: 'chat-gritter-msg'
+				});
+			}
 
 			if (data.userId === clientVars.userId) {
 				window.headingId = data.headingId;
@@ -160,8 +169,38 @@ var WRTC_Room = (function () {
 				$("#rtcbox").prepend('<h4 class="chatTitle">' + headerText + '</h4>');
 			}
 		},
+		scrollDown: function scrollDown(force) {
+			if ($('#chatbox').hasClass('visible')) {
+				if (force || !self.lastMessage || !self.lastMessage.position() || self.lastMessage.position().top < $('#chattext').outerHeight() + 20) {
+					$('#chattext').animate({ scrollTop: $('#chattext')[0].scrollHeight }, { duration: 400, queue: false });
+					self.lastMessage = $('#chattext > p').eq(-1);
+				}
+			}
+		},
+		addTextChatMessage: function addTextChatMessage(msg) {
+			var authorClass = "author-" + msg.userId.replace(/[^a-y0-9]/g, function (c) {
+				if (c == ".") return "-";
+				return 'z' + c.charCodeAt(0) + 'z';
+			});
+
+			//create the time string
+			var minutes = "" + new Date(msg.time).getMinutes();
+			var hours = "" + new Date(msg.time).getHours();
+			if (minutes.length == 1) minutes = "0" + minutes;
+			if (hours.length == 1) hours = "0" + hours;
+			var timeStr = hours + ":" + minutes;
+
+			var html = "<p data-authorId='" + msg.userId + "' class='" + authorClass + "'><b>" + msg.userName + ":</b><span class='time " + authorClass + "'>" + timeStr + "</span> " + msg.text + "</p>";
+
+			$(document).find("#chatbox #chattext").append(html);
+			self.scrollDown();
+		},
 		$body_ace_outer: function $body_ace_outer() {
 			return $('iframe[name="ace_outer"]').contents();
+		},
+		createSahreLink: function createSahreLink(headingTagId) {
+			var headingTagId = /(?:^| )wbrtc_roomBox_([A-Za-z0-9]*)/.exec(headingTagId);
+			return window.location.origin + window.location.pathname + "?heading=" + headingTagId[1] + "&joinvideo=true";
 		},
 		findTags: function findTags() {
 			var _self = this;
@@ -225,17 +264,13 @@ var WRTC_Room = (function () {
 
 			self.$body_ace_outer().on("mouseover", ".wbrtc_roomBox", function () {
 				var $this = $(this);
-				self.$body_ace_outer().find("#wbrtc_chatBox")
-				.css({ overflow: "inherit" })
-				.animate({}, 10, function () {
+				self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "inherit" }).animate({}, 10, function () {
 					$this.addClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").show('fast');
 				});
 			});
 
 			self.$body_ace_outer().on("mouseleave", ".wbrtc_roomBox", function () {
-				$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b")
-				.css({ display: "none" })
-				.animate({ display: "none" }, 10, function () {
+				$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "none" }).animate({ display: "none" }, 10, function () {
 					self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "hidden" });
 				});
 			});
