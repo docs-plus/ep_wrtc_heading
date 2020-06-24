@@ -9,6 +9,7 @@ var WRTC_Room = (function () {
 	var VIDEOCHATLIMIT = 0;
 	var $lastJoinButton = null;
 	var prefixId = "wbrtc_roomBox_";
+	var prefixHeaderId = "headingTagId_";
 
 	var self = {
 		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
@@ -64,8 +65,15 @@ var WRTC_Room = (function () {
 					headingId: prefixId + headingId
 				};
 
-				self.isUserMediaAvailable().then(function () {
+				// scroll down to header
+				var padContainer = self.$body_ace_outer().find("iframe").contents().find("#innerdocbody");
 
+				padContainer.find("."+ prefixHeaderId+headingId)[0]
+				.scrollIntoView({
+					behavior: 'smooth' 
+				});
+		
+				self.isUserMediaAvailable().then(function () {
 					if (!currentUserRoom.userId) return socket.emit("userJoin", data, self.socketUserJoin);
 					// if user join the video-chat before, first leave that chatroom
 					// then join to the new chatroom

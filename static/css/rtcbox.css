@@ -1,8 +1,7 @@
 #rtcbox {
 	display: none;
 	padding: 0;
-	order: -1; /* on left side */
-
+	order: -1;
 }
 
 #editorcontainerbox #editorcontainer{
@@ -13,10 +12,9 @@
 	height: 100%;
 }
 
-#editorcontainer .editor_title{
-	display: none;
+#editorcontainer #editor_title{
+	display: none!important;
 }
-
 
 #rtcbox .videoWrapper{
 	display: flex;
@@ -42,9 +40,6 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
-	/* background: #fff; */
-	/* border-radius: 8px 6px 6px 8px; */
-	/* box-shadow: 1px 1px 3px rgba(0,0,0,0.1); */
 }
 
 #rtcbox .error-msg {
@@ -115,7 +110,7 @@
 	transition: opacity 0.2s, background-color 0.2s;
 	position: absolute;
 	top: 0;
-	left: 5px; /* border-width */
+	left: 5px; 
 	right: 0;
 	opacity: 1;
 	background-color: rgba(255, 255, 255, 0.8);
@@ -130,7 +125,7 @@
 	text-overflow: ellipsis;
 }
 #rtcbox .video-container.local-user {
-	order: -1; /* first position */
+	order: -1; 
 }
 #rtcbox .video-container:hover .interface-btn,
 #rtcbox .video-container:hover .user-name,
@@ -143,9 +138,6 @@
 }
 
 @media (max-width: 1600px) {
-	 /* #editorcontainerbox {
-		flex-direction: column;
-	} */
 	#rtcbox > .chatTitle{
 		width: 280px;
     position: absolute;
