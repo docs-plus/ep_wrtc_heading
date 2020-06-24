@@ -63,7 +63,7 @@ exports.socketio = function (hookName, args, cb) {
 
 		// remove the room that not available and excrete user from room
 		socket.on("bulkUpdateRooms", function (padId, heading, callback) {
-			rooms = rooms.filter(el => heading.find(x => x.headingTagId === el.headingId))
+			rooms = rooms.filter(el => heading.find(x => x.padId === padId && x.headingTagId === el.headingId))
 			socket.broadcast.to(padId).emit("bulkUpdateRooms", rooms)
 			callback(rooms)
 		})
