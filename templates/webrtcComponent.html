@@ -1,5 +1,20 @@
 <script src="../static/plugins/ep_wrtc_heading/static/js/jquery.tmpl.min.js"></script>
 
+<script id="wertc_pad_title" type="text/html">
+	<div id="wrtc_roomInfo" class="">
+		<p>
+			<span class="userCoutn">${userCount}</span><span>/${videoChatLimit}</span>
+			<span class="videoIcon">
+				<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="video" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-video fa-w-18 fa-2x"><path fill="currentColor" d="M336.2 64H47.8C21.4 64 0 85.4 0 111.8v288.4C0 426.6 21.4 448 47.8 448h288.4c26.4 0 47.8-21.4 47.8-47.8V111.8c0-26.4-21.4-47.8-47.8-47.8zm189.4 37.7L416 177.3v157.4l109.6 75.5c21.2 14.6 50.4-.3 50.4-25.8V127.5c0-25.4-29.1-40.4-50.4-25.8z"class=""></path></svg>
+			</span>
+		</p>
+		<p class="RoomTitle">
+			${headTitle}
+		</p>
+		<button data-headid="${headingTagId}" data-action="LEAVE">LEAVE</button>
+	</div>
+</script>
+
 <script id="wertc_roomBox" type="text/html">
 	<div class='wbrtc_roomBox' data-x="${positionLeft}" data-y="${positionTop}" id="${headingTagId}" style="top:${positionTop}px">
 	    <div class='wbrtc_roomBoxHeader'>
@@ -13,7 +28,7 @@
 	        <ul></ul>
 	    </div>
 	    <div class='wbrtc_roomBoxFooter'>
-					<button class="active btn_door" data-userId="${userId}" data-action="JOIN"><b>JOIN</b></button>
+					<button class="active btn_door" data-headid="${headingTagId}" data-userId="${userId}" data-action="JOIN">JOIN</button>
 					<button class="btn_share" data-url="url">
 						<b>copy url</b>
 						<input type="hidden" class="headingUrl" value="${url}">

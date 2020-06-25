@@ -8,7 +8,7 @@ var WRTC_Room = (function () {
 	var currentUserRoom = {};
 	var VIDEOCHATLIMIT = 0;
 	var $lastJoinButton = null;
-	var prefixId = "wbrtc_roomBox_";
+	var prefixRoomId = "wbrtc_roomBox_";
 	var prefixHeaderId = "headingTagId_";
 
 	var self = {
@@ -62,17 +62,16 @@ var WRTC_Room = (function () {
 					padId: clientVars.padId,
 					userId: clientVars.userId,
 					userName: clientVars.userName || "anonymous",
-					headingId: prefixId + headingId
+					headingId: headingId
 				};
 
 				// scroll down to header
 				var padContainer = self.$body_ace_outer().find("iframe").contents().find("#innerdocbody");
 
-				padContainer.find("."+ prefixHeaderId+headingId)[0]
-				.scrollIntoView({
-					behavior: 'smooth' 
+				padContainer.find("." + prefixHeaderId + headingId)[0].scrollIntoView({
+					behavior: 'smooth'
 				});
-		
+
 				self.isUserMediaAvailable().then(function () {
 					if (!currentUserRoom.userId) return socket.emit("userJoin", data, self.socketUserJoin);
 					// if user join the video-chat before, first leave that chatroom
@@ -114,11 +113,12 @@ var WRTC_Room = (function () {
 				WRTC.deactivate(data.userId, data.headingId);
 				window.headingId = null;
 				currentUserRoom = {};
-				$headingRoom.find(".wbrtc_roomBoxFooter button.btn_door").html("<b></b>").attr({
+				$("#primaryHeader #wrtc_roomInfo").remove();
+				$headingRoom.find(".wbrtc_roomBoxFooter button.btn_door").attr({
 					"data-userId": data.userId,
 					"data-action": "JOIN",
 					"disabled": false
-				}).addClass('active').removeClass('deactivate').find("b").text("JOIN");
+				}).addClass('active').removeClass('deactivate').text("JOIN");
 				$("#rtcbox .chatTitle").remove();
 			}
 		},
@@ -144,6 +144,7 @@ var WRTC_Room = (function () {
 			var userCount = $headingRoomUsers.length;
 
 			$headingRoom.find(".userCoutn").text(userCount);
+			$("#primaryHeader #wrtc_roomInfo .userCoutn").text(userCount);
 
 			var videoIcon = '<span class="videoIcon"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="video" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-video fa-w-18 fa-2x"><path fill="currentColor" d="M336.2 64H47.8C21.4 64 0 85.4 0 111.8v288.4C0 426.6 21.4 448 47.8 448h288.4c26.4 0 47.8-21.4 47.8-47.8V111.8c0-26.4-21.4-47.8-47.8-47.8zm189.4 37.7L416 177.3v157.4l109.6 75.5c21.2 14.6 50.4-.3 50.4-25.8V127.5c0-25.4-29.1-40.4-50.4-25.8z" class=""></path></svg></span>';
 
@@ -151,7 +152,7 @@ var WRTC_Room = (function () {
 			var msg = {
 				time: new Date(),
 				userId: user.userId,
-				text: videoIcon + headerText + " <a class='txt_shareLink' href='" + self.createSahreLink(data.headingId) + "'>Join</a>",
+				text: videoIcon + "<span>" + headerText + "</span>" + " <a class='txt_shareLink' href='" + self.createSahreLink(data.headingId) + "'>Join</a>",
 				userName: user.name
 			};
 			self.addTextChatMessage(msg);
@@ -167,6 +168,17 @@ var WRTC_Room = (function () {
 			}
 
 			if (data.userId === clientVars.userId) {
+
+				var box = $("#wertc_pad_title").tmpl({
+					headingTagId: data.headingId,
+					videoChatLimit: VIDEOCHATLIMIT,
+					headTitle: headerText,
+					userCount: userCount
+				});
+				$("#primaryHeader #wrtc_roomInfo").remove();
+				$("#primaryHeader #in_title").append(box);
+				$(document).find("#primaryHeader #wrtc_roomInfo button").on("click", self.roomBtnHandler);
+
 				window.headingId = data.headingId;
 				WRTC.activate(data.headingId, user.userId);
 				currentUserRoom = data;
@@ -175,7 +187,7 @@ var WRTC_Room = (function () {
 					"data-userId": user.userId,
 					"data-action": "LEAVE",
 					"disabled": false
-				}).removeClass("deactivate active").html("<b>LEAVE</b>");
+				}).removeClass("deactivate active").html("LEAVE");
 				$("#rtcbox").prepend('<h4 class="chatTitle">' + headerText + '</h4>');
 			}
 		},
@@ -206,11 +218,10 @@ var WRTC_Room = (function () {
 			self.scrollDown();
 		},
 		$body_ace_outer: function $body_ace_outer() {
-			return $('iframe[name="ace_outer"]').contents();
+			return $(document).find('iframe[name="ace_outer"]').contents();
 		},
 		createSahreLink: function createSahreLink(headingTagId) {
-			var headingTagId = /(?:^| )wbrtc_roomBox_([A-Za-z0-9]*)/.exec(headingTagId);
-			return window.location.origin + window.location.pathname + "?heading=" + headingTagId[1] + "&joinvideo=true";
+			return window.location.origin + window.location.pathname + "?heading=" + headingTagId + "&joinvideo=true";
 		},
 		findTags: function findTags() {
 			var _self = this;
@@ -231,7 +242,7 @@ var WRTC_Room = (function () {
 				headingTagId = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(headingTagId);
 				if (!headingTagId) return true;
 				hTagList.push({
-					headingTagId: "wbrtc_roomBox_" + headingTagId[1],
+					headingTagId: headingTagId[1],
 					tag: tag,
 					y: newY,
 					x: newX,
@@ -263,76 +274,74 @@ var WRTC_Room = (function () {
 			_self.bulkUpdateRooms(hTagList);
 		},
 		bulkUpdateRooms: function bulkUpdateRooms(hTagList) {
-			var _self = this;
 			socket.emit("bulkUpdateRooms", clientVars.padId, hTagList, function (users) {
 				users.forEach(function (user) {
-					_self.addUserToRoom(user);
+					self.addUserToRoom(user);
 				});
 			});
 		},
+		roomBtnHandler: function roomBtnHandler() {
+			var headingId = $(this).attr("data-headid");
+			var actions = $(this).attr("data-action");
+			var data = {
+				padId: clientVars.padId,
+				userId: clientVars.userId,
+				userName: clientVars.userName || "anonymous",
+				headingId: headingId
+			};
+
+			$(this).addClass('deactivate').attr({ "disabled": true });
+			$lastJoinButton = $(this);
+
+			if (actions === "JOIN") {
+
+				self.isUserMediaAvailable().then(function () {
+
+					if (!currentUserRoom.userId) return socket.emit("userJoin", data, self.socketUserJoin);
+
+					// if user join the video-chat before, first leave that chatroom
+					// then join to the new chatroom
+					socket.emit("userLeave", currentUserRoom, function (_data) {
+						self.socketUserLeave(_data);
+						socket.emit("userJoin", data, self.socketUserJoin);
+					});
+				});
+			} else {
+				socket.emit("userLeave", data, self.socketUserLeave);
+			}
+		},
 		activeEventListenr: function activeEventListenr() {
 
-			self.$body_ace_outer().on("mouseover", ".wbrtc_roomBox", function () {
+			self.$body_ace_outer().on("mouseenter", ".wbrtc_roomBox", function () {
 				var $this = $(this);
-				self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "inherit" });
-				$this.addClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({display: "block"});
-			});
-
-			self.$body_ace_outer().on("mouseleave", ".wbrtc_roomBox", function () {
-				$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "none" });
-				self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "hidden" });
-			});
-
-			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_door", function () {
-				var parent = $(this).parent().parent();
-				var headingId = parent.attr("id");
-				var actions = $(this).attr("data-action");
-				var data = {
-					padId: clientVars.padId,
-					userId: clientVars.userId,
-					userName: clientVars.userName || "anonymous",
-					headingId: headingId
-				};
-
-				$(this).addClass('deactivate').attr({ "disabled": true });
-				$lastJoinButton = $(this);
-
-				if (actions === "JOIN") {
-
-					self.isUserMediaAvailable().then(function () {
-
-						if (!currentUserRoom.userId) return socket.emit("userJoin", data, self.socketUserJoin);
-
-						// if user join the video-chat before, first leave that chatroom
-						// then join to the new chatroom
-						socket.emit("userLeave", currentUserRoom, function (_data) {
-							self.socketUserLeave(_data);
-							socket.emit("userJoin", data, self.socketUserJoin);
-						});
-					});
-				} else {
-					socket.emit("userLeave", data, self.socketUserLeave);
-				}
-			});
-
-			function copyToClipboard(text) {
-				var $temp = $("<input>");
-				$("body").append($temp);
-				$temp.val(text).select();
-				document.execCommand("copy");
-				$temp.remove();
-				$.gritter.add({
-					title: "Copied",
-					text: "Join link copied to clip board",
-					sticky: false,
-					class_name: "copyToClipboard",
-					time: '3000'
+				self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "inherit" }).ready(function () {
+					$this.addClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "block" });
 				});
-			}
+			}).on("mouseleave", ".wbrtc_roomBox", function () {
+				$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "none" }).ready(function () {
+					self.$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "hidden" });
+				});
+			});
+
+			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_door", self.roomBtnHandler);
 
 			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_share", function () {
 				var url = $(this).find("input").val();
-				copyToClipboard(url);
+				self.link2Clipboard(url);
+			});
+		},
+		link2Clipboard: function link2Clipboard(text) {
+			var $temp = $("<input>");
+			$("body").append($temp);
+			$temp.val(text).select();
+			document.execCommand("copy");
+			$temp.remove();
+			$.gritter.add({
+				title: "Copied",
+				text: "Join link copied to clip board",
+				sticky: false,
+				class_name: "copyLinkToClipboard",
+				time: '3000'
 			});
 		},
 		reachedChatRoomSize: function reachedChatRoomSize(present, showAlert) {

@@ -38,7 +38,6 @@ var WRTC = (function () {
 	var self = {
 		// API HOOKS
 		postAceInit: function postAceInit(hook, context) {
-			$("#editorcontainer").append('<div id="rtcbox" class="thin-scrollbar"><div class="videoWrapper" class="thin-scrollbar"></div></div>')
 			pcConfig.iceServers = clientVars.webrtc && clientVars.webrtc.iceServers ? clientVars.webrtc.iceServers : [{
 				url: "stun:stun.l.google.com:19302"
 			}];
@@ -49,6 +48,48 @@ var WRTC = (function () {
 				videoSizes.small = clientVars.webrtc.video.sizes.small + "px";
 			}
 			self.init(context.pad);
+		},
+		appendInterfaceLayout: function appendInterfaceLayout() {
+
+			// map element
+			// div#primaryHeader >
+			// div#pad_title.in_title >
+			// 		input#title +
+			// 		div#wrtc_roomInfo >
+			// 				p >
+			// 						span + span.videoIcon
+			// 				+
+			// 				p.RoomTitle
+			// 				+
+			// 				button
+			// div#rtcbox.thin-scrollbar.ep_title >
+			// 		div.videoWrapper.thin-scrollbar
+
+			// if the ep_set_title_on_pad plugin exist put the video interface to header next to the pad title
+			var ep_padTitle = clientVars.plugins.plugins['ep_set_title_on_pad'];
+			var $rtcBox = $('<div id="rtcbox" class="thin-scrollbar"><div class="videoWrapper" class="thin-scrollbar"></div></div>');
+
+			if (!ep_padTitle) {
+				$('body').append($rtcBox);
+				return;
+			}
+
+			var $pad_title_input = $("#pad_title #title");
+			var $pad_title_a = $("#pad_title a");
+			$("#pad_title").remove();
+
+			var $pad_title = $("<div id='pad_title' class='f_wrtcActive'></div>");
+			var $intitle = $("<div id='in_title'></div>");
+
+			$intitle.append($pad_title_input, $("#wrtc_roomInfo"));
+			$pad_title.append($pad_title_a, $intitle);
+
+			var $new_pad_title = $("<div id='primaryHeader'></div>");
+
+			$rtcBox.addClass('ep_padTitle');
+			$new_pad_title.append($pad_title, $rtcBox);
+
+			$('body').prepend($new_pad_title);
 		},
 		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
 			if (context.author) {

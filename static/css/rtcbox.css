@@ -42,25 +42,35 @@
 	overflow: hidden;
 }
 
+#rtcbox.ep_padTitle > .chatTitle {
+	display: none;
+}
+
 #rtcbox .error-msg {
 	padding: 10px;
 	max-width: 120px;
 }
 #rtcbox .video-container {
 	position: relative;
+	margin: 0 8px
 }
-#rtcbox .video-container:not(:first-child) {
+/* #rtcbox .video-container:not(:first-child) {
 	margin-top: 5px;
-}
+} */
 #rtcbox video {
-	border-left: 5px solid;
+	border-bottom: 5px solid;
 	box-sizing: border-box;
 	background-color: black;
 }
 #rtcbox .video-container,
 #rtcbox video {
-	border-radius: 0 3px 3px 0;
+	border-radius: 3px;
 	transition: max-width 0.3s, max-height 0.3s, width 0.3s, height 0.3s;
+	overflow: hidden;
+}
+
+.video-container:hover .interface-btn{
+	opacity: 1;
 }
 
 .interface-container {
@@ -68,22 +78,28 @@
 	position: absolute;
 	z-index: 2;
 	bottom: 8px;
-	left: 8px;
+	left: 0;
 }
 .interface-btn {
 	background-color: rgba(255, 255, 255, 0.35);
 	border-radius: 50%;
-	padding: 5px;
-	margin-right: 6px;
+	padding: 1px;
+	margin: 0 7px;
 	cursor: pointer;
 	transition: opacity 0.2s, background-color 0.2s;
 	color: #333;
-	width: 28px;
-	height: 28px;
+	width: 22px;
+	height: 22px;
+	opacity: 0;
+	transition: all .3s linear;
+	
 }
 .interface-btn:hover {
 	opacity: 1;
 	background-color: white !important;
+}
+.interface-btn:before{
+	font-size: 13px;
 }
 .interface-btn.audio-btn:before {
 	content: "\e83d";
@@ -110,19 +126,21 @@
 	transition: opacity 0.2s, background-color 0.2s;
 	position: absolute;
 	top: 0;
-	left: 5px; 
+	left: 0; 
 	right: 0;
 	opacity: 1;
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: rgba(255, 255, 255, 0.7);
 	font-weight: bold;
-	line-height: 20px;
+	line-height: 16px;
 	padding-left: 8px;
 	color: #111;
 	z-index: 5;
-	height: 20px;
+	height: 16px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+	font-size: 0.9em;
+	font-family: Quicksand;
 }
 #rtcbox .video-container.local-user {
 	order: -1; 
@@ -131,7 +149,6 @@
 #rtcbox .video-container:hover .user-name,
 #rtcbox .video-container.local-user .interface-btn {
 	background-color: rgba(255, 255, 255, 1);
-	opacity: 1;
 }
 #rtcbox .video-container:hover .user-name {
 	opacity: 1;
@@ -146,7 +163,7 @@
 		background: #f8f9fa;
 	}
 
-	#rtcbox {
+	#rtcbox:not(.ep_padTitle) {
 		flex-direction: row;
 		flex-shrink: 0;
 		order: 2;
@@ -157,7 +174,8 @@
     bottom: 0;
     width: 100%;
     background: #eee;
-	}
+	} 
+
 	#rtcbox .video-container:not(:first-child) {
 		margin-top: 0;
 		margin-left: 5px;
@@ -168,10 +186,12 @@
 }
 
 @media (min-width: 1600px) {
-	#rtcbox.active{
+	#rtcbox.active:not(.ep_padTitle){
 		display: block;
 		position: absolute;
 		left: 0;
+		top: 80px;
+    height: 100%;
 		top: 0;
 	}
 }
@@ -193,4 +213,55 @@
 	float: left;
 	margin: 2px 6px 0 0;
 	height: 17px;
+}
+
+
+/* ============= primaryHeader =============== */
+
+#primaryHeader {
+	position: relative; display: flex; align-items: stretch;
+	background-color: #fff; border-bottom: 1px solid #ccc;
+}
+
+#primaryHeader #rtcbox.active {
+	display: flex;justify-content: start; order: 2; flex-grow: 8;
+	background-color: #fff; padding-left: 20px; width: calc(100% - 400px);
+}
+
+#primaryHeader .videoIcon {
+	float: left; margin-right: 6px; width: 14px; display: inline-block; margin-top: 2px;
+}
+
+#primaryHeader #pad_title > a { height: 100%;align-items: center;display: flex; } 
+#primaryHeader #pad_title .logo { width: 44px; }
+#primaryHeader #pad_title.f_wrtcActive { 
+	flex-grow: 1; order: 1; flex-direction: row; display: flex;
+	align-items: center; border: none!important;padding: 0;
+}
+
+#primaryHeader #wrtc_roomInfo .RoomTitle {
+	max-width: 180px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-weight: bold;
+}
+
+#primaryHeader #wrtc_roomInfo {
+	font-family: Quicksand; font-style: normal; font-weight: bold; font-size: 12px; line-height: 15px;
+}
+
+#primaryHeader #wrtc_roomInfo button {
+	margin: 0; padding: 0 4px; margin-left: 10px; outline: none;
+}
+
+#primaryHeader #wrtc_roomInfo p {
+	float: left; margin: 0 8px 0 0;
+}
+
+
+#primaryHeader #title {
+	max-width: 100%;
+	margin: 0;
+	padding: 0;
 }

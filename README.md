@@ -5,6 +5,8 @@ WebRTC video/audio, a dedicated chat room for each headlines (h tags).
 
 > Note: for better expriance use [ep_heading2](https://github.com/ether/ep_headings2)
 
+> Note: If you have [ep_set_title_on_pad](https://www.npmjs.com/package/ep_set_title_on_pad) plugin installed, the video interface adds to the header(close to the pad title). otherwise, adds to the bottom of the pad.
+
 ## Installing
 
 ```bash

@@ -63,7 +63,7 @@ exports.socketio = function (hookName, args, cb) {
 
 		// remove the room that not available and excrete user from room
 		socket.on("bulkUpdateRooms", function (padId, heading, callback) {
-			rooms = rooms.filter(el => heading.find(x => x.padId === padId && x.headingTagId === el.headingId))
+			rooms = rooms.filter(el => heading.find(x => el.padId === padId && x.headingTagId === el.headingId))
 			socket.broadcast.to(padId).emit("bulkUpdateRooms", rooms)
 			callback(rooms)
 		})
@@ -90,7 +90,7 @@ exports.eejsBlock_styles = function (hookName, args, cb) {
 }
 
 exports.eejsBlock_editorContainerBox = function (hookName, args, cb) {
-	args.content = args.content + eejs.require("ep_wrtc_heading/templates/webrtc.ejs", {}, module)
+	// args.content = args.content + eejs.require("ep_wrtc_heading/templates/webrtc.ejs", {}, module)
 	return cb();
 }
 

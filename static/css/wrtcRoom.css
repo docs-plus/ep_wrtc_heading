@@ -9,6 +9,8 @@
 }
 
 
+
+
 @media (max-width: 1500px) {
 	#wbrtc_chatBox {
 		order: -1;
@@ -39,6 +41,7 @@
 	max-width: 360px;
 	min-width: 230px;
 }
+
 
 .wbrtc_roomBox > .wbrtc_roomBoxHeader {
 	padding: 6px;

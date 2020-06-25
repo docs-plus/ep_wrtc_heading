@@ -53,7 +53,7 @@ var EPwrtcHeading = (function () {
 		if(!$padOuter) return;
 		$padOuter.find(".wbrtc_roomBox").each(function (index) {
 			var $boxId = $(this).attr("id");
-			var hClassId = "headingTagId_" + $boxId.split("_")[2];
+			var hClassId = "headingTagId_" + $boxId;
 			var aceOuterPadding = parseInt($padOuter.find('iframe[name="ace_inner"]').css("padding-top"));
 			var $headingEl = $padOuter.find("iframe").contents().find("#innerdocbody").find("." + hClassId);
 
@@ -96,6 +96,7 @@ var hooks = {
 		WRTC_Room.init(context);
 
 		$("#editorcontainer iframe").ready(function () {
+			WRTC.appendInterfaceLayout();
 			setTimeout(function () {
 				WRTC_Room.findTags();
 			}, 250);
