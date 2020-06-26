@@ -109,6 +109,9 @@ var WRTC_Room = (function () {
 
 			$headingRoom.find(".userCoutn").text(userCount);
 
+			// remove the text-chat
+			$(".wrtc_text[data-authorid='" + data.userId + "'][data-headid='" + data.headingId + "']").remove();
+
 			if (data.userId === clientVars.userId) {
 				WRTC.deactivate(data.userId, data.headingId);
 				window.headingId = null;
@@ -147,13 +150,15 @@ var WRTC_Room = (function () {
 			$("#primaryHeader #wrtc_roomInfo .userCoutn").text(userCount);
 
 			var videoIcon = '<span class="videoIcon"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="video" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-video fa-w-18 fa-2x"><path fill="currentColor" d="M336.2 64H47.8C21.4 64 0 85.4 0 111.8v288.4C0 426.6 21.4 448 47.8 448h288.4c26.4 0 47.8-21.4 47.8-47.8V111.8c0-26.4-21.4-47.8-47.8-47.8zm189.4 37.7L416 177.3v157.4l109.6 75.5c21.2 14.6 50.4-.3 50.4-25.8V127.5c0-25.4-29.1-40.4-50.4-25.8z" class=""></path></svg></span>';
-
+			var roomCounter = "<span class='userCount'>(" + userCount+"/"+ VIDEOCHATLIMIT + ")</span>";
+			var btnJoin = "<span class='wrtc_roomLink' data-action='JOIN' data-headid='" + data.headingId + "' title='Join' data-url='" + self.createSahreLink(data.headingId) + "'>" + headerText + "</span>";
 			// notify a user join the video-chat room
 			var msg = {
 				time: new Date(),
 				userId: user.userId,
-				text: videoIcon + "<span>" + headerText + "</span>" + " <a class='txt_shareLink' href='" + self.createSahreLink(data.headingId) + "'>Join</a>",
-				userName: user.name
+				text: "<span>joins</span>" + videoIcon + btnJoin + roomCounter,
+				userName: user.name,
+				headId: data.headingId
 			};
 			self.addTextChatMessage(msg);
 
@@ -212,7 +217,7 @@ var WRTC_Room = (function () {
 			if (hours.length == 1) hours = "0" + hours;
 			var timeStr = hours + ":" + minutes;
 
-			var html = "<p data-authorId='" + msg.userId + "' class='" + authorClass + "'><b>" + msg.userName + ":</b><span class='time " + authorClass + "'>" + timeStr + "</span> " + msg.text + "</p>";
+			var html = "<p data-headid='" + msg.headId + "' data-authorId='" + msg.userId + "' class='wrtc_text " + msg.headId + " " + authorClass + "'><b>" + msg.userName + "</b><span class='time " + authorClass + "'>" + timeStr + "</span> " + msg.text + "</p>";
 
 			$(document).find("#chatbox #chattext").append(html);
 			self.scrollDown();
@@ -290,6 +295,13 @@ var WRTC_Room = (function () {
 				headingId: headingId
 			};
 
+			// check if user does not already in there
+			if( 
+				currentUserRoom && actions === "JOIN" &&
+				currentUserRoom.headingId === data.headingId &&
+				currentUserRoom.userId === data.userId
+			) return;
+
 			$(this).addClass('deactivate').attr({ "disabled": true });
 			$lastJoinButton = $(this);
 
@@ -324,6 +336,7 @@ var WRTC_Room = (function () {
 			});
 
 			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_door", self.roomBtnHandler);
+			$(document).on('click', '.wrtc_text .wrtc_roomLink', self.roomBtnHandler);
 
 			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_share", function () {
 				var url = $(this).find("input").val();

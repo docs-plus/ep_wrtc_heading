@@ -114,7 +114,9 @@
 .interface-btn.video-btn.off:before {
 	content: "\e83c";
 }
-
+.interface-btn.enlarge-btn{
+	display: none;
+}
 .interface-btn.enlarge-btn:before {
 	content: "\e840";
 }
@@ -196,24 +198,22 @@
 	}
 }
 
-.txt_shareLink{
-	background: #eee;
-	padding: 0 10px;
+.wrtc_text .time { order: 5;}
+
+.wrtc_text .wrtc_roomLink {
+	display: inline-block;
 	margin: 0 4px;
-	color: black;
-	float: right;
-	border: 1px solid;
-	border-radius: 3px;
-	float: right;
+	text-decoration: underline;
+	cursor: pointer;
 }
 
-#chattext .videoIcon{
-	width: 17px;
-	display: inherit;
-	float: left;
-	margin: 2px 6px 0 0;
+.wrtc_text .videoIcon{
+	width: 16px;
+	display: inline-block;
+	margin: 0 2px 0 6px;
 	height: 17px;
 }
+.wrtc_text .videoIcon svg {display: inline-block;margin-bottom: -2px;}
 
 
 /* ============= primaryHeader =============== */
@@ -221,20 +221,28 @@
 #primaryHeader {
 	position: relative; display: flex; align-items: stretch;
 	background-color: #fff; border-bottom: 1px solid #ccc;
+	font-family: Quicksand;font-style: normal;font-weight: bold;
 }
 
 #primaryHeader #rtcbox.active {
 	display: flex;justify-content: start; order: 2; flex-grow: 8;
 	background-color: #fff; padding-left: 20px; width: calc(100% - 400px);
 }
+#primaryHeader #rtcbox .videoWrapper {
+	width: 100%; justify-content: center;
+}
 
 #primaryHeader .videoIcon {
 	float: left; margin-right: 6px; width: 14px; display: inline-block; margin-top: 2px;
 }
 
-#primaryHeader #pad_title > a { height: 100%;align-items: center;display: flex; } 
-#primaryHeader #pad_title .logo { width: 44px; }
-#primaryHeader #pad_title.f_wrtcActive { 
+#primaryHeader #pad_title > a { 
+	height: 100%;align-items: center;display: flex; width: 64px;
+	justify-content: center; 
+} 
+#primaryHeader #pad_title .logo {padding: 0; margin: 2px 0; transition: all .3s ease-in-out; }
+#primaryHeader #pad_title.f_wrtcActive .logo {width: 55px; margin: 0 0; }
+#primaryHeader #pad_title { 
 	flex-grow: 1; order: 1; flex-direction: row; display: flex;
 	align-items: center; border: none!important;padding: 0;
 }
@@ -248,7 +256,7 @@
 }
 
 #primaryHeader #wrtc_roomInfo {
-	font-family: Quicksand; font-style: normal; font-weight: bold; font-size: 12px; line-height: 15px;
+	font-size: 12px; line-height: 15px;
 }
 
 #primaryHeader #wrtc_roomInfo button {
@@ -259,9 +267,9 @@
 	float: left; margin: 0 8px 0 0;
 }
 
-
 #primaryHeader #title {
 	max-width: 100%;
 	margin: 0;
 	padding: 0;
+	border-radius: 4px;
 }

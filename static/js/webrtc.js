@@ -78,7 +78,7 @@ var WRTC = (function () {
 			var $pad_title_a = $("#pad_title a");
 			$("#pad_title").remove();
 
-			var $pad_title = $("<div id='pad_title' class='f_wrtcActive'></div>");
+			var $pad_title = $("<div id='pad_title'></div>");
 			var $intitle = $("<div id='in_title'></div>");
 
 			$intitle.append($pad_title_input, $("#wrtc_roomInfo"));
@@ -111,9 +111,9 @@ var WRTC = (function () {
 		handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
 			if (context.payload.data.headingId === window.headingId) self.receiveMessage(context.payload);
 		},
-
 		// END OF API HOOKS
 		show: function show() {
+			$("#pad_title").addClass('f_wrtcActive')
 			$("#rtcbox").addClass("active");
 		},
 		showUserMediaError: function showUserMediaError(err) {
@@ -174,6 +174,7 @@ var WRTC = (function () {
 			if (!userId) return false;
 			userId = userId.split(".")[1];
 			$("#rtcbox").find("#video_a_" + userId).parent().remove();
+			$("#pad_title").removeClass('f_wrtcActive')
 		},
 		activate: function activate(headingId) {
 			self.show();
