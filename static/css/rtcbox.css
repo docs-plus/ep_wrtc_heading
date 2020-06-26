@@ -229,7 +229,7 @@
 	background-color: #fff; padding-left: 20px; width: calc(100% - 400px);
 }
 #primaryHeader #rtcbox .videoWrapper {
-	width: 100%; justify-content: center;
+	width: 100%; justify-content: center; flex-direction: row;
 }
 
 #primaryHeader .videoIcon {
