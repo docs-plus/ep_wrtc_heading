@@ -108,6 +108,7 @@ var WRTC_Room = (function () {
 			var userCount = users.length;
 
 			$headingRoom.find(".userCoutn").text(userCount);
+			$("#werc_toolbar .nd_title .nd_count").text(userCount);
 
 			// remove the text-chat
 			$(".wrtc_text[data-authorid='" + data.userId + "'][data-headid='" + data.headingId + "']").remove();
@@ -116,13 +117,17 @@ var WRTC_Room = (function () {
 				WRTC.deactivate(data.userId, data.headingId);
 				window.headingId = null;
 				currentUserRoom = {};
-				$("#primaryHeader #wrtc_roomInfo").remove();
 				$headingRoom.find(".wbrtc_roomBoxFooter button.btn_door").attr({
 					"data-userId": data.userId,
 					"data-action": "JOIN",
 					"disabled": false
 				}).addClass('active').removeClass('deactivate').text("JOIN");
 				$("#rtcbox .chatTitle").remove();
+
+				$("#wrtc_modal").css({
+					"transform": "translate(-50%, -100%)",
+					"opacity": 0
+				});
 			}
 		},
 		addUserToRoom: function addUserToRoom(data) {
@@ -147,10 +152,11 @@ var WRTC_Room = (function () {
 			var userCount = $headingRoomUsers.length;
 
 			$headingRoom.find(".userCoutn").text(userCount);
-			$("#primaryHeader #wrtc_roomInfo .userCoutn").text(userCount);
+			$("#werc_toolbar .nd_title .nd_count").text(userCount);
+			$("#werc_toolbar .btn_leave").attr({ "data-headid": data.headingId });
 
 			var videoIcon = '<span class="videoIcon"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="video" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-video fa-w-18 fa-2x"><path fill="currentColor" d="M336.2 64H47.8C21.4 64 0 85.4 0 111.8v288.4C0 426.6 21.4 448 47.8 448h288.4c26.4 0 47.8-21.4 47.8-47.8V111.8c0-26.4-21.4-47.8-47.8-47.8zm189.4 37.7L416 177.3v157.4l109.6 75.5c21.2 14.6 50.4-.3 50.4-25.8V127.5c0-25.4-29.1-40.4-50.4-25.8z" class=""></path></svg></span>';
-			var roomCounter = "<span class='userCount'>(" + userCount+"/"+ VIDEOCHATLIMIT + ")</span>";
+			var roomCounter = "<span class='userCount'>(" + userCount + "/" + VIDEOCHATLIMIT + ")</span>";
 			var btnJoin = "<span class='wrtc_roomLink' data-action='JOIN' data-headid='" + data.headingId + "' title='Join' data-url='" + self.createSahreLink(data.headingId) + "'>" + headerText + "</span>";
 			// notify a user join the video-chat room
 			var msg = {
@@ -174,15 +180,7 @@ var WRTC_Room = (function () {
 
 			if (data.userId === clientVars.userId) {
 
-				var box = $("#wertc_pad_title").tmpl({
-					headingTagId: data.headingId,
-					videoChatLimit: VIDEOCHATLIMIT,
-					headTitle: headerText,
-					userCount: userCount
-				});
-				$("#primaryHeader #wrtc_roomInfo").remove();
-				$("#primaryHeader #in_title").append(box);
-				$(document).find("#primaryHeader #wrtc_roomInfo button").on("click", self.roomBtnHandler);
+				$("#werc_toolbar p").text(headerText);
 
 				window.headingId = data.headingId;
 				WRTC.activate(data.headingId, user.userId);
@@ -194,6 +192,8 @@ var WRTC_Room = (function () {
 					"disabled": false
 				}).removeClass("deactivate active").html("LEAVE");
 				$("#rtcbox").prepend('<h4 class="chatTitle">' + headerText + '</h4>');
+
+				$("#wrtc_modal").css({ "transform": "translate(-50%, 0)", "opacity": 1 });
 			}
 		},
 		scrollDown: function scrollDown(force) {
@@ -296,11 +296,7 @@ var WRTC_Room = (function () {
 			};
 
 			// check if user does not already in there
-			if( 
-				currentUserRoom && actions === "JOIN" &&
-				currentUserRoom.headingId === data.headingId &&
-				currentUserRoom.userId === data.userId
-			) return;
+			if (currentUserRoom && actions === "JOIN" && currentUserRoom.headingId === data.headingId && currentUserRoom.userId === data.userId) return;
 
 			$(this).addClass('deactivate').attr({ "disabled": true });
 			$lastJoinButton = $(this);
@@ -336,7 +332,7 @@ var WRTC_Room = (function () {
 			});
 
 			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_door", self.roomBtnHandler);
-			$(document).on('click', '.wrtc_text .wrtc_roomLink', self.roomBtnHandler);
+			$(document).on('click', '#werc_toolbar .btn_leave', self.roomBtnHandler);
 
 			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_share", function () {
 				var url = $(this).find("input").val();

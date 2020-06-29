@@ -50,46 +50,30 @@ var WRTC = (function () {
 			self.init(context.pad);
 		},
 		appendInterfaceLayout: function appendInterfaceLayout() {
-
-			// map element
-			// div#primaryHeader >
-			// div#pad_title.in_title >
-			// 		input#title +
-			// 		div#wrtc_roomInfo >
-			// 				p >
-			// 						span + span.videoIcon
-			// 				+
-			// 				p.RoomTitle
-			// 				+
-			// 				button
-			// div#rtcbox.thin-scrollbar.ep_title >
-			// 		div.videoWrapper.thin-scrollbar
-
-			// if the ep_set_title_on_pad plugin exist put the video interface to header next to the pad title
-			var ep_padTitle = clientVars.plugins.plugins['ep_set_title_on_pad'];
-			var $rtcBox = $('<div id="rtcbox" class="thin-scrollbar"><div class="videoWrapper" class="thin-scrollbar"></div></div>');
-
-			if (!ep_padTitle) {
-				$('body').append($rtcBox);
-				return;
-			}
-
-			var $pad_title_input = $("#pad_title #title");
-			var $pad_title_a = $("#pad_title a");
-			$("#pad_title").remove();
-
-			var $pad_title = $("<div id='pad_title'></div>");
-			var $intitle = $("<div id='in_title'></div>");
-
-			$intitle.append($pad_title_input, $("#wrtc_roomInfo"));
-			$pad_title.append($pad_title_a, $intitle);
-
-			var $new_pad_title = $("<div id='primaryHeader'></div>");
-
-			$rtcBox.addClass('ep_padTitle');
-			$new_pad_title.append($pad_title, $rtcBox);
-
-			$('body').prepend($new_pad_title);
+			var werc_toolbar = $("#wertc_modal_toolbar").tmpl({
+				videoChatLimit: clientVars.webrtc.videoChatLimit
+			});
+			var $wrtc_modal = $('<div id="wrtc_modal"><div class="videoWrapper" class="thin-scrollbar"></div></div');
+			$wrtc_modal.append(werc_toolbar);
+			$('body').prepend($wrtc_modal);
+			$(document).on('click', '.btn_toggle_modal', function () {
+				var $parent = $(this).parent().parent();
+				var action = $(this).attr('data-action');
+				var videoBox = $("#wrtc_modal .videoWrapper").innerHeight();
+				if (action === "collapse") {
+					$(this).removeClass("active");
+					$parent.find('[data-action="expand"]').addClass("active");
+					$("#wrtc_modal").css({
+						"transform": "translate(-50%, -" + videoBox + "px)"
+					});
+				} else {
+					$(this).removeClass("active");
+					$parent.find('[data-action="collapse"]').addClass("active");
+					$("#wrtc_modal").css({
+						"transform": "translate(-50%, 0)"
+					});
+				}
+			});
 		},
 		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
 			if (context.author) {
@@ -113,8 +97,7 @@ var WRTC = (function () {
 		},
 		// END OF API HOOKS
 		show: function show() {
-			$("#pad_title").addClass('f_wrtcActive')
-			$("#rtcbox").addClass("active");
+			$("#pad_title").addClass('f_wrtcActive');
 		},
 		showUserMediaError: function showUserMediaError(err) {
 			// show an error returned from getUserMedia
@@ -174,7 +157,6 @@ var WRTC = (function () {
 			if (!userId) return false;
 			userId = userId.split(".")[1];
 			$("#rtcbox").find("#video_a_" + userId).parent().remove();
-			$("#pad_title").removeClass('f_wrtcActive')
 		},
 		activate: function activate(headingId) {
 			self.show();
@@ -234,7 +216,7 @@ var WRTC = (function () {
 				var videoContainer = $("<div class='video-container'>").css({
 					width: videoSizes.small,
 					"max-height": videoSizes.small
-				}).appendTo($("#rtcbox .videoWrapper"));
+				}).appendTo($("#wrtc_modal .videoWrapper"));
 
 				videoContainer.append($('<div class="user-name">').text(user.name));
 

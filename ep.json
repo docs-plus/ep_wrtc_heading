@@ -20,7 +20,6 @@
 				"eejsBlock_scripts": "ep_wrtc_heading/index",
 				"eejsBlock_mySettings": "ep_wrtc_heading/index",
 				"eejsBlock_styles": "ep_wrtc_heading/index",
-				"eejsBlock_editorContainerBox": "ep_wrtc_heading/index",
 				"clientVars": "ep_wrtc_heading/index",
 				"handleMessage": "ep_wrtc_heading/index"
 			}

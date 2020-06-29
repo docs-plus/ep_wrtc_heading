@@ -1,8 +1,112 @@
-#rtcbox {
-	display: none;
-	padding: 0;
-	order: -1;
+
+#wrtc_modal{
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translate(-50%, -100%);
+	max-width: 70%;
+	height: auto;
+	z-index: 10;
+	min-width: 400px;
+	font-family: Quicksand;
+	font-style: normal;
+	font-weight: 600;
+	transition: all .3s;
+	overflow: hidden;
+	border-radius: 0 0 6px 6px;
+	box-shadow: 1px 1px 10px rgb(87, 98, 115, .3);
+	border: 1px solid #e6e8e9;
+	border-bottom: none;
+	border-top: none;
 }
+
+
+/*=========toolbar=========*/
+#werc_toolbar{
+	width: 100%;
+	height: auto;
+	padding: 3px;
+	overflow: hidden;
+	padding: 6px;
+	display: flex;
+	align-items: center;
+	background: #576273;
+	color: #fff;
+	font-size: 14px;
+}
+#werc_toolbar .nd_title{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	flex-grow: 8;
+}
+#werc_toolbar .nd_title .fa_video{
+	width: 18px;
+	margin-bottom: -4px;
+}
+#werc_toolbar .nd_title .nd_count {
+	margin: 0 0 0 0;
+}
+
+#werc_toolbar p{
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	width: 70%;
+	float: left;
+	margin-left: 6px;
+}
+
+.btn_controllers{
+	width: 30%;
+	float: right;
+}
+
+.btn_controllers span{
+	cursor: pointer;
+}
+
+#werc_toolbar span[class*='fa_']{
+	width: 14px;
+	display: inline-block;
+	margin: 0 8px;
+	float: right;
+	height: 20px;
+}
+
+#werc_toolbar .nd_toolbar_toggle{
+	overflow: hidden;
+	width: 16px;
+	height: 20px;
+	float: right;
+	margin: 0 6px;
+}
+
+#werc_toolbar .nd_toolbar_toggle span{
+	width: 16px; margin: 0!important;
+	display: none;
+}
+
+#werc_toolbar .nd_toolbar_toggle span.active{
+	display: block;
+}
+
+#werc_toolbar span[class*='btn_'] {
+	margin: 0 6px;
+}
+
+.btn_close, .btn_minus{
+	width: 23px;
+  display: inline-block;
+}
+
+.btn_close .fa-primary, .btn_minus .fa-primary{
+	fill: #eee;
+}
+.btn_close .fa-secondary, .btn_minus .fa-secondary {
+	fill: #485365;
+}
+
 
 #editorcontainerbox #editorcontainer{
 	flex-direction: column;
@@ -16,23 +120,21 @@
 	display: none!important;
 }
 
-#rtcbox .videoWrapper{
+#wrtc_modal .videoWrapper{
 	display: flex;
-	flex-direction: column;
-	justify-content: start;
-	padding: 0;
-	box-sizing: border-box;
-	background-color: transparent;
-	height: auto;
-	overflow: auto;
-  flex-shrink: 0;
+	flex-direction: row;
+	justify-content: center;
+	padding: 8px;
+	background: #f8f9fa;
+	min-height: 136px;
+	flex-wrap: wrap;
 }
 
-#rtcbox.active{
+#wrtc_modal.active{
 	display: flex;
 }
 
-#rtcbox > .chatTitle {
+#wrtc_modal > .chatTitle {
 	order: -1;
 	margin: 20px 4px 10px 4px;
 	padding: 6px 10px;
@@ -42,31 +144,32 @@
 	overflow: hidden;
 }
 
-#rtcbox.ep_padTitle > .chatTitle {
+#wrtc_modal.ep_padTitle > .chatTitle {
 	display: none;
 }
 
-#rtcbox .error-msg {
+#wrtc_modal .error-msg {
 	padding: 10px;
 	max-width: 120px;
 }
-#rtcbox .video-container {
+#wrtc_modal .video-container {
 	position: relative;
-	margin: 0 8px
+	margin: 6px
 }
-/* #rtcbox .video-container:not(:first-child) {
+/* #wrtc_modal .video-container:not(:first-child) {
 	margin-top: 5px;
 } */
-#rtcbox video {
+#wrtc_modal video {
 	border-bottom: 5px solid;
 	box-sizing: border-box;
 	background-color: black;
+	float: left;
 }
-#rtcbox .video-container,
-#rtcbox video {
-	border-radius: 3px;
-	transition: max-width 0.3s, max-height 0.3s, width 0.3s, height 0.3s;
+#wrtc_modal .video-container,
+#wrtc_modal video {
+	transition:all .3s linear;
 	overflow: hidden;
+	border: none;
 }
 
 .video-container:hover .interface-btn{
@@ -77,19 +180,21 @@
 	display: flex;
 	position: absolute;
 	z-index: 2;
-	bottom: 8px;
+	bottom: 4px;
 	left: 0;
+	width: 100%;
+	justify-content: space-around;
 }
 .interface-btn {
 	background-color: rgba(255, 255, 255, 0.35);
 	border-radius: 50%;
-	padding: 1px;
-	margin: 0 7px;
+	padding: 4px;
+	margin: 0 8px;
 	cursor: pointer;
 	transition: opacity 0.2s, background-color 0.2s;
 	color: #333;
-	width: 22px;
-	height: 22px;
+	width: 26px;
+	height: 26px;
 	opacity: 0;
 	transition: all .3s linear;
 	
@@ -99,7 +204,7 @@
 	background-color: white !important;
 }
 .interface-btn:before{
-	font-size: 13px;
+	font-size: 16px;
 }
 .interface-btn.audio-btn:before {
 	content: "\e83d";
@@ -114,9 +219,6 @@
 .interface-btn.video-btn.off:before {
 	content: "\e83c";
 }
-.interface-btn.enlarge-btn{
-	display: none;
-}
 .interface-btn.enlarge-btn:before {
 	content: "\e840";
 }
@@ -124,7 +226,7 @@
 	content: "\e83f";
 }
 
-#rtcbox .video-container .user-name {
+#wrtc_modal .video-container .user-name {
 	transition: opacity 0.2s, background-color 0.2s;
 	position: absolute;
 	top: 0;
@@ -144,59 +246,29 @@
 	font-size: 0.9em;
 	font-family: Quicksand;
 }
-#rtcbox .video-container.local-user {
+#wrtc_modal .video-container.local-user {
 	order: -1; 
 }
-#rtcbox .video-container:hover .interface-btn,
-#rtcbox .video-container:hover .user-name,
-#rtcbox .video-container.local-user .interface-btn {
+#wrtc_modal .video-container:hover .interface-btn,
+#wrtc_modal .video-container:hover .user-name,
+#wrtc_modal .video-container.local-user .interface-btn {
 	background-color: rgba(255, 255, 255, 1);
 }
-#rtcbox .video-container:hover .user-name {
+#wrtc_modal .video-container:hover .user-name {
 	opacity: 1;
 }
 
 @media (max-width: 1600px) {
-	#rtcbox > .chatTitle{
-		width: 280px;
-    position: absolute;
-		top: -38px;
-		margin: 0;
-		background: #f8f9fa;
-	}
-
-	#rtcbox:not(.ep_padTitle) {
-		flex-direction: row;
-		flex-shrink: 0;
-		order: 2;
-		justify-content: start;
-		align-items: baseline;
-		display: flex;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-    background: #eee;
-	} 
-
-	#rtcbox .video-container:not(:first-child) {
-		margin-top: 0;
-		margin-left: 5px;
-	}
-	#rtcbox .videoWrapper{
-		flex-direction: row;
-	}
 }
 
 @media (min-width: 1600px) {
-	#rtcbox.active:not(.ep_padTitle){
-		display: block;
-		position: absolute;
-		left: 0;
-		top: 80px;
-    height: 100%;
-		top: 0;
-	}
+
 }
+
+
+
+
+/* =========text-chat========= */
 
 .wrtc_text .time { order: 5;}
 
@@ -215,61 +287,3 @@
 }
 .wrtc_text .videoIcon svg {display: inline-block;margin-bottom: -2px;}
 
-
-/* ============= primaryHeader =============== */
-
-#primaryHeader {
-	position: relative; display: flex; align-items: stretch;
-	background-color: #fff; border-bottom: 1px solid #ccc;
-	font-family: Quicksand;font-style: normal;font-weight: bold;
-}
-
-#primaryHeader #rtcbox.active {
-	display: flex;justify-content: start; order: 2; flex-grow: 8;
-	background-color: #fff; padding-left: 20px; width: calc(100% - 400px);
-}
-#primaryHeader #rtcbox .videoWrapper {
-	width: 100%; justify-content: center; flex-direction: row;
-}
-
-#primaryHeader .videoIcon {
-	float: left; margin-right: 6px; width: 14px; display: inline-block; margin-top: 2px;
-}
-
-#primaryHeader #pad_title > a { 
-	height: 100%;align-items: center;display: flex; width: 64px;
-	justify-content: center; 
-} 
-#primaryHeader #pad_title .logo {padding: 0; margin: 2px 0; transition: all .3s ease-in-out; }
-#primaryHeader #pad_title.f_wrtcActive .logo {width: 55px; margin: 0 0; }
-#primaryHeader #pad_title { 
-	flex-grow: 1; order: 1; flex-direction: row; display: flex;
-	align-items: center; border: none!important;padding: 0;
-}
-
-#primaryHeader #wrtc_roomInfo .RoomTitle {
-	max-width: 180px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	font-weight: bold;
-}
-
-#primaryHeader #wrtc_roomInfo {
-	font-size: 12px; line-height: 15px;
-}
-
-#primaryHeader #wrtc_roomInfo button {
-	margin: 0; padding: 0 4px; margin-left: 10px; outline: none;
-}
-
-#primaryHeader #wrtc_roomInfo p {
-	float: left; margin: 0 8px 0 0;
-}
-
-#primaryHeader #title {
-	max-width: 100%;
-	margin: 0;
-	padding: 0;
-	border-radius: 4px;
-}

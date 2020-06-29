@@ -89,11 +89,6 @@ exports.eejsBlock_styles = function (hookName, args, cb) {
 	return cb();
 }
 
-exports.eejsBlock_editorContainerBox = function (hookName, args, cb) {
-	// args.content = args.content + eejs.require("ep_wrtc_heading/templates/webrtc.ejs", {}, module)
-	return cb();
-}
-
 exports.clientVars = function (hook, context, callback) {
 	var enabled = true
 	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.enabled === false) {
