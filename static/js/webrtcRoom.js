@@ -66,11 +66,7 @@ var WRTC_Room = (function () {
 				};
 
 				// scroll down to header
-				var padContainer = self.$body_ace_outer().find("iframe").contents().find("#innerdocbody");
-
-				padContainer.find("." + prefixHeaderId + headingId)[0].scrollIntoView({
-					behavior: 'smooth'
-				});
+				self.scroll2Header(headingId);
 
 				self.isUserMediaAvailable().then(function () {
 					if (!currentUserRoom.userId) return socket.emit("userJoin", data, self.socketUserJoin);
@@ -114,6 +110,7 @@ var WRTC_Room = (function () {
 			$(".wrtc_text[data-authorid='" + data.userId + "'][data-headid='" + data.headingId + "']").remove();
 
 			if (data.userId === clientVars.userId) {
+				$headingRoom.find('span.videoIcon').removeClass('active');
 				WRTC.deactivate(data.userId, data.headingId);
 				window.headingId = null;
 				currentUserRoom = {};
@@ -152,6 +149,7 @@ var WRTC_Room = (function () {
 			var userCount = $headingRoomUsers.length;
 
 			$headingRoom.find(".userCoutn").text(userCount);
+			$("#werc_toolbar p").attr({ "data-headid": data.headingId });
 			$("#werc_toolbar .nd_title .nd_count").text(userCount);
 			$("#werc_toolbar .btn_leave").attr({ "data-headid": data.headingId });
 
@@ -181,6 +179,7 @@ var WRTC_Room = (function () {
 			if (data.userId === clientVars.userId) {
 
 				$("#werc_toolbar p").text(headerText);
+				$headingRoom.find('span.videoIcon').addClass('active');
 
 				window.headingId = data.headingId;
 				WRTC.activate(data.headingId, user.userId);
@@ -318,6 +317,12 @@ var WRTC_Room = (function () {
 				socket.emit("userLeave", data, self.socketUserLeave);
 			}
 		},
+		scroll2Header: function scroll2Header(headingId) {
+			var padContainer = self.$body_ace_outer().find("iframe").contents().find("#innerdocbody");
+			padContainer.find("." + prefixHeaderId + headingId)[0].scrollIntoView({
+				behavior: 'smooth'
+			});
+		},
 		activeEventListenr: function activeEventListenr() {
 
 			self.$body_ace_outer().on("mouseenter", ".wbrtc_roomBox", function () {
@@ -337,6 +342,11 @@ var WRTC_Room = (function () {
 			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_share", function () {
 				var url = $(this).find("input").val();
 				self.link2Clipboard(url);
+			});
+
+			$(document).on("click", "#werc_toolbar p", function(){
+				var headingId = $(this).attr("data-headid");
+				self.scroll2Header(headingId);
 			});
 		},
 		link2Clipboard: function link2Clipboard(text) {

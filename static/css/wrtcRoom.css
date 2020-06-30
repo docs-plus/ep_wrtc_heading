@@ -73,6 +73,9 @@
 	width: 18px;
 	margin-right: 8px;
 }
+.wbrtc_roomBox > .wbrtc_roomBoxHeader span.videoIcon.active{
+	color: #2678ff;
+}
 
 .wbrtc_roomBox > .wbrtc_roomBoxHeader span:last-of-type{
 	margin-right: 8px

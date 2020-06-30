@@ -8,16 +8,17 @@
 	height: auto;
 	z-index: 10;
 	min-width: 400px;
-	font-family: Quicksand;
+	font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 	font-style: normal;
-	font-weight: 600;
+	color: rgb(32, 33, 36);
+	font-size: 14px;
 	transition: all .3s;
 	overflow: hidden;
 	border-radius: 0 0 6px 6px;
-	box-shadow: 1px 1px 10px rgb(87, 98, 115, .3);
+	box-shadow: 1px 1px 4px rgb(87, 98, 115, .1);
 	border: 1px solid #e6e8e9;
-	border-bottom: none;
 	border-top: none;
+	background-color: #fff;
 }
 
 
@@ -25,14 +26,11 @@
 #werc_toolbar{
 	width: 100%;
 	height: auto;
-	padding: 3px;
 	overflow: hidden;
-	padding: 6px;
+	padding: 4px;
 	display: flex;
 	align-items: center;
-	background: #576273;
-	color: #fff;
-	font-size: 14px;
+	border-top: 1px solid rgb(218, 220, 224);
 }
 #werc_toolbar .nd_title{
 	display: flex;
@@ -41,8 +39,8 @@
 	flex-grow: 8;
 }
 #werc_toolbar .nd_title .fa_video{
-	width: 18px;
-	margin-bottom: -4px;
+	width: 16px;
+	margin-bottom: -5px;
 }
 #werc_toolbar .nd_title .nd_count {
 	margin: 0 0 0 0;
@@ -55,6 +53,7 @@
 	width: 70%;
 	float: left;
 	margin-left: 6px;
+	cursor: pointer;
 }
 
 .btn_controllers{
@@ -67,7 +66,7 @@
 }
 
 #werc_toolbar span[class*='fa_']{
-	width: 14px;
+	width: 13px;
 	display: inline-block;
 	margin: 0 8px;
 	float: right;
@@ -83,7 +82,7 @@
 }
 
 #werc_toolbar .nd_toolbar_toggle span{
-	width: 16px; margin: 0!important;
+	width: 14px; margin: 0!important;
 	display: none;
 }
 
@@ -124,9 +123,7 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
-	padding: 8px;
-	background: #f8f9fa;
-	min-height: 136px;
+	min-height: 90px;
 	flex-wrap: wrap;
 }
 
@@ -154,7 +151,11 @@
 }
 #wrtc_modal .video-container {
 	position: relative;
-	margin: 6px
+	margin: 4px;
+	background-color: #232323;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 /* #wrtc_modal .video-container:not(:first-child) {
 	margin-top: 5px;
@@ -188,13 +189,13 @@
 .interface-btn {
 	background-color: rgba(255, 255, 255, 0.35);
 	border-radius: 50%;
-	padding: 4px;
+	padding: 3px;
 	margin: 0 8px;
 	cursor: pointer;
 	transition: opacity 0.2s, background-color 0.2s;
 	color: #333;
-	width: 26px;
-	height: 26px;
+	width: 24px;
+	height: 24px;
 	opacity: 0;
 	transition: all .3s linear;
 	
@@ -204,7 +205,7 @@
 	background-color: white !important;
 }
 .interface-btn:before{
-	font-size: 16px;
+	font-size: 14px;
 }
 .interface-btn.audio-btn:before {
 	content: "\e83d";
@@ -233,7 +234,7 @@
 	left: 0; 
 	right: 0;
 	opacity: 1;
-	background-color: rgba(255, 255, 255, 0.7);
+	background-color: rgba(255, 255, 255, 0.8);
 	font-weight: bold;
 	line-height: 16px;
 	padding-left: 8px;
