@@ -8,7 +8,6 @@ var WRTC_Room = (function () {
 	var currentUserRoom = {};
 	var VIDEOCHATLIMIT = 0;
 	var $lastJoinButton = null;
-	var prefixRoomId = "wbrtc_roomBox_";
 	var prefixHeaderId = "headingTagId_";
 
 	var self = {
@@ -227,20 +226,46 @@ var WRTC_Room = (function () {
 		createSahreLink: function createSahreLink(headingTagId) {
 			return window.location.origin + window.location.pathname + "?heading=" + headingTagId + "&joinvideo=true";
 		},
+		adoptHeaderYRoom: function adoptHeaderYRoom () {
+			// Set all video_heading to be inline with their target REP
+			var $padOuter = self.$body_ace_outer()
+			if(!$padOuter) return;
+
+			$padOuter.find(".wbrtc_roomBox").each(function (index) {
+				var $boxId = $(this).attr("id");
+				var hClassId = "headingTagId_" + $boxId;
+				var $headingEl = $padOuter.find("iframe").contents().find("#innerdocbody").find("." + hClassId);
+	
+				// if the H tags does not find remove chatBox
+				// TODO: and kick out the user form the chatBox
+				if ($headingEl.length <= 0) {
+					$(this).remove();
+					return false;
+				}
+	
+				$(this).css({ top: WRTC_Room.getHeaderRoomY($headingEl) + "px" });
+			});
+
+		},
+		getHeaderRoomY: function getHeaderRoomY($element){
+			var offsetTop = $element.offset().top
+			var height = $element.outerHeight()
+			var aceOuterPadding = parseInt(self.$body_ace_outer().find('iframe[name="ace_inner"]').css("padding-top"));
+			var offsetTop = Math.ceil($element.offset().top + aceOuterPadding)
+			return (offsetTop + height / 2) - 14
+		},
 		findTags: function findTags() {
 			var _self = this;
 			var hTagList = []; // The main object we will use
 			var hElements = ["h1", "h2", "h3", "h4", "h5", "h6", ".h1", ".h2", ".h3", ".h4", ".h5", ".h6"];
 			hElements = hElements.join(",");
 			var hTags = _self.$body_ace_outer().find("iframe").contents().find("#innerdocbody").children("div").children(hElements);
-			var aceOuterPadding = parseInt(_self.$body_ace_outer().find('iframe[name="ace_inner"]').css("padding-top"));
 			var aceInnerOffset = _self.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
 			$(hTags).each(function () {
 				var lineNumber = $(this).parent().prevAll().length;
 				var tag = $(this).prop("tagName").toLowerCase();
-				var offset = $(this).offset();
-				var newY = Math.floor(offset.top + aceOuterPadding);
-				var newX = Math.floor(aceInnerOffset.left);
+				var newY = self.getHeaderRoomY($(this));
+				var newX = Math.ceil(aceInnerOffset.left);
 				var linkText = $(this).text();
 				var headingTagId = $(this).find("span").attr("class");
 				headingTagId = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(headingTagId);
@@ -337,7 +362,8 @@ var WRTC_Room = (function () {
 			});
 
 			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_door", self.roomBtnHandler);
-			$(document).on('click', '#werc_toolbar .btn_leave', self.roomBtnHandler);
+
+			$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', self.roomBtnHandler);
 
 			self.$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_share", function () {
 				var url = $(this).find("input").val();

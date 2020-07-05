@@ -47,32 +47,8 @@ var EPwrtcHeading = (function () {
 
 	}
 
-	// Set all video_heading to be inline with their target REP
-	function setYofHeadingBox () {
-		var $padOuter = $('iframe[name="ace_outer"]').contents()
-		if(!$padOuter) return;
-		$padOuter.find(".wbrtc_roomBox").each(function (index) {
-			var $boxId = $(this).attr("id");
-			var hClassId = "headingTagId_" + $boxId;
-			var aceOuterPadding = parseInt($padOuter.find('iframe[name="ace_inner"]').css("padding-top"));
-			var $headingEl = $padOuter.find("iframe").contents().find("#innerdocbody").find("." + hClassId);
-
-			// if the H tags does not find remove chatBox
-			// TODO: and kick out the user form the chatBox
-			if ($headingEl.length <= 0) {
-				$(this).remove();
-				return false;
-			}
-
-			var offsetTop = Math.floor($headingEl.offset().top + aceOuterPadding);
-
-			$(this).css({ top: offsetTop + "px" });
-		});
-	};
-
 	return Object.freeze({
 		init: init,
-		setYofHeadingBox: setYofHeadingBox
 	});
 })();
 
@@ -103,7 +79,7 @@ var hooks = {
 		});
 
 		$(window).resize(_.debounce(function () {
-			EPwrtcHeading.setYofHeadingBox();
+			WRTC_Room.adoptHeaderYRoom();
 		}, 100));
 
 	},
@@ -114,7 +90,7 @@ var hooks = {
 		if ("handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps".includes(eventType)) return;
 
 		// some times init ep_wrtc_heading is not yet in the plugin list
-		if (context.callstack.docTextChanged ) EPwrtcHeading.setYofHeadingBox();
+		if (context.callstack.docTextChanged ) WRTC_Room.adoptHeaderYRoom();
 
 		// apply changes to the other user
 		if (eventType === "applyChangesToBase" && context.callstack.selectionAffected) {
