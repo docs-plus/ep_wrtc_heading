@@ -123,7 +123,7 @@ var WRTC_Room = (function () {
 				$("#wrtc_modal").css({
 					"transform": "translate(-50%, -100%)",
 					"opacity": 0
-				});
+				}).attr({"data-active": false});
 			}
 		},
 		addUserToRoom: function addUserToRoom(data) {
@@ -191,7 +191,9 @@ var WRTC_Room = (function () {
 				}).removeClass("deactivate active").html("LEAVE");
 				$("#rtcbox").prepend('<h4 class="chatTitle">' + headerText + '</h4>');
 
-				$("#wrtc_modal").css({ "transform": "translate(-50%, 0)", "opacity": 1 });
+				$("#wrtc_modal")
+				.css({ "transform": "translate(-50%, 0)", "opacity": 1 })
+				.attr({"data-active": true});
 			}
 		},
 		scrollDown: function scrollDown(force) {
