@@ -8,9 +8,6 @@
 	width: 66px;
 }
 
-
-
-
 @media (max-width: 1500px) {
 	#wbrtc_chatBox {
 		order: -1;
