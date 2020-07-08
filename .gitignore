@@ -112,5 +112,6 @@ temp/
 coverage
 
 .ep_initialized
+.vscode
 
 # End of https://www.gitignore.io/api/node

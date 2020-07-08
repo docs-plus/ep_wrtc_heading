@@ -7,7 +7,7 @@
 		"email": "marzban98@gmail.com"
 	},
 	"main": "index.js",
-	"keywords":[
+	"keywords": [
 		"etherpad",
 		"webrtc",
 		"video",
@@ -21,5 +21,8 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/HMarzban/ep_wrtc_heading"
+	},
+	"dependencies": {
+		"better-queue": "^3.8.10"
 	}
 }

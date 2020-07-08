@@ -6,7 +6,6 @@ var sessioninfos = require("ep_etherpad-lite/node/handler/PadMessageHandler").se
 var statsLogger = log4js.getLogger("stats")
 var stats = require("ep_etherpad-lite/node/stats")
 var packageJson = require('./package.json');
-
 // Make sure any updates to this are reflected in README
 var statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
 var VIDEOCHATLIMIT = 4;
@@ -21,6 +20,14 @@ exports.socketio = function (hookName, args, cb) {
 			socket.join(padId)
 		})
 
+		socket.on("userList", function(padId, callback) {
+			var userList = rooms
+				.filter(x => x.padId === padId)
+				.map(x => x.userId)
+
+			callback(userList)
+		})
+
 		socket.on("userJoin", function (data, callback) {
 			// find user in current pad, user can only join in one heading room in each pad section
 			var findUserInPad = rooms.find(x => x.padId === data.padId && x.userId === data.userId)
@@ -28,28 +35,34 @@ exports.socketio = function (hookName, args, cb) {
 
 			var usersInCurrentRoom = rooms.filter(x => x.headingId === data.headingId && x.padId === data.padId)
 
-			var users = {
+			var roomInfo = {
 				present: usersInCurrentRoom.length,
 				list: usersInCurrentRoom
 			};
 
-			data = { ...data, users }
-
-			if(users.present < VIDEOCHATLIMIT){
+			if(roomInfo.present < VIDEOCHATLIMIT){
 				rooms.push(data);
-				socket.broadcast.to(data.padId).emit("userJoin", data)
+				roomInfo.present++
+				roomInfo.list.push(data)
+				socket.broadcast.to(data.padId).emit("userJoin", data, roomInfo)
+				callback(data, roomInfo)
+			} else {
+				callback(null, roomInfo)
 			}
 
-			callback(data)
 		})
 
 		socket.on("userLeave", function (data, callback) {
 			rooms = rooms.filter(x => !(x.headingId === data.headingId && x.padId === data.padId && x.userId === data.userId))
 			var userInCurrentRoom = rooms.filter(x => x.headingId === data.headingId && x.padId === data.padId)
-			Object.assign(data, { userCount: userInCurrentRoom.length })
 
-			socket.broadcast.to(data.padId).emit("userLeave", data)
-			callback(data)
+			var roomInfo = {
+				present: userInCurrentRoom.length,
+				list: userInCurrentRoom
+			};
+
+			socket.broadcast.to(data.padId).emit("userLeave", data, roomInfo)
+			callback(data, roomInfo)
 		})
 
 		socket.on("leaveSession", function (data, callback) {
@@ -63,9 +76,27 @@ exports.socketio = function (hookName, args, cb) {
 
 		// remove the room that not available and excrete user from room
 		socket.on("bulkUpdateRooms", function (padId, heading, callback) {
-			rooms = rooms.filter(el => heading.find(x => el.padId === padId && x.headingTagId === el.headingId))
-			socket.broadcast.to(padId).emit("bulkUpdateRooms", rooms)
-			callback(rooms)
+			rooms = rooms.filter(el => 
+				heading.find(x => el.padId === padId && x.headingTagId === el.headingId)
+			)
+
+			var existedRoom = rooms.filter(room => room.padId === padId)
+			
+			var roomCollection = {}
+
+			existedRoom.forEach(room => {
+				if(!roomCollection[room.headingId]){
+					roomCollection[room.headingId] = []
+				}
+				roomCollection[room.headingId].push(room)
+			})
+			
+			var roomInfo = {
+				present: existedRoom.length,
+				list: existedRoom
+			};
+			socket.broadcast.to(padId).emit("bulkUpdateRooms", roomCollection, roomInfo)
+			callback(roomCollection, roomInfo)
 		})
 	})
 }

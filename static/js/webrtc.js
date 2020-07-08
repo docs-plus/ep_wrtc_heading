@@ -167,18 +167,10 @@ var WRTC = (function () {
 			self.hide(userId);
 			self.hangupAll(headingId);
 			self.hangup(userId, true, headingId);
-
 			if (localStream) {
-				var videoTrack = localStream.getVideoTracks()[0];
-				// var audioTrack = localStream.getAudioTracks()[0]
-				if (videoTrack.stop === undefined) {
-					// deprecated in 2015, probably disabled by 2020
-					// https://developers.google.com/web/updates/2015/07/mediastream-deprecations
-					localStream.stop();
-				} else {
-					// videoTrack.stop();
-					// audioTrack.stop();
-				}
+				localStream.getTracks().forEach(function (track) {
+					track.stop();
+				});
 				localStream = null;
 			}
 		},
