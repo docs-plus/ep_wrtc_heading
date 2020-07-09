@@ -188,7 +188,8 @@ var WRTC_Room = (function () {
 			socket.emit("bulkUpdateRooms", padId, hTagList, socketBulkUpdateRooms);
 		},
 		initSocketJoin: function initSocketJoin() {
-			socket.emit("joinPadRooms", clientVars.padId, function () {});
+			var userId = window.pad.getUserId()
+			socket.emit("joinPadRooms", clientVars.padId, userId, function () {});
 		},
 		init: function init() {
 			this._pad = window.pad.getPadId()
@@ -202,28 +203,7 @@ var WRTC_Room = (function () {
 				getway_userLeave(data, roomInfo);
 			});
 
-			// socket.on("bulkUpdateRooms", function(rooms, roomInfo){
-			// 	// _.debounce(function () {
-			// 		socketBulkUpdateRooms(rooms, roomInfo)
-			// 	// }, 1000)
-			// });
-
 			activeEventListenr();
-
-			// socket.emit("userList", this._pad , function(users){
-			// 	var usersPad = window.pad.collabClient.getConnectedUsers()
-			// 	// usersPad.forEach(f)
-			// 	// var kickOutUsers = usersPad.filter(function(el){
-			// 	// 	if(!users[el.userId])
-			// 	// 		return users[el.userId]
-			// 	// })
-			// 	console.log(kickOutUsers,"====================================================", users, usersPad)
-			// })
-
-		
-
-
-
 
 			// check if there is a join request in URI queryString
 			setTimeout(function () {
@@ -472,7 +452,6 @@ var WRTC_Room = (function () {
   * @param {Boolean} bulkUpdate 
   */
 	function getway_userJoin(data, roomInfo, showAlert, bulkUpdate) {
-		console.log(data, roomInfo, showAlert, bulkUpdate)
 		if (!data) return reachedVideoRoomSize(null, true, false);
 
 		if (data && reachedVideoRoomSize(roomInfo, showAlert, bulkUpdate)) {

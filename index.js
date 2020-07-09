@@ -10,14 +10,24 @@ var packageJson = require('./package.json');
 var statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
 var VIDEOCHATLIMIT = 4;
 
+
 exports.socketio = function (hookName, args, cb) {
 	socketio = args.io
 	var io = args.io
 	var rooms = []
+
 	io.of("/heading_chat_room").on("connect", function (socket) {
+
+		socket.on('disconnect', function() {
+			var data = socket.ndHolder
+			if(data) {
+				rooms = rooms.filter(x => !(x.padId === data.padId && x.userId === data.userId))
+			}
+    });
 		
-		socket.on("joinPadRooms", function (padId, callback) {
-			socket.join(padId)
+		socket.on("joinPadRooms", function (padId ,userId,callback) {
+			socket.ndHolder = {userId, padId}
+			socket.join(padId) 	
 		})
 
 		socket.on("userList", function(padId, callback) {
@@ -45,6 +55,7 @@ exports.socketio = function (hookName, args, cb) {
 				roomInfo.present++
 				roomInfo.list.push(data)
 				socket.broadcast.to(data.padId).emit("userJoin", data, roomInfo)
+				socket.ndHolder = data
 				callback(data, roomInfo)
 			} else {
 				callback(null, roomInfo)
