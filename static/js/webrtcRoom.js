@@ -170,13 +170,18 @@ var WRTC_Room = (function () {
 				}
 			}
 		},
-		userLeave: function userLeave(context) {
+		userLeave: function userLeave(context, callback) {
+			var userId = context.userInfo.userId;
+			var headingId = $body_ace_outer()
+				.find(".wbrtc_roomBoxBody ul li[data-id='" + userId + "']")
+				.parent().parent().parent();
 			var data = {
 				padId: window.pad.getPadId(),
-				userId: context.userInfo.userId
+				userId: userId,
+				headingId: headingId.attr("id")
 			};
-
 			socket.emit("userLeave", data, getway_userLeave);
+			callback()
 		},
 		bulkUpdateRooms: function bulkUpdateRooms(hTagList) {
 			var padId = window.pad.getPadId();
@@ -430,7 +435,7 @@ var WRTC_Room = (function () {
 
 				// If the user has already joined the video chat, make suere leave that room then join to the new chat room
 				socket.emit("userLeave", currentUserRoom, function (_data, roomInfo) {
-					getwayUserLeave(_data, roomInfo);
+					getway_userLeave(_data, roomInfo);
 					socket.emit("userJoin", data, getway_userJoin);
 				});
 			});

@@ -123,7 +123,7 @@ var hooks = {
 		WRTC.aceSetAuthorStyle(context);
 	},
 	userLeave: function userLeave(hook, context, callback) {
-		WRTC_Room.userLeave(context);
+		WRTC_Room.userLeave(context, callback);
 		WRTC.userLeave(hook, context, callback);
 	},
 	handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
