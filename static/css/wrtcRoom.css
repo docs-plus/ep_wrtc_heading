@@ -8,6 +8,10 @@
 	width: 66px;
 }
 
+#wbrtc_chatBox:hover {
+	overflow: initial;
+}
+
 @media (max-width: 1500px) {
 	#wbrtc_chatBox {
 		order: -1;

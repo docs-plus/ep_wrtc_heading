@@ -10,6 +10,7 @@ var WRTC_Room = (function () {
 	var $lastJoinButton = null;
 	var prefixHeaderId = "headingTagId_";
 	var localStream = null;
+	var hElements = ["h1", "h2", "h3", "h4", "h5", "h6", ".h1", ".h2", ".h3", ".h4", ".h5", ".h6"];
 
 	/** --------- Helper --------- */
 
@@ -192,7 +193,8 @@ var WRTC_Room = (function () {
 			socket.emit("joinPadRooms", clientVars.padId, userId, function () {});
 		},
 		init: function init() {
-			this._pad = window.pad.getPadId()
+			this._pad = window.pad.getPadId();
+
 			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
 
 			socket.on("userJoin", function (data, roomInfo) {
@@ -216,8 +218,12 @@ var WRTC_Room = (function () {
 			var $headingRoom = $body_ace_outer().contents();
 			var $user = $headingRoom.find(".wbrtc_roomBoxBody ul li[data-id='" + data.userId + "']");
 			$headingRoom = $user.closest("div").parent(".wbrtc_roomBox");
-			$user.remove();
 
+			$headingRoom.find(".wbrtc_roomBoxBody ul").empty();
+			roomInfo.list.forEach(function(el) {
+				$headingRoom.find(".wbrtc_roomBoxBody ul").append("<li data-id=" + el.userId + " style='border-color: " + el.colorId + "'>" + el.name + "</li>");
+			});
+			
 			var userCount = roomInfo.present;
 			$headingRoom.find(".userCoutn").text(userCount);
 			$("#werc_toolbar .nd_title .nd_count").text(userCount);
@@ -254,13 +260,20 @@ var WRTC_Room = (function () {
 			if (!user) return true;
 
 			var headerText = $headingRoom.find(".wbrtc_roomBoxHeader b").text();
+			var userCount = roomInfo.present;
+			$headingRoom.find(".userCoutn").text(userCount);
+			$("#werc_toolbar .nd_title .nd_count").text(userCount);
+
+
 			// if incoming user has already in the room dont persude the requeiest
 			var IsUserInRooms = $headingRoom.find(".wbrtc_roomBoxBody ul li[data-id='" + user.userId + "']").text();
 			if (IsUserInRooms) return false;
 
-			$headingRoom.find(".wbrtc_roomBoxBody ul").append("<li data-id=" + user.userId + " style='border-color: " + user.colorId + "'>" + user.name + "</li>");
-			var userCount = roomInfo.present;
-			$headingRoom.find(".userCoutn").text(userCount);
+			$headingRoom.find(".wbrtc_roomBoxBody ul").empty()
+			roomInfo.list.forEach(function(el) {
+				$headingRoom.find(".wbrtc_roomBoxBody ul").append("<li data-id=" + el.userId + " style='border-color: " + el.colorId + "'>" + el.name + "</li>");
+			})
+
 
 			var videoIcon = '<span class="videoIcon"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="video" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-video fa-w-18 fa-2x"><path fill="currentColor" d="M336.2 64H47.8C21.4 64 0 85.4 0 111.8v288.4C0 426.6 21.4 448 47.8 448h288.4c26.4 0 47.8-21.4 47.8-47.8V111.8c0-26.4-21.4-47.8-47.8-47.8zm189.4 37.7L416 177.3v157.4l109.6 75.5c21.2 14.6 50.4-.3 50.4-25.8V127.5c0-25.4-29.1-40.4-50.4-25.8z" class=""></path></svg></span>';
 			var roomCounter = "<span class='userCount'>(" + userCount + "/" + VIDEOCHATLIMIT + ")</span>";
@@ -286,13 +299,9 @@ var WRTC_Room = (function () {
 			}
 
 			if (data.userId === currentUserId) {
-
 				$("#werc_toolbar p").attr({ "data-headid": data.headingId }).text(headerText);
 				$("#werc_toolbar .btn_leave").attr({ "data-headid": data.headingId });
-				$("#werc_toolbar .nd_title .nd_count").text(userCount);
-
 				$headingRoom.find('span.videoIcon').addClass('active');
-
 				window.headingId = data.headingId;
 				WRTC.activate(data.headingId, user.userId);
 				currentUserRoom = data;
@@ -302,6 +311,7 @@ var WRTC_Room = (function () {
 					"data-action": "LEAVE",
 					"disabled": false
 				}).removeClass("deactivate active").html("LEAVE");
+
 				$("#rtcbox").prepend('<h4 class="chatTitle">' + headerText + '</h4>');
 
 				$("#wrtc_modal").css({
@@ -333,9 +343,8 @@ var WRTC_Room = (function () {
 		},
 		findTags: function findTags() {
 			var hTagList = [];
-			var hElements = ["h1", "h2", "h3", "h4", "h5", "h6", ".h1", ".h2", ".h3", ".h4", ".h5", ".h6"];
-			hElements = hElements.join(",");
-			var hTags = $body_ace_outer().find("iframe").contents().find("#innerdocbody").children("div").children(hElements);
+			var hTagElements = hElements.join(",");
+			var hTags = $body_ace_outer().find("iframe").contents().find("#innerdocbody").children("div").children(hTagElements);
 			var aceInnerOffset = $body_ace_outer().find('iframe[name="ace_inner"]').offset();
 			$(hTags).each(function () {
 				var $el = $(this);
@@ -371,11 +380,19 @@ var WRTC_Room = (function () {
 					url: el.url,
 					videoChatLimit: VIDEOCHATLIMIT
 				};
+
 				// if the header does not exists then adde to list
+				// otherwise update textHeader
 				if (target.find("#" + el.headingTagId).length <= 0) {
 					var box = $("#wertc_roomBox").tmpl(data);
 					target.find("#wbrtc_chatBox").append(box);
 					newHTagAdded = true;
+				} else {
+					$(document)
+					.find("[data-headid=" + el.headingTagId + "].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-headid=" +  el.headingTagId + "]")
+					.text(el.text);
+
+					target.find(".wbrtc_roomBox[id=" + el.headingTagId + "] .wbrtc_roomBoxHeader b").text(el.text);
 				}
 			});
 
@@ -384,6 +401,7 @@ var WRTC_Room = (function () {
 				self.bulkUpdateRooms(hTagList);
 				newHTagAdded = false;
 			}
+
 		}
 	};
 
