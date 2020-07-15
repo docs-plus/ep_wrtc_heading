@@ -35,9 +35,11 @@ var WRTC_Room = (function () {
 
 	function scroll2Header(headingId) {
 		var padContainer = $body_ace_outer().find("iframe").contents().find("#innerdocbody");
-		padContainer.find("." + prefixHeaderId + headingId)[0].scrollIntoView({
-			behavior: 'smooth'
-		});
+		padContainer.find("." + prefixHeaderId + headingId).each(function(){
+			this.scrollIntoView({
+				behavior: 'smooth'
+			});
+		})
 	};
 
 	function isUserMediaAvailable() {
@@ -190,7 +192,8 @@ var WRTC_Room = (function () {
 		},
 		initSocketJoin: function initSocketJoin() {
 			var userId = window.pad.getUserId()
-			socket.emit("joinPadRooms", clientVars.padId, userId, function () {});
+			var padId = window.pad.getPadId()
+			socket.emit("join pad", padId, userId, function () {});
 		},
 		init: function init() {
 			this._pad = window.pad.getPadId();
@@ -220,10 +223,12 @@ var WRTC_Room = (function () {
 			$headingRoom = $user.closest("div").parent(".wbrtc_roomBox");
 
 			$headingRoom.find(".wbrtc_roomBoxBody ul").empty();
-			roomInfo.list.forEach(function(el) {
-				$headingRoom.find(".wbrtc_roomBoxBody ul").append("<li data-id=" + el.userId + " style='border-color: " + el.colorId + "'>" + el.name + "</li>");
-			});
-			
+			if(roomInfo.list){
+				roomInfo.list.forEach(function(el) {
+					$headingRoom.find(".wbrtc_roomBoxBody ul").append("<li data-id=" + el.userId + " style='border-color: " + el.colorId + "'>" + el.userName + "</li>");
+				});	
+			}
+
 			var userCount = roomInfo.present;
 			$headingRoom.find(".userCoutn").text(userCount);
 			$("#werc_toolbar .nd_title .nd_count").text(userCount);
@@ -270,10 +275,12 @@ var WRTC_Room = (function () {
 			if (IsUserInRooms) return false;
 
 			$headingRoom.find(".wbrtc_roomBoxBody ul").empty()
-			roomInfo.list.forEach(function(el) {
-				$headingRoom.find(".wbrtc_roomBoxBody ul").append("<li data-id=" + el.userId + " style='border-color: " + el.colorId + "'>" + el.name + "</li>");
-			})
 
+			if(roomInfo.list){
+				roomInfo.list.forEach(function(el) {
+					$headingRoom.find(".wbrtc_roomBoxBody ul").append("<li data-id=" + el.userId + " style='border-color: " + el.colorId + "'>" + el.userName + "</li>");
+				})
+			}
 
 			var videoIcon = '<span class="videoIcon"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="video" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-video fa-w-18 fa-2x"><path fill="currentColor" d="M336.2 64H47.8C21.4 64 0 85.4 0 111.8v288.4C0 426.6 21.4 448 47.8 448h288.4c26.4 0 47.8-21.4 47.8-47.8V111.8c0-26.4-21.4-47.8-47.8-47.8zm189.4 37.7L416 177.3v157.4l109.6 75.5c21.2 14.6 50.4-.3 50.4-25.8V127.5c0-25.4-29.1-40.4-50.4-25.8z" class=""></path></svg></span>';
 			var roomCounter = "<span class='userCount'>(" + userCount + "/" + VIDEOCHATLIMIT + ")</span>";
@@ -482,9 +489,7 @@ var WRTC_Room = (function () {
 	}
 
 	function getway_userLeave(data, roomInfo) {
-		if (data) {
-			self.removeUserFromRoom(data, roomInfo);
-		}
+		self.removeUserFromRoom(data, roomInfo);
 	}
 
 	return self;
