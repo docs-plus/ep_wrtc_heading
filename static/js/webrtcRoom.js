@@ -83,15 +83,12 @@ var WRTC_Room = (function () {
 
 	function activeEventListenr() {
 
+		// $body_ace_outer().find('iframe[name="ace_inner"]').contents().on("paste", function(e) {})
+
 		$body_ace_outer().on("mouseenter", ".wbrtc_roomBox", function () {
-			var $this = $(this);
-			$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "inherit" }).ready(function () {
-				$this.addClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "block" });
-			});
+			$(this).addClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "block" });
 		}).on("mouseleave", ".wbrtc_roomBox", function () {
-			$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "none" }).ready(function () {
-				$body_ace_outer().find("#wbrtc_chatBox").css({ overflow: "hidden" });
-			});
+			$(this).removeClass("active").find(".wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b").css({ display: "none" });
 		});
 
 		$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_share", function () {
@@ -107,6 +104,15 @@ var WRTC_Room = (function () {
 		$body_ace_outer().on("click", ".wbrtc_roomBoxFooter > button.btn_door", roomBtnHandler);
 
 		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
+
+		$(document).on('click', '.bnt_expand', function(){
+			if(!$(this).attr("active")) return true;
+
+			$(this).toggleClass("large")
+			$("#wrtc_modal .video-container .enlarge-btn").each(function(){
+				$(this).trigger("click")
+			})
+		})
 	};
 
 	function getHeaderRoomY($element) {
@@ -353,6 +359,8 @@ var WRTC_Room = (function () {
 			var hTagElements = hElements.join(",");
 			var hTags = $body_ace_outer().find("iframe").contents().find("#innerdocbody").children("div").children(hTagElements);
 			var aceInnerOffset = $body_ace_outer().find('iframe[name="ace_inner"]').offset();
+			var target = $body_ace_outer().find("#outerdocbody");
+			var newHTagAdded = false;
 			$(hTags).each(function () {
 				var $el = $(this);
 				var lineNumber = $el.parent().prevAll().length;
@@ -363,45 +371,36 @@ var WRTC_Room = (function () {
 				var headingTagId = $el.find("span").attr("class");
 				headingTagId = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(headingTagId);
 				if (!headingTagId) return true;
-				hTagList.push({
+
+				var data = {
 					headingTagId: headingTagId[1],
 					tag: tag,
-					y: newY,
-					x: newX,
-					text: linkText,
+					positionTop: newY,
+					positionLeft: newX,
+					headTitle: linkText,
 					lineNumber: lineNumber,
-					url: window.location.origin + window.location.pathname + "?heading=" + headingTagId[1] + "&joinvideo=true"
-				});
-			});
-
-			clientVars.plugins.plugins.ep_wrtc_heading_room = hTagList;
-			var target = $body_ace_outer().find("#outerdocbody");
-			var newHTagAdded = false;
-			$.each(hTagList, function (index, el) {
-				var data = {
-					lineNumber: el.lineNumber,
-					positionTop: el.y,
-					positionLeft: el.x,
-					headTitle: el.text,
-					headingTagId: el.headingTagId,
-					url: el.url,
+					url: window.location.origin + window.location.pathname + "?heading=" + headingTagId[1] + "&joinvideo=true",
 					videoChatLimit: VIDEOCHATLIMIT
-				};
+				}
 
 				// if the header does not exists then adde to list
 				// otherwise update textHeader
-				if (target.find("#" + el.headingTagId).length <= 0) {
+				if (target.find("#" + data.headingTagId).length <= 0) {
 					var box = $("#wertc_roomBox").tmpl(data);
 					target.find("#wbrtc_chatBox").append(box);
 					newHTagAdded = true;
 				} else {
 					$(document)
-					.find("[data-headid=" + el.headingTagId + "].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-headid=" +  el.headingTagId + "]")
-					.text(el.text);
+					.find("[data-headid=" + data.headingTagId + "].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-headid=" +  data.headingTagId + "]")
+					.text(data.text);
 
-					target.find(".wbrtc_roomBox[id=" + el.headingTagId + "] .wbrtc_roomBoxHeader b").text(el.text);
+					target.find(".wbrtc_roomBox[id=" + data.headingTagId + "] .wbrtc_roomBoxHeader b").text(data.text);
 				}
+
+				hTagList.push(data);
 			});
+
+			clientVars.plugins.plugins.ep_wrtc_heading_room = hTagList;
 
 			// if a new h tag addedd check all heading agian!
 			if (newHTagAdded) {

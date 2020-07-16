@@ -61,6 +61,7 @@ var WRTC = (function () {
 				var action = $(this).attr('data-action');
 				var videoBox = $("#wrtc_modal .videoWrapper").innerHeight();
 				if (action === "collapse") {
+					$parent.find(".bnt_expand").removeAttr('active')
 					$(this).removeClass("active");
 					$parent.find('[data-action="expand"]').addClass("active");
 					$("#wrtc_modal").css({
@@ -68,6 +69,7 @@ var WRTC = (function () {
 					});
 				} else {
 					$(this).removeClass("active");
+					$parent.find(".bnt_expand").attr({'active': true})
 					$parent.find('[data-action="collapse"]').addClass("active");
 					$("#wrtc_modal").css({
 						"transform": "translate(-50%, 0)"

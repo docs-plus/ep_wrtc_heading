@@ -3,8 +3,7 @@
 	position: absolute;
 	top: 0;
 	left: 50%;
-	transform: translate(-50%, -100%);
-	max-width: 70%;
+	transform: translate(-50%, -100%);	max-width: 90%;
 	height: auto;
 	z-index: 99999;
 	min-width: 400px;
@@ -59,12 +58,25 @@
 
 .btn_controllers{
 	width: 30%;
+	min-width: 130px;
 	float: right;
 }
 
 .btn_controllers span{
 	cursor: pointer;
 }
+#werc_toolbar span.bnt_expand{
+	float: right;
+	margin: 0 4px;
+}
+#werc_toolbar span.bnt_expand::before{
+	content: "\e840";
+	font-size: 16px;
+}
+#werc_toolbar span.bnt_expand.large::before{
+	content: "\e83f";
+}
+
 
 #werc_toolbar span[class*='fa_']{
 	width: 13px;
