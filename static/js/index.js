@@ -163,13 +163,24 @@ function getSelectionHtml() {
 }
 
 function selectionMultipleLine() {
-	return null;
+	var rawHtml = getSelectionHtml()
+	rawHtml = $("<div></div>").append(rawHtml)
+	rawHtml.find(":header span").removeClass(function (index, css) {
+		return (css.match(/\headingTagId_\S+/g) || []).join(' '); 
+	}).addClass(function( index, css ) {
+		return 'headingTagId_' + randomString(16) + ' ' + css;
+	});
+	return rawHtml.html()
 }
 
 function selectionOneLine(headerId){
-	var content = padInner.contents().find(".headingTagId_"+headerId).removeClass("").closest(":header").html();
 	var hTag = padInner.contents().find(".headingTagId_"+headerId).closest(":header")[0].tagName;
-	return "<"+hTag+">" +content + "</"+hTag+">";
+	var content = padInner.contents().find(".headingTagId_"+headerId)
+	.closest(":header span").removeClass(function (index, css) {
+		return (css.match(/\headingTagId_\S+/g) || []).join(' '); 
+	}).html();
+	const rawHtml = $("<div></div>").append("<" + hTag + "><span class='headingTagId_" + randomString(16) + "'>" + content + "</span></" + hTag + ">")
+	return rawHtml.html() ;
 }
 
 var hooks = {
@@ -204,45 +215,18 @@ var hooks = {
 		padInner = padOuter.find('iframe[name="ace_inner"]');
 		outerBody = padOuter.find("#outerdocbody");
 
-		var ace = context.ace
+	var ace = context.ace
 		
 	if(browser.chrome || browser.firefox){
+
     padInner.contents().on("copy", function(e) {
+			events.addTextOnClipboard(e, ace, padInner, false)
+		});
 
-			var removeSelection = false
-
-			var selection;
-			ace.callWithAce(function(ace) {
-				selection = ace.ace_hasHeaderOnSelection();
-			});
-			
-
-			// console.log(selection)
-			
-			if(selection.hasVideoHeader){
-				var rawHtml;
-
-				if(hasMultipleLine){
-					var htmlSelection = getSelectionHtml();
-					rawHtml = selectionMultipleLine(htmlSelection);
-				} else {
-					rawHtml = selectionOneLine(selection.headId);
-				}
-			
-				// console.log("rawHtml========>>>>>>>", rawHtml)
-		
-				if(rawHtml){
-					e.originalEvent.clipboardData.setData('text/html', rawHtml);
-					e.preventDefault();
-				}
-	
-				// if it is a cut event we have to remove the selection
-				if(removeSelection){
-					padInner.contents()[0].execCommand("delete");
-				}
-			}
-
+    self.padInner.contents().on("cut", function(e) {
+      events.addTextOnClipboard(e, ace, padInner, true);
     });
+
   }
 
 
@@ -303,7 +287,6 @@ var hooks = {
 	aceInitialized: function aceInitialized(hook, context){
 		var editorInfo = context.editorInfo;
 		editorInfo.ace_hasHeaderOnSelection = _(hasHeaderOnSelection).bind(context);
-		editorInfo.ace_getHeaderIdOnFirstPositionSelected = _(getHeaderIdOnFirstPositionSelected).bind(context);
 
 	}
 };
