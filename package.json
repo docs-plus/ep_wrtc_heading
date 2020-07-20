@@ -16,7 +16,7 @@
 	],
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"lint": "eslint --fix ./static/js/*.js"
+		"lint": "npx eslint --fix ./static/js/*.js"
 	},
 	"devDependencies": {
 		"eslint": "^7.5.0",
