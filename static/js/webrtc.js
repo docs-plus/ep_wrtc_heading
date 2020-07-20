@@ -15,18 +15,21 @@
  */
 "use strict";
 
+require("ep_wrtc_heading/static/js/adapter");
+require("ep_wrtc_heading/static/js/getUserMediaPolyfill");
+
 var WRTC = (function () {
-	var videoSizes = { large: "260px", small: "160px" };
+	var videoSizes = { "large": "260px", "small": "160px" };
 	var pcConfig = {};
 	var pcConstraints = {
-		optional: [{
-			DtlsSrtpKeyAgreement: true
+		"optional": [{
+			"DtlsSrtpKeyAgreement": true
 		}]
 	};
 	var sdpConstraints = {
-		mandatory: {
-			OfferToReceiveAudio: true,
-			OfferToReceiveVideo: true
+		"mandatory": {
+			"OfferToReceiveAudio": true,
+			"OfferToReceiveVideo": true
 		}
 	};
 	var localStream;
@@ -37,9 +40,9 @@ var WRTC = (function () {
 
 	var self = {
 		// API HOOKS
-		postAceInit: function postAceInit(hook, context) {
+		"postAceInit": function postAceInit (hook, context) {
 			pcConfig.iceServers = clientVars.webrtc && clientVars.webrtc.iceServers ? clientVars.webrtc.iceServers : [{
-				url: "stun:stun.l.google.com:19302"
+				"url": "stun:stun.l.google.com:19302"
 			}];
 			if (clientVars.webrtc.video.sizes.large) {
 				videoSizes.large = clientVars.webrtc.video.sizes.large + "px";
@@ -49,35 +52,35 @@ var WRTC = (function () {
 			}
 			self.init(context.pad);
 		},
-		appendInterfaceLayout: function appendInterfaceLayout() {
+		"appendInterfaceLayout": function appendInterfaceLayout () {
 			var werc_toolbar = $("#wertc_modal_toolbar").tmpl({
-				videoChatLimit: clientVars.webrtc.videoChatLimit
+				"videoChatLimit": clientVars.webrtc.videoChatLimit
 			});
-			var $wrtc_modal = $('<div id="wrtc_modal"><div class="videoWrapper" class="thin-scrollbar"></div></div');
+			var $wrtc_modal = $("<div id=\"wrtc_modal\"><div class=\"videoWrapper\" class=\"thin-scrollbar\"></div></div");
 			$wrtc_modal.append(werc_toolbar);
-			$('body').prepend($wrtc_modal);
-			$(document).on('click', '.btn_toggle_modal', function () {
+			$("body").prepend($wrtc_modal);
+			$(document).on("click", ".btn_toggle_modal", function () {
 				var $parent = $(this).parent().parent();
-				var action = $(this).attr('data-action');
+				var action = $(this).attr("data-action");
 				var videoBox = $("#wrtc_modal .videoWrapper").innerHeight();
 				if (action === "collapse") {
-					$parent.find(".bnt_expand").removeAttr('active')
+					$parent.find(".bnt_expand").removeAttr("active");
 					$(this).removeClass("active");
-					$parent.find('[data-action="expand"]').addClass("active");
+					$parent.find("[data-action=\"expand\"]").addClass("active");
 					$("#wrtc_modal").css({
 						"transform": "translate(-50%, -" + videoBox + "px)"
 					});
 				} else {
 					$(this).removeClass("active");
-					$parent.find(".bnt_expand").attr({'active': true})
-					$parent.find('[data-action="collapse"]').addClass("active");
+					$parent.find(".bnt_expand").attr({"active": true});
+					$parent.find("[data-action=\"collapse\"]").addClass("active");
 					$("#wrtc_modal").css({
 						"transform": "translate(-50%, 0)"
 					});
 				}
 			});
 		},
-		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
+		"aceSetAuthorStyle": function aceSetAuthorStyle (context) {
 			if (context.author) {
 				var user = self.getUserFromId(context.author);
 				if (user) {
@@ -87,21 +90,21 @@ var WRTC = (function () {
 				}
 			}
 		},
-		userLeave: function userLeave(hook, context, callback) {
+		"userLeave": function userLeave (hook, context, callback) {
 			var userId = context.userInfo.userId;
 			if (userId && pc[userId]) {
 				self.hangup(userId, true);
 			}
 			callback();
 		},
-		handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
+		"handleClientMessage_RTC_MESSAGE": function handleClientMessage_RTC_MESSAGE (hook, context) {
 			if (context.payload.data.headingId === window.headingId) self.receiveMessage(context.payload);
 		},
 		// END OF API HOOKS
-		show: function show() {
-			$("#pad_title").addClass('f_wrtcActive');
+		"show": function show () {
+			$("#pad_title").addClass("f_wrtcActive");
 		},
-		showUserMediaError: function showUserMediaError(err) {
+		"showUserMediaError": function showUserMediaError (err) {
 			// show an error returned from getUserMedia
 			var reason;
 			// For reference on standard errors returned by getUserMedia:
@@ -109,7 +112,7 @@ var WRTC = (function () {
 			// However keep in mind that we add our own errors in getUserMediaPolyfill
 			switch (err.name) {
 				case "CustomNotSupportedError":
-					reason = "Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>" + "To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera." + '<a href="http://www.webrtc.org/" target="_new">Find out more</a>';
+					reason = "Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>" + "To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera." + "<a href=\"http://www.webrtc.org/\" target=\"_new\">Find out more</a>";
 					self.sendErrorStat("NotSupported");
 					break;
 				case "CustomSecureConnectionError":
@@ -148,24 +151,24 @@ var WRTC = (function () {
 					self.sendErrorStat("Unknown");
 			}
 			$.gritter.add({
-				title: "Error",
-				text: reason,
-				sticky: true,
-				class_name: "error"
+				"title": "Error",
+				"text": reason,
+				"sticky": true,
+				"class_name": "error"
 			});
 			self.hide();
 		},
-		hide: function hide(userId) {
+		"hide": function hide (userId) {
 			if (!userId) return false;
 			userId = userId.split(".")[1];
 			$("#rtcbox").find("#video_a_" + userId).parent().remove();
 		},
-		activate: function activate(headingId) {
+		"activate": function activate (headingId) {
 			self.show();
 			self.hangupAll();
 			self.getUserMedia(headingId);
 		},
-		deactivate: function deactivate(userId, headingId) {
+		"deactivate": function deactivate (userId, headingId) {
 			self.hide(userId);
 			self.hangupAll(headingId);
 			self.hangup(userId, true, headingId);
@@ -176,21 +179,21 @@ var WRTC = (function () {
 				localStream = null;
 			}
 		},
-		toggleMuted: function toggleMuted() {
+		"toggleMuted": function toggleMuted () {
 			var audioTrack = localStream.getAudioTracks()[0];
 			if (audioTrack) {
 				audioTrack.enabled = !audioTrack.enabled;
 				return !audioTrack.enabled;
 			}
 		},
-		toggleVideo: function toggleVideo() {
+		"toggleVideo": function toggleVideo () {
 			var videoTrack = localStream.getVideoTracks()[0];
 			if (videoTrack) {
 				videoTrack.enabled = !videoTrack.enabled;
 				return !videoTrack.enabled;
 			}
 		},
-		getUserFromId: function getUserFromId(userId) {
+		"getUserFromId": function getUserFromId (userId) {
 			if (!self._pad || !self._pad.collabClient) return null;
 			var result = self._pad.collabClient.getConnectedUsers().filter(function (user) {
 				return user.userId === userId;
@@ -198,7 +201,7 @@ var WRTC = (function () {
 			var user = result.length > 0 ? result[0] : null;
 			return user;
 		},
-		setStream: function setStream(userId, stream) {
+		"setStream": function setStream (userId, stream) {
 			if (!userId) return false;
 			var isLocal = userId === self.getUserId();
 			var videoId = "video_" + userId.replace(/\./g, "_");
@@ -208,18 +211,18 @@ var WRTC = (function () {
 
 			if (!video && stream) {
 				var videoContainer = $("<div class='video-container'>").css({
-					width: videoSizes.small,
+					"width": videoSizes.small,
 					"max-height": videoSizes.small
 				}).appendTo($("#wrtc_modal .videoWrapper"));
 
-				videoContainer.append($('<div class="user-name">').text(user.name));
+				videoContainer.append($("<div class=\"user-name\">").text(user.name));
 
 				video = $("<video playsinline>").attr("id", videoId).css({
 					"border-color": user.colorId,
-					width: videoSizes.small,
+					"width": videoSizes.small,
 					"max-height": videoSizes.small
 				}).on({
-					loadedmetadata: function loadedmetadata() {
+					"loadedmetadata": function loadedmetadata () {
 						self.addInterface(userId);
 					}
 				}).appendTo(videoContainer)[0];
@@ -237,14 +240,14 @@ var WRTC = (function () {
 				$(video).parent().remove();
 			}
 		},
-		addInterface: function addInterface(userId) {
+		"addInterface": function addInterface (userId) {
 			if (!userId) return false;
 			var isLocal = userId === self.getUserId();
 			var videoId = "video_" + userId.replace(/\./g, "_");
 			var $video = $("#" + videoId);
 
 			var $mute = $("<span class='interface-btn audio-btn buttonicon'>").attr("title", "Mute").on({
-				click: function click() {
+				"click": function click () {
 					var muted;
 					if (isLocal) {
 						muted = self.toggleMuted();
@@ -257,7 +260,7 @@ var WRTC = (function () {
 			});
 			var videoEnabled = true;
 			var $disableVideo = isLocal ? $("<span class='interface-btn video-btn buttonicon'>").attr("title", "Disable video").on({
-				click: function click() {
+				"click": function click () {
 					self.toggleVideo();
 					videoEnabled = !videoEnabled;
 					$disableVideo.attr("title", videoEnabled ? "Disable video" : "Enable video").toggleClass("off", !videoEnabled);
@@ -266,7 +269,7 @@ var WRTC = (function () {
 
 			var videoEnlarged = false;
 			var $largeVideo = $("<span class='interface-btn enlarge-btn buttonicon'>").attr("title", "Make video larger").on({
-				click: function click() {
+				"click": function click () {
 					videoEnlarged = !videoEnlarged;
 
 					if (videoEnlarged) {
@@ -278,8 +281,8 @@ var WRTC = (function () {
 					$largeVideo.attr("title", videoEnlarged ? "Make video smaller" : "Make video larger").toggleClass("large", videoEnlarged);
 
 					var videoSize = videoEnlarged ? videoSizes.large : videoSizes.small;
-					$video.parent().css({ width: videoSize, "max-height": videoSize });
-					$video.css({ width: videoSize, "max-height": videoSize });
+					$video.parent().css({ "width": videoSize, "max-height": videoSize });
+					$video.css({ "width": videoSize, "max-height": videoSize });
 				}
 			});
 
@@ -288,17 +291,17 @@ var WRTC = (function () {
 		},
 		// Sends a stat to the back end. `statName` must be in the
 		// approved list on the server side.
-		sendErrorStat: function sendErrorStat(statName) {
-			var msg = { component: "pad", type: "STATS", data: { statName: statName, type: "RTC_MESSAGE" } };
+		"sendErrorStat": function sendErrorStat (statName) {
+			var msg = { "component": "pad", "type": "STATS", "data": { "statName": statName, "type": "RTC_MESSAGE" } };
 			pad.socket.json.send(msg);
 		},
-		sendMessage: function sendMessage(to, data) {
+		"sendMessage": function sendMessage (to, data) {
 			self._pad.collabClient.sendMessage({
-				type: "RTC_MESSAGE",
-				payload: { data: data, to: to }
+				"type": "RTC_MESSAGE",
+				"payload": { "data": data, "to": to }
 			});
 		},
-		receiveMessage: function receiveMessage(msg) {
+		"receiveMessage": function receiveMessage (msg) {
 			var peer = msg.from;
 			var data = msg.data;
 			var type = data.type;
@@ -335,7 +338,7 @@ var WRTC = (function () {
 					pc[peer].createAnswer(function (desc) {
 						desc.sdp = cleanupSdp(desc.sdp);
 						pc[peer].setLocalDescription(desc, function () {
-							self.sendMessage(peer, { type: "answer", answer: desc, headingId: data.headingId });
+							self.sendMessage(peer, { "type": "answer", "answer": desc, "headingId": data.headingId });
 						}, logError);
 					}, logError, sdpConstraints);
 				}, logError);
@@ -360,29 +363,29 @@ var WRTC = (function () {
 				console.log("unknown message", data);
 			}
 		},
-		hangupAll: function hangupAll(_headingId) {
+		"hangupAll": function hangupAll (_headingId) {
 			Object.keys(pc).forEach(function (userId) {
 				self.hangup(userId, true, _headingId);
 			});
 		},
-		getUserId: function getUserId() {
+		"getUserId": function getUserId () {
 			return self._pad && self._pad.getUserId();
 		},
-		hangup: function hangup(userId, notify, headingId) {
+		"hangup": function hangup (userId, notify, headingId) {
 			notify = arguments.length === 1 ? true : notify;
 			if (pc[userId] && userId !== self.getUserId()) {
 				self.setStream(userId, "");
 				pc[userId].close();
 				delete pc[userId];
-				if (notify) self.sendMessage(userId, { type: "hangup", headingId: headingId });
+				if (notify) self.sendMessage(userId, { "type": "hangup", "headingId": headingId });
 			}
 		},
-		call: function call(userId, headingId) {
+		"call": function call (userId, headingId) {
 			if (!localStream) {
 				callQueue.push(userId);
 				return;
 			}
-			var constraints = { optional: [], mandatory: {} };
+			var constraints = { "optional": [], "mandatory": {} };
 			// temporary measure to remove Moz* constraints in Chrome
 			if (webrtcDetectedBrowser === "chrome") {
 				for (var prop in constraints.mandatory) {
@@ -400,11 +403,11 @@ var WRTC = (function () {
 			pc[userId].createOffer(function (desc) {
 				desc.sdp = cleanupSdp(desc.sdp);
 				pc[userId].setLocalDescription(desc, function () {
-					self.sendMessage(userId, { type: "offer", offer: desc, headingId: headingId });
+					self.sendMessage(userId, { "type": "offer", "offer": desc, "headingId": headingId });
 				}, logError);
 			}, logError, constraints);
 		},
-		createPeerConnection: function createPeerConnection(userId, headingId) {
+		"createPeerConnection": function createPeerConnection (userId, headingId) {
 			if (pc[userId]) {
 				console.log("WARNING creating PC connection even though one exists", userId);
 			}
@@ -412,9 +415,9 @@ var WRTC = (function () {
 			pc[userId].onicecandidate = function (event) {
 				if (event.candidate) {
 					self.sendMessage(userId, {
-						type: "icecandidate",
-						headingId: headingId,
-						candidate: event.candidate
+						"type": "icecandidate",
+						"headingId": headingId,
+						"candidate": event.candidate
 					});
 				}
 			};
@@ -426,14 +429,14 @@ var WRTC = (function () {
 				self.setStream(userId, "");
 			};
 		},
-		getUserMedia: function getUserMedia(headingId) {
+		"getUserMedia": function getUserMedia (headingId) {
 			var mediaConstraints = {
-				audio: true,
-				video: {
-					optional: [],
-					mandatory: {
-						maxWidth: 320,
-						maxHeight: 240
+				"audio": true,
+				"video": {
+					"optional": [],
+					"mandatory": {
+						"maxWidth": 320,
+						"maxHeight": 240
 					}
 				}
 			};
@@ -452,7 +455,7 @@ var WRTC = (function () {
 				self.showUserMediaError(err);
 			});
 		},
-		init: function init(pad) {
+		"init": function init (pad) {
 			self._pad = pad || window.pad;
 			$(window).on("unload", function () {
 				self.hangupAll();
@@ -462,7 +465,7 @@ var WRTC = (function () {
 
 	// Normalize RTC implementation between browsers
 	// var getUserMedia = window.navigator.mediaDevices.getUserMedia
-	var attachMediaStream = function attachMediaStream(element, stream) {
+	var attachMediaStream = function attachMediaStream (element, stream) {
 		if (typeof element.srcObject !== "undefined") {
 			element.srcObject = stream;
 		} else if (typeof element.mozSrcObject !== "undefined") {
@@ -476,7 +479,7 @@ var WRTC = (function () {
 	var webrtcDetectedBrowser = "chrome";
 
 	// Set Opus as the default audio codec if it's present.
-	function preferOpus(sdp) {
+	function preferOpus (sdp) {
 		var sdpLines = sdp.split("\r\n");
 		var mLineIndex = null;
 
@@ -505,13 +508,13 @@ var WRTC = (function () {
 		return sdp;
 	}
 
-	function extractSdp(sdpLine, pattern) {
+	function extractSdp (sdpLine, pattern) {
 		var result = sdpLine.match(pattern);
 		return result && result.length === 2 ? result[1] : null;
 	}
 
 	// Set the selected codec to the first in m line.
-	function setDefaultCodec(mLine, payload) {
+	function setDefaultCodec (mLine, payload) {
 		var elements = mLine.split(" ");
 		var newLine = [];
 		var index = 0;
@@ -525,7 +528,7 @@ var WRTC = (function () {
 	}
 
 	// Strip CN from sdp before CN constraints is ready.
-	function removeCN(sdpLines, mLineIndex) {
+	function removeCN (sdpLines, mLineIndex) {
 		var mLineElements = sdpLines[mLineIndex].split(" ");
 		// Scan from end for the convenience of removing an item.
 		for (var i = sdpLines.length - 1; i >= 0; i--) {
@@ -545,18 +548,18 @@ var WRTC = (function () {
 		return sdpLines;
 	}
 
-	function sdpRate(sdp, rate) {
+	function sdpRate (sdp, rate) {
 		rate = rate || 1638400;
 		return sdp.replace(/b=AS:\d+\r/g, "b=AS:" + rate + "\r");
 	}
 
-	function cleanupSdp(sdp) {
+	function cleanupSdp (sdp) {
 		sdp = preferOpus(sdp);
 		sdp = sdpRate(sdp);
 		return sdp;
 	}
 
-	function mergeConstraints(cons1, cons2) {
+	function mergeConstraints (cons1, cons2) {
 		var merged = cons1;
 		for (var name in cons2.mandatory) {
 			merged.mandatory[name] = cons2.mandatory[name];
@@ -564,7 +567,7 @@ var WRTC = (function () {
 		merged.optional.concat(cons2.optional);
 		return merged;
 	}
-	function logError(error) {
+	function logError (error) {
 		console.log("WebRTC ERROR:", error);
 	}
 

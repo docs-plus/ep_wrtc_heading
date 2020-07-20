@@ -149,6 +149,29 @@ exports.socketio = function (hookName, args, cb) {
 			socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
 		})
 
+
+		// socket.on('sync user info', (padId, user) => {
+		// 	console.log("padId: ", padId)
+		// 	console.log("user: ", user)
+		// 	let roomKeys = Object.keys(rooms).find(x=> x.includes(padId))
+		// 	console.log("roomKeys: ", roomKeys)
+
+		// 	console.log(!rooms[roomKeys], !roomKeys)
+		// 	if(!roomKeys || !rooms[roomKeys]) return true;
+
+		// 	console.log("data: ", rooms[roomKeys])
+
+		// 	rooms[roomKeys] = rooms[roomKeys].forEach((el, index) => {
+		// 		if(el.userId === user.userId)
+		// 			rooms[roomKeys][index] = {
+		// 				padId,
+		// 				userId: user.userId,
+		// 				userName: user.name,
+		// 				headingId: user.headingId
+		// 			}
+		// 	})
+		// })
+
 	})
 }
 
@@ -159,8 +182,6 @@ exports.eejsBlock_mySettings = function (hookName, args, cb) {
 
 exports.eejsBlock_scripts = function (hookName, args, cb) {
 	args.content = args.content + eejs.require("ep_wrtc_heading/templates/webrtcComponent.html", {}, module)
-	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/adapter.js?v=" + packageJson.version + "'></script>"
-	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/getUserMediaPolyfill.js?v=" + packageJson.version + "'></script>"
 	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtc.js?v=" + packageJson.version + "'></script>"
 	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtcRoom.js?v=" + packageJson.version + "'></script>"
 	return cb();
