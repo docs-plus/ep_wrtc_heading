@@ -1,7 +1,7 @@
 {
 	"name": "ep_wrtc_heading",
 	"description": "Video Headings Plugin for Etherpad",
-	"version": "0.11.1",
+	"version": "0.13.0",
 	"author": {
 		"name": "Hossein Marzban",
 		"email": "marzban98@gmail.com"
@@ -31,6 +31,6 @@
 		"babel-eslint": "^10.1.0"
 	},
 	"husky": {
-		"pre-commit": "npm lint"
+		"pre-commit": "npm run lint"
 	}
 }
