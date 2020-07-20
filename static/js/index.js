@@ -3,7 +3,6 @@ var _ = require("ep_etherpad-lite/static/js/underscore");
 var randomString = require("ep_etherpad-lite/static/js/pad_utils").randomString;
 var events = require("ep_wrtc_heading/static/js/copyPasteEvents");
 
-
 /** **********************************************************************/
 /*                              Plugin                                  */
 /** **********************************************************************/
@@ -70,7 +69,7 @@ var EPwrtcHeading = (function () {
 /** **********************************************************************/
 
 var hooks = {
-	"postAceInit": function postAceInit (hook, context) {
+	postAceInit: function postAceInit (hook, context) {
 
 		if (!$("#editorcontainerbox").hasClass("flex-layout")) {
 			$.gritter.add({
@@ -99,7 +98,7 @@ var hooks = {
 		}, 100));
 
 	},
-	"aceEditEvent": function aceEditEvent (hook, context) {
+	aceEditEvent: function aceEditEvent (hook, context) {
 		var eventType = context.callstack.editEvent.eventType;
 
 		// ignore these types
@@ -125,34 +124,34 @@ var hooks = {
 			}, 250);
 		}
 	},
-	"aceAttribsToClasses": function aceAttribsToClasses (hook, context) {
+	aceAttribsToClasses: function aceAttribsToClasses (hook, context) {
 		if (context.key === "headingTagId") {
 			return ["headingTagId_" + context.value];
 		}
 	},
-	"aceEditorCSS": function aceEditorCSS () {
+	aceEditorCSS: function aceEditorCSS () {
 		var version = clientVars.webrtc.version || 1;
 		return ["ep_wrtc_heading/static/css/wrtcRoom.css?v=" + version + ""];
 	},
-	"aceSetAuthorStyle": function aceSetAuthorStyle (hook, context) {
+	aceSetAuthorStyle: function aceSetAuthorStyle (hook, context) {
 		WRTC_Room.aceSetAuthorStyle(context);
 		WRTC.aceSetAuthorStyle(context);
 	},
-	"userLeave": function userLeave (hook, context, callback) {
+	userLeave: function userLeave (hook, context, callback) {
 		WRTC_Room.userLeave(context, callback);
 		WRTC.userLeave(hook, context, callback);
 	},
-	"handleClientMessage_RTC_MESSAGE": function handleClientMessage_RTC_MESSAGE (hook, context) {
+	handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE (hook, context) {
 		WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
 	},
-	"aceSelectionChanged": function aceSelectionChanged (rep, context) {
+	aceSelectionChanged: function aceSelectionChanged (rep, context) {
 		if (context.callstack.type === "insertheading") {
 			rep = context.rep;
 			var headingTagId = ["headingTagId", randomString(16)];
 			context.documentAttributeManager.setAttributesOnRange(rep.selStart, rep.selEnd, [headingTagId]);
 		}
 	},
-	"aceInitialized": function aceInitialized (hook, context) {
+	aceInitialized: function aceInitialized (hook, context) {
 		var editorInfo = context.editorInfo;
 		editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
 
