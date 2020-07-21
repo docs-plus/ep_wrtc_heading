@@ -1,17 +1,31 @@
 {
 	"parser": "babel-eslint",
+	"extends": "eslint-config-es5",
 	"env": {
-		"browser": true
+		"browser": true,
+		"jquery": true,
+		"commonjs": true
 	},
+	"globals": {
+		"clientVars": true,
+		"WRTC": true,
+		"WRTC_Room": true,
+		"io": true,
+		"browser": true
+  },
   "plugins": [
     "es5"
 	],
 	"rules": {
+		"indent": [2, "tab"],
+		"no-param-reassign": 0,
+		"consistent-return": 0,
+		"camelcase": 1,
 		"semi": 2,
 		"quotes": 2,
 		"quote-props": 2,
 		"template-tag-spacing": 2,
-		"no-console": 1,
+		"no-console": [2, { "allow": ["warn", "error", "info"] }],
 		"no-multi-spaces": 2,
 		"space-in-parens": 2,
 		"no-multi-str": 2,

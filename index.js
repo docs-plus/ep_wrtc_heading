@@ -15,7 +15,7 @@ exports.socketio = function (hookName, args, cb) {
 	socketio = args.io
 	var io = args.io
 
-	// data Structur
+	// data Structure
 	// "padId:headingId": [{object}]
 	const rooms = {}
 

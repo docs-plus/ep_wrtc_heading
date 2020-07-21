@@ -194,10 +194,10 @@
 	display: flex;
 	position: absolute;
 	z-index: 2;
-	bottom: 4px;
-	left: 0;
+	top: 4px;
+	right: 0;
 	width: 100%;
-	justify-content: space-around;
+	flex-direction: row-reverse;
 }
 .interface-btn {
 	background-color: rgba(255, 255, 255, 0.35);
@@ -233,6 +233,9 @@
 .interface-btn.video-btn.off:before {
 	content: "\e83c";
 }
+.interface-btn.enlarge-btn{
+	display: none;
+}
 .interface-btn.enlarge-btn:before {
 	content: "\e840";
 }
@@ -243,7 +246,7 @@
 #wrtc_modal .video-container .user-name {
 	transition: opacity 0.2s, background-color 0.2s;
 	position: absolute;
-	top: 0;
+	bottom: 0;
 	left: 0; 
 	right: 0;
 	opacity: 1;
