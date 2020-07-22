@@ -21,6 +21,8 @@ require('ep_wrtc_heading/static/js/getUserMediaPolyfill');
 var WRTC = (function() {
 	var videoSizes = { 'large': '260px', 'small': '160px' };
 	var pcConfig = {};
+	var audioInputSelect = null;
+	var videoSelect = null;
 	var pcConstraints = {
 		'optional': [{
 			'DtlsSrtpKeyAgreement': true
@@ -286,14 +288,16 @@ var WRTC = (function() {
 				}
 			});
 
+			var $videoSettings = isLocal ? $("<span class='interface-btn settings-btn buttonicon'>") : null;
+
 			$('#interface_' + videoId).remove();
-			$("<div class='interface-container'>").attr('id', 'interface_' + videoId).append($mute).append($disableVideo).append($largeVideo).insertAfter($video);
+			$("<div class='interface-container'>").attr('id', 'interface_' + videoId).append($mute).append($disableVideo).append($largeVideo).append($videoSettings).insertAfter($video);
 		},
 		// Sends a stat to the back end. `statName` must be in the
 		// approved list on the server side.
 		'sendErrorStat': function sendErrorStat(statName) {
 			var msg = { 'component': 'pad', 'type': 'STATS', 'data': { 'statName': statName, 'type': 'RTC_MESSAGE' } };
-			pad.socket.json.send(msg);
+			self._pad.socket.json.send(msg);
 		},
 		'sendMessage': function sendMessage(to, data) {
 			self._pad.collabClient.sendMessage({
@@ -429,7 +433,20 @@ var WRTC = (function() {
 				self.setStream(userId, '');
 			};
 		},
+		'audioVideoInputChange': function() {
+			localStream.getTracks().forEach(track => {
+				track.stop();
+			});
+
+			self.getUserMedia(window.headingId);
+		},
 		'getUserMedia': function getUserMedia(headingId) {
+			audioInputSelect = document.querySelector('select#audioSource');
+			videoSelect = document.querySelector('select#videoSource');
+
+			var audioSource = audioInputSelect.value;
+			var videoSource = videoSelect.value;
+
 			var mediaConstraints = {
 				'audio': true,
 				'video': {
@@ -440,6 +457,10 @@ var WRTC = (function() {
 					}
 				}
 			};
+
+			if (audioSource) { mediaConstraints.audio = {'deviceId': {'exact': audioSource}}; }
+			if (videoSource) { mediaConstraints.video = {'deviceId': {'exact': videoSource}}; }
+
 			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function(stream) {
 				localStream = stream;
 				self.setStream(self._pad.getUserId(), stream);
@@ -457,6 +478,12 @@ var WRTC = (function() {
 		},
 		'init': function init(pad) {
 			self._pad = pad || window.pad;
+
+
+			$(document).on('change', 'select#audioSource', self.audioVideoInputChange);
+			$(document).on('change', 'select#videoSource', self.audioVideoInputChange);
+
+
 			$(window).on('unload', function() {
 				self.hangupAll();
 			});
@@ -519,9 +546,11 @@ var WRTC = (function() {
 		var newLine = [];
 		var index = 0;
 		for (var i = 0; i < elements.length; i++) {
-			if (index === 3)
-			// Format of media starts from the fourth.
-			{ newLine[index++] = payload; } // Put target payload to the first.
+			if (index === 3) {
+				// Format of media starts from the fourth.
+				newLine[index++] = payload;
+			}
+			// Put target payload to the first.
 			if (elements[i] !== payload) newLine[index++] = elements[i];
 		}
 		return newLine.join(' ');
@@ -572,6 +601,5 @@ var WRTC = (function() {
 	}
 
 	self.pc = pc;
-	// window.rtc = self
 	return self;
 })();

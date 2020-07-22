@@ -13,6 +13,29 @@ var WRTC_Room = (function() {
 	var localStream = null;
 	var hElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.h1', '.h2', '.h3', '.h4', '.h5', '.h6'];
 
+	function mediaDevices() {
+		navigator.mediaDevices.enumerateDevices().then(function(data) {
+			var audioInputSelect = document.querySelector('select#audioSource');
+			var videoSelect = document.querySelector('select#videoSource');
+
+			for (let i = 0; i !== data.length; ++i) {
+				const deviceInfo = data[i];
+				const option = document.createElement('option');
+				option.value = deviceInfo.deviceId;
+				if (deviceInfo.kind === 'audioinput') {
+					option.text = deviceInfo.label || `microphone ${audioInputSelect.length + 1}`;
+					audioInputSelect.appendChild(option);
+				} else if (deviceInfo.kind === 'videoinput') {
+					option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
+					videoSelect.appendChild(option);
+				} else {
+					console.log('Some other kind of source/device: ', deviceInfo);
+				}
+			}
+		});
+	}
+
+
 	/** --------- Helper --------- */
 
 	function link2Clipboard(text) {
@@ -44,17 +67,11 @@ var WRTC_Room = (function() {
 	}
 
 	function isUserMediaAvailable() {
-
-		// navigator.mediaDevices.enumerateDevices().then(function (data) {
-		// 	console.log(data)
-		// 	return data
-		// })
-
 		return window.navigator.mediaDevices.getUserMedia({ 'audio': true, 'video': true })
-		.catch(function(err) {
-			WRTC.showUserMediaError(err);
-			console.error(err);
-		});
+			.catch(function(err) {
+				WRTC.showUserMediaError(err);
+				console.error(err);
+			});
 	}
 
 	function roomBtnHandler(headingId, actions) {
@@ -166,12 +183,21 @@ var WRTC_Room = (function() {
 				$(this).trigger('click');
 			});
 		});
+
+
+		$(document).on('click', '.settings-btn', function() {
+			$(document).find('#wrtc_settings').toggleClass('active');
+		});
+
+		$(document).on('click', '#wrtc_settings .btn_close', function() {
+			$('#wrtc_settings').toggleClass('active');
+		});
 	}
 
 	function getHeaderRoomY($element) {
 		var height = $element.outerHeight();
 		var paddingTop = $body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
-		var aceOuterPadding = parseInt(paddingTop);
+		var aceOuterPadding = parseInt(paddingTop, 10);
 		var offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
 		return offsetTop + height / 2 - 14;
 	}
@@ -269,8 +295,8 @@ var WRTC_Room = (function() {
 		self.removeUserFromRoom(data, roomInfo);
 	}
 
-	var self = {
-		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
+	self = {
+		'aceSetAuthorStyle': function aceSetAuthorStyle(context) {
 			if (context.author) {
 				var user = getUserFromId(context.author);
 				if (user) {
@@ -280,7 +306,7 @@ var WRTC_Room = (function() {
 				}
 			}
 		},
-		userLeave: function userLeave(context, callback) {
+		'userLeave': function userLeave(context, callback) {
 			var userId = context.userInfo.userId;
 			var headingId = $body_ace_outer().find(".wbrtc_roomBoxBody ul li[data-id='" + userId + "']").parent().parent().parent();
 			var data = {
@@ -291,16 +317,16 @@ var WRTC_Room = (function() {
 			socket.emit('userLeave', data, gateway_userLeave);
 			callback();
 		},
-		bulkUpdateRooms: function bulkUpdateRooms(hTagList) {
+		'bulkUpdateRooms': function bulkUpdateRooms(hTagList) {
 			var padId = window.pad.getPadId();
 			socket.emit('bulkUpdateRooms', padId, hTagList, socketBulkUpdateRooms);
 		},
-		initSocketJoin: function initSocketJoin() {
+		'initSocketJoin': function initSocketJoin() {
 			var userId = window.pad.getUserId();
 			var padId = window.pad.getPadId();
 			socket.emit('join pad', padId, userId, function() {});
 		},
-		init: function init() {
+		'init': function init() {
 			this._pad = window.pad.getPadId();
 
 			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
@@ -315,12 +341,14 @@ var WRTC_Room = (function() {
 
 			activeEventListener();
 
+			mediaDevices();
+
 			// check if there is a join request in URI queryString
 			setTimeout(function() {
 				joinByQueryString();
 			}, 500);
 		},
-		removeUserFromRoom: function removeUserFromRoom(data, roomInfo) {
+		'removeUserFromRoom': function removeUserFromRoom(data, roomInfo) {
 			if (!data) return false;
 			var currentUserId = window.pad.getUserId();
 			var $headingRoom = $body_ace_outer().contents();
@@ -362,7 +390,7 @@ var WRTC_Room = (function() {
 				stopStreaming(localStream);
 			}
 		},
-		addUserToRoom: function addUserToRoom(data, roomInfo) {
+		'addUserToRoom': function addUserToRoom(data, roomInfo) {
 			if (!data) return false;
 			var currentUserId = window.pad.getUserId();
 			var $headingRoom = $body_ace_outer().find('#' + data.headingId);
@@ -433,7 +461,7 @@ var WRTC_Room = (function() {
 				}).attr({ 'data-active': true });
 			}
 		},
-		adoptHeaderYRoom: function adoptHeaderYRoom() {
+		'adoptHeaderYRoom': function adoptHeaderYRoom() {
 			// Set all video_heading to be inline with their target REP
 			var $padOuter = $body_ace_outer();
 			if (!$padOuter) return;
@@ -454,7 +482,7 @@ var WRTC_Room = (function() {
 				$el.css({ 'top': getHeaderRoomY($headingEl) + 'px' });
 			});
 		},
-		findTags: function findTags() {
+		'findTags': function findTags() {
 			var hTagList = [];
 			var hTagElements = hElements.join(',');
 			var hTags = $body_ace_outer().find('iframe').contents().find('#innerdocbody').children('div').children(hTagElements);
@@ -490,9 +518,8 @@ var WRTC_Room = (function() {
 					target.find('#wbrtc_chatBox').append(box);
 					newHTagAdded = true;
 				} else {
-					$(document).find('[data-headid=' + data.headingTagId + '].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-headid=' + data.headingTagId + ']').text(data.text);
-
-					target.find('.wbrtc_roomBox[id=' + data.headingTagId + '] .wbrtc_roomBoxHeader b').text(data.text);
+					$(document).find('[data-headid=' + data.headingTagId + '].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-headid=' + data.headingTagId + ']').text(data.headTitle);
+					target.find('.wbrtc_roomBox[id=' + data.headingTagId + '] .wbrtc_roomBoxHeader b').text(data.headTitle);
 				}
 
 				hTagList.push(data);

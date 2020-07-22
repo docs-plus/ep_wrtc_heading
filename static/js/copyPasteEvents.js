@@ -7,19 +7,19 @@ var _ = require('ep_etherpad-lite/static/js/underscore');
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 var padInner = null;
 
-var getFirstColumnOfSelection = function (line, rep, firstLineOfSelection) {
-  return line !== firstLineOfSelection ? 0 : rep.selStart[1];
+var getFirstColumnOfSelection = function(line, rep, firstLineOfSelection) {
+	return line !== firstLineOfSelection ? 0 : rep.selStart[1];
 };
 
-var getLength = function (line, rep) {
-  var nextLine = line + 1;
-  var startLineOffset = rep.lines.offsetOfIndex(line);
-  var endLineOffset = rep.lines.offsetOfIndex(nextLine);
+var getLength = function(line, rep) {
+	var nextLine = line + 1;
+	var startLineOffset = rep.lines.offsetOfIndex(line);
+	var endLineOffset = rep.lines.offsetOfIndex(nextLine);
 
-  // lineLength without \n
-  var lineLength = endLineOffset - startLineOffset - 1;
+	// lineLength without \n
+	var lineLength = endLineOffset - startLineOffset - 1;
 
-  return lineLength;
+	return lineLength;
 };
 
 var getLastColumnOfSelection = function getLastColumnOfSelection(line, rep, lastLineOfSelection) {
@@ -86,7 +86,7 @@ function getSelectionHtml() {
 		if (sel.rangeCount) {
 			var container = document.createElement('div');
 			for (var i = 0, len = sel.rangeCount; i < len; ++i) {
-					container.appendChild(sel.getRangeAt(i).cloneContents());
+				container.appendChild(sel.getRangeAt(i).cloneContents());
 			}
 			html = container.innerHTML;
 		}
@@ -98,7 +98,7 @@ function getSelectionHtml() {
 	return html;
 }
 
-function selectionMultipleLine () {
+function selectionMultipleLine() {
 	var rawHtml = getSelectionHtml();
 	rawHtml = $('<div></div>').append(rawHtml);
 	rawHtml.find(':header span').removeClass(function(index, css) {
@@ -126,10 +126,10 @@ exports.addTextOnClipboard = function(e, aces, inner, removeSelection) {
 		selection = ace.ace_hasHeaderOnSelection();
 	});
 
-	if(selection.hasVideoHeader || selection.hasMultipleLine) {
+	if (selection.hasVideoHeader || selection.hasMultipleLine) {
 		var rawHtml;
 
-		if(selection.hasMultipleLine) {
+		if (selection.hasMultipleLine) {
 			var htmlSelection = getSelectionHtml();
 			rawHtml = selectionMultipleLine(htmlSelection);
 		} else {
