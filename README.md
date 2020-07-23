@@ -1,9 +1,25 @@
 
+<p align="center">
 
-[![](https://img.shields.io/badge/License-MIT%202.0-blue.svg)](LICENSE)
-![npm](https://img.shields.io/npm/v/ep_wrtc_heading)
-![npm](https://img.shields.io/npm/dt/ep_wrtc_heading)
-[![NPM](https://nodei.co/npm/ep_wrtc_heading.png)](https://nodei.co/npm/ep_wrtc_heading/)
+<a href="LICENSE">
+<img src="https://img.shields.io/badge/License-MIT%202.0-blue.svg">
+</a>
+
+<a href="#">
+<img src="https://img.shields.io/npm/v/ep_wrtc_heading">
+</a>
+
+<a href="#">
+<img src="https://img.shields.io/npm/dt/ep_wrtc_heading">
+</a>
+
+</p>
+
+<p align="center">
+<a href="https://nodei.co/npm/ep_wrtc_heading/">
+<img src="https://nodei.co/npm/ep_wrtc_heading.png">
+</a>
+</p>
 
 # ep_wrtc_heading
 Video Headings Plugin for Etherpad.
