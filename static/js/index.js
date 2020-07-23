@@ -53,6 +53,12 @@ var EPwrtcHeading = (function() {
 			padInner.contents().on('cut', function(e) {
 				events.addTextOnClipboard(e, ace, padInner, true);
 			});
+
+			padInner.contents().on('paste', function(e) {
+				setTimeout(function(){
+					WRTC_Room.adoptHeaderYRoom();
+				},250);
+			});
 		}
 
 		return true;

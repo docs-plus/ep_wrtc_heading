@@ -28,8 +28,6 @@ var WRTC_Room = (function() {
 				} else if (deviceInfo.kind === 'videoinput') {
 					option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
 					videoSelect.appendChild(option);
-				} else {
-					console.log('Some other kind of source/device: ', deviceInfo);
 				}
 			}
 		});
