@@ -1,6 +1,6 @@
 'use strict';
 
-var WRTC_Room = (function() {
+var WRTC_Room = (function () {
 	var self = null;
 	var loc = document.location;
 	var port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
@@ -14,25 +14,24 @@ var WRTC_Room = (function() {
 	var hElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.h1', '.h2', '.h3', '.h4', '.h5', '.h6'];
 
 	function mediaDevices() {
-		navigator.mediaDevices.enumerateDevices().then(function(data) {
+		navigator.mediaDevices.enumerateDevices().then(function (data) {
 			var audioInputSelect = document.querySelector('select#audioSource');
 			var videoSelect = document.querySelector('select#videoSource');
 
-			for (let i = 0; i !== data.length; ++i) {
-				const deviceInfo = data[i];
-				const option = document.createElement('option');
+			for (var i = 0; i !== data.length; ++i) {
+				var deviceInfo = data[i];
+				var option = document.createElement('option');
 				option.value = deviceInfo.deviceId;
 				if (deviceInfo.kind === 'audioinput') {
-					option.text = deviceInfo.label || `microphone ${audioInputSelect.length + 1}`;
+					option.text = deviceInfo.label || 'microphone ' + (audioInputSelect.length + 1);
 					audioInputSelect.appendChild(option);
 				} else if (deviceInfo.kind === 'videoinput') {
-					option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
+					option.text = deviceInfo.label || 'camera ' + (videoSelect.length + 1);
 					videoSelect.appendChild(option);
 				}
 			}
 		});
 	}
-
 
 	/** --------- Helper --------- */
 
@@ -57,7 +56,7 @@ var WRTC_Room = (function() {
 
 	function scroll2Header(headingId) {
 		var padContainer = $body_ace_outer().find('iframe').contents().find('#innerdocbody');
-		padContainer.find('.' + prefixHeaderId + headingId).each(function() {
+		padContainer.find('.' + prefixHeaderId + headingId).each(function () {
 			this.scrollIntoView({
 				'behavior': 'smooth'
 			});
@@ -65,11 +64,10 @@ var WRTC_Room = (function() {
 	}
 
 	function isUserMediaAvailable() {
-		return window.navigator.mediaDevices.getUserMedia({ 'audio': true, 'video': true })
-			.catch(function(err) {
-				WRTC.showUserMediaError(err);
-				console.error(err);
-			});
+		return window.navigator.mediaDevices.getUserMedia({ 'audio': true, 'video': true })['catch'](function (err) {
+			WRTC.showUserMediaError(err);
+			console.error(err);
+		});
 	}
 
 	function roomBtnHandler(headingId, actions) {
@@ -90,14 +88,14 @@ var WRTC_Room = (function() {
 		// $lastJoinButton = $(this);
 
 		if (actions === 'JOIN') {
-			isUserMediaAvailable().then(function(stream) {
+			isUserMediaAvailable().then(function (stream) {
 				localStream = stream;
 				if (!currentUserRoom.userId) {
 					return socket.emit('userJoin', data, gateway_userJoin);
 				}
 
 				// If the user has already joined the video chat, make suer leave that room then join to the new chat room
-				socket.emit('userLeave', currentUserRoom, function(_data, roomInfo) {
+				socket.emit('userLeave', currentUserRoom, function (_data, roomInfo) {
 					gateway_userLeave(_data, roomInfo);
 					socket.emit('userJoin', data, gateway_userJoin);
 				});
@@ -109,11 +107,11 @@ var WRTC_Room = (function() {
 
 	function slugify(text) {
 		return text.toString().toLowerCase().trim().replace(/\s+/g, '-') // Replace spaces with -
-			.replace(/&/g, '-and-') // Replace & with 'and'
-			.replace(/[^\w\-]+/g, '') // Remove all non-word chars
-			.replace(/\--+/g, '-') // Replace multiple - with single -
-			.replace(/^-+/, '') // Trim - from start of text
-			.replace(/-+$/, ''); // Trim - from end of text
+		.replace(/&/g, '-and-') // Replace & with 'and'
+		.replace(/[^\w\-]+/g, '') // Remove all non-word chars
+		.replace(/\--+/g, '-') // Replace multiple - with single -
+		.replace(/^-+/, '') // Trim - from start of text
+		.replace(/-+$/, ''); // Trim - from end of text
 	}
 
 	function createShareLink(headingTagId, headerText) {
@@ -134,7 +132,7 @@ var WRTC_Room = (function() {
 
 	function getUserFromId(userId) {
 		if (!window.pad || !window.pad.collabClient) return null;
-		var result = window.pad.collabClient.getConnectedUsers().filter(function(user) {
+		var result = window.pad.collabClient.getConnectedUsers().filter(function (user) {
 			return user.userId === userId;
 		});
 		var user = result.length > 0 ? result[0] : null;
@@ -153,18 +151,18 @@ var WRTC_Room = (function() {
 	function activeEventListener() {
 		// $body_ace_outer().find('iframe[name="ace_inner"]').contents().on("paste", function(e) {})
 
-		$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function() {
+		$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function () {
 			$(this).addClass('active').find('.wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b').css({ 'display': 'block' });
-		}).on('mouseleave', '.wbrtc_roomBox', function() {
+		}).on('mouseleave', '.wbrtc_roomBox', function () {
 			$(this).removeClass('active').find('.wbrtc_roomBoxFooter, .wbrtc_roomBoxBody, .wbrtc_roomBoxHeader b').css({ 'display': 'none' });
 		});
 
-		$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_share', function() {
+		$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_share', function () {
 			var headerURI = $(this).find('input').val();
 			link2Clipboard(headerURI);
 		});
 
-		$(document).on('click', '#werc_toolbar p', function() {
+		$(document).on('click', '#werc_toolbar p', function () {
 			var headingId = $(this).attr('data-headid');
 			scroll2Header(headingId);
 		});
@@ -173,21 +171,20 @@ var WRTC_Room = (function() {
 
 		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
 
-		$(document).on('click', '.bnt_expand', function() {
+		$(document).on('click', '.bnt_expand', function () {
 			if (!$(this).attr('active')) return true;
 
 			$(this).toggleClass('large');
-			$('#wrtc_modal .video-container .enlarge-btn').each(function() {
+			$('#wrtc_modal .video-container .enlarge-btn').each(function () {
 				$(this).trigger('click');
 			});
 		});
 
-
-		$(document).on('click', '.settings-btn', function() {
+		$(document).on('click', '.settings-btn', function () {
 			$(document).find('#wrtc_settings').toggleClass('active');
 		});
 
-		$(document).on('click', '#wrtc_settings .btn_close', function() {
+		$(document).on('click', '#wrtc_settings .btn_close', function () {
 			$('#wrtc_settings').toggleClass('active');
 		});
 	}
@@ -201,7 +198,7 @@ var WRTC_Room = (function() {
 	}
 
 	function addTextChatMessage(msg) {
-		var authorClass = 'author-' + msg.userId.replace(/[^a-y0-9]/g, function(c) {
+		var authorClass = 'author-' + msg.userId.replace(/[^a-y0-9]/g, function (c) {
 			if (c === '.') return '-';
 			return 'z' + c.charCodeAt(0) + 'z';
 		});
@@ -221,7 +218,7 @@ var WRTC_Room = (function() {
 
 	function stopStreaming(stream) {
 		if (stream) {
-			stream.getTracks().forEach(function(track) {
+			stream.getTracks().forEach(function (track) {
 				track.stop();
 			});
 			stream = null;
@@ -231,7 +228,7 @@ var WRTC_Room = (function() {
 	function socketBulkUpdateRooms(rooms) {
 		var roomsInfo = {};
 		// create a roomInfo for each individual room
-		Object.keys(rooms).forEach(function(headingId) {
+		Object.keys(rooms).forEach(function (headingId) {
 			var roomInfo = {
 				'present': rooms[headingId].length,
 				'list': rooms[headingId]
@@ -240,8 +237,8 @@ var WRTC_Room = (function() {
 		});
 
 		// bind roomInfo and send user to gateway_userJoin
-		Object.keys(rooms).forEach(function(headingId) {
-			rooms[headingId].forEach(function(user) {
+		Object.keys(rooms).forEach(function (headingId) {
+			rooms[headingId].forEach(function (user) {
 				gateway_userJoin(user, roomsInfo[headingId], true);
 			});
 		});
@@ -322,18 +319,18 @@ var WRTC_Room = (function() {
 		'initSocketJoin': function initSocketJoin() {
 			var userId = window.pad.getUserId();
 			var padId = window.pad.getPadId();
-			socket.emit('join pad', padId, userId, function() {});
+			socket.emit('join pad', padId, userId, function () {});
 		},
 		'init': function init() {
 			this._pad = window.pad.getPadId();
 
 			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
 
-			socket.on('userJoin', function(data, roomInfo) {
+			socket.on('userJoin', function (data, roomInfo) {
 				gateway_userJoin(data, roomInfo, false);
 			});
 
-			socket.on('userLeave', function(data, roomInfo) {
+			socket.on('userLeave', function (data, roomInfo) {
 				gateway_userLeave(data, roomInfo);
 			});
 
@@ -342,7 +339,7 @@ var WRTC_Room = (function() {
 			mediaDevices();
 
 			// check if there is a join request in URI queryString
-			setTimeout(function() {
+			setTimeout(function () {
 				joinByQueryString();
 			}, 500);
 		},
