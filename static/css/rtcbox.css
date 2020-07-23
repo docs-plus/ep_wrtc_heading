@@ -2,9 +2,11 @@
 	position: absolute;
 	top: 0;
 	left: 50%;
-	transform: translate(-50%, -100%);	max-width: 90%;
+	transform: translate(-50%, -100%);	
+	width: fit-content;
+	max-width: 90%;
 	height: auto;
-	z-index: 99999;
+	z-index: 10;
 	min-width: 400px;
 	font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 	font-style: normal;
