@@ -61,21 +61,24 @@ var WRTC = (function () {
 			var $wrtc_modal = $('<div id="wrtc_modal"><div class="videoWrapper" class="thin-scrollbar"></div></div');
 			$wrtc_modal.append(werc_toolbar);
 			$('body').prepend($wrtc_modal);
-			$(document).on('click', '.btn_toggle_modal', function () {
+			$(document).on('click', '#werc_toolbar .btn_toggle_modal', function () {
+
 				var $parent = $(this).parent().parent();
 				var action = $(this).attr('data-action');
 				var videoBox = $('#wrtc_modal .videoWrapper').innerHeight();
+
+				$(this).find('.fa_arrow-from-top').toggle();
+				$(this).find('.fa_arrow-to-top').toggle();
+
 				if (action === 'collapse') {
-					$parent.find('.bnt_expand').removeAttr('active');
-					$(this).removeClass('active');
-					$parent.find('[data-action="expand"]').addClass('active');
+					$(this).attr({'data-action': "expand"});
+					$parent.find('.btn_enlarge').removeAttr('active');
 					$('#wrtc_modal').css({
 						'transform': 'translate(-50%, -' + videoBox + 'px)'
 					});
 				} else {
-					$(this).removeClass('active');
-					$parent.find('.bnt_expand').attr({ 'active': true });
-					$parent.find('[data-action="collapse"]').addClass('active');
+					$(this).attr({'data-action': "collapse"});
+					$parent.find('.btn_enlarge').attr({ 'active': true });
 					$('#wrtc_modal').css({
 						'transform': 'translate(-50%, 0)'
 					});
@@ -464,6 +467,8 @@ var WRTC = (function () {
 			if (videoSource) {
 				mediaConstraints.video = { 'deviceId': { 'exact': videoSource } };
 			}
+
+			localStorage.setItem('videoSettings', JSON.stringify({video: videoSource, audio: audioSource}))
 
 			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
 				localStream = stream;

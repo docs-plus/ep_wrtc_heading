@@ -13,8 +13,16 @@ var WRTC_Room = (function () {
 	var localStream = null;
 	var hElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.h1', '.h2', '.h3', '.h4', '.h5', '.h6'];
 
+	/** --------- Helper --------- */
+
 	function mediaDevices() {
 		navigator.mediaDevices.enumerateDevices().then(function (data) {
+			var videoSettings = localStorage.getItem('videoSettings') || {video: null, audio: null}
+			
+			if(typeof videoSettings === "string") {
+				videoSettings = JSON.parse(videoSettings);
+			}
+
 			var audioInputSelect = document.querySelector('select#audioSource');
 			var videoSelect = document.querySelector('select#videoSource');
 
@@ -24,16 +32,18 @@ var WRTC_Room = (function () {
 				option.value = deviceInfo.deviceId;
 				if (deviceInfo.kind === 'audioinput') {
 					option.text = deviceInfo.label || 'microphone ' + (audioInputSelect.length + 1);
+					if(videoSettings.audio === deviceInfo.deviceId)
+						option.selected = true
 					audioInputSelect.appendChild(option);
 				} else if (deviceInfo.kind === 'videoinput') {
 					option.text = deviceInfo.label || 'camera ' + (videoSelect.length + 1);
+					if(videoSettings.video === deviceInfo.deviceId)
+						option.selected = true
 					videoSelect.appendChild(option);
 				}
 			}
 		});
 	}
-
-	/** --------- Helper --------- */
 
 	function link2Clipboard(text) {
 		var $temp = $('<input>');
@@ -171,10 +181,11 @@ var WRTC_Room = (function () {
 
 		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
 
-		$(document).on('click', '.bnt_expand', function () {
+		$(document).on('click', '#werc_toolbar .btn_enlarge', function () {
 			if (!$(this).attr('active')) return true;
 
 			$(this).toggleClass('large');
+
 			$('#wrtc_modal .video-container .enlarge-btn').each(function () {
 				$(this).trigger('click');
 			});
