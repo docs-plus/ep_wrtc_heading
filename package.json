@@ -1,7 +1,7 @@
 {
 	"name": "ep_wrtc_heading",
 	"description": "Video Headings Plugin for Etherpad",
-	"version": "0.11.1",
+	"version": "0.14.4",
 	"author": {
 		"name": "Hossein Marzban",
 		"email": "marzban98@gmail.com"
@@ -16,9 +16,10 @@
 	],
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"lint": "eslint --fix ./static/js/*.js"
+		"lint": "npx eslint --fix ./static/js/*.js"
 	},
 	"devDependencies": {
+		"babel-eslint": "^10.1.0",
 		"eslint": "^7.5.0",
 		"eslint-config-es5": "^0.5.0",
 		"eslint-plugin-es5": "^1.5.0",
@@ -28,10 +29,8 @@
 		"type": "git",
 		"url": "https://github.com/HMarzban/ep_wrtc_heading"
 	},
-	"dependencies": {
-		"babel-eslint": "^10.1.0"
-	},
+	"dependencies": {},
 	"husky": {
-		"pre-commit": "npm lint"
+		"pre-commit": "npm run lint"
 	}
 }

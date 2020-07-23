@@ -23,7 +23,6 @@
 		"camelcase": 1,
 		"semi": 2,
 		"quotes": 2,
-		"quote-props": 2,
 		"template-tag-spacing": 2,
 		"no-console": [2, { "allow": ["warn", "error", "info"] }],
 		"no-multi-spaces": 2,
@@ -36,8 +35,7 @@
 		"space-before-blocks": 2,
 		"space-before-function-paren": 2,
 		"space-infix-ops": 2,
-		"space-unary-ops": 
-		2,
+		"space-unary-ops": 2,
 		"spaced-comment": 2
 	}
 }
