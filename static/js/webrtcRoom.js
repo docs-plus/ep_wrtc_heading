@@ -249,54 +249,8 @@ var WRTC_Room = (function() {
 		});
 	}
 
-	function reachedVideoRoomSize(roomInfo, showAlert, isBulkUpdate) {
-		if (roomInfo && roomInfo.present <= VIDEOCHATLIMIT) return true;
-
-		showAlert = showAlert || true;
-		if (showAlert && !isBulkUpdate) {
-			$.gritter.add({
-				'title': 'Video chat Limitation',
-				'text': 'The video-chat room has been reached its limitation. \r\n <br> The size of this video-chat room is ' + VIDEOCHATLIMIT + '.',
-				'sticky': false,
-				'class_name': 'error',
-				'time': '5000'
-			});
-		}
-
-		return false;
-	}
-
-	/**
-  *
-  * @param {Object} data @requires
-  * @param {String} data.padId @requires
-  * @param {String} data.userId @requires
-  * @param {String} data.userName @requires
-  * @param {String} data.headingId
-  *
-  * @param {Object} roomInfo
-  * @param {Boolean} showAlert
-  * @param {Boolean} bulkUpdate
- *
- *	@returns
-  */
-	function gateway_userJoin(data, roomInfo, showAlert, bulkUpdate) {
-		if (!data) return reachedVideoRoomSize(null, true, false);
-
-		if (data && reachedVideoRoomSize(roomInfo, showAlert, bulkUpdate)) {
-			return self.addUserToRoom(data, roomInfo);
-		} else if (bulkUpdate) {
-			return self.addUserToRoom(data, roomInfo);
-		}
-		return stopStreaming(localStream);
-	}
-
-	function gateway_userLeave(data, roomInfo) {
-		self.removeUserFromRoom(data, roomInfo);
-	}
-
-	self = {
-		'aceSetAuthorStyle': function aceSetAuthorStyle(context) {
+	var self = {
+		aceSetAuthorStyle: function aceSetAuthorStyle (context) {
 			if (context.author) {
 				var user = getUserFromId(context.author);
 				if (user) {
@@ -306,7 +260,7 @@ var WRTC_Room = (function() {
 				}
 			}
 		},
-		'userLeave': function userLeave(context, callback) {
+		userLeave: function userLeave (context, callback) {
 			var userId = context.userInfo.userId;
 			var headingId = $body_ace_outer().find(".wbrtc_roomBoxBody ul li[data-id='" + userId + "']").parent().parent().parent();
 			var data = {
@@ -317,16 +271,16 @@ var WRTC_Room = (function() {
 			socket.emit('userLeave', data, gateway_userLeave);
 			callback();
 		},
-		'bulkUpdateRooms': function bulkUpdateRooms(hTagList) {
+		bulkUpdateRooms: function bulkUpdateRooms (hTagList) {
 			var padId = window.pad.getPadId();
 			socket.emit('bulkUpdateRooms', padId, hTagList, socketBulkUpdateRooms);
 		},
-		'initSocketJoin': function initSocketJoin() {
+		initSocketJoin: function initSocketJoin () {
 			var userId = window.pad.getUserId();
 			var padId = window.pad.getPadId();
 			socket.emit('join pad', padId, userId, function() {});
 		},
-		'init': function init() {
+		init: function init () {
 			this._pad = window.pad.getPadId();
 
 			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
@@ -348,7 +302,7 @@ var WRTC_Room = (function() {
 				joinByQueryString();
 			}, 500);
 		},
-		'removeUserFromRoom': function removeUserFromRoom(data, roomInfo) {
+		removeUserFromRoom: function removeUserFromRoom (data, roomInfo) {
 			if (!data) return false;
 			var currentUserId = window.pad.getUserId();
 			var $headingRoom = $body_ace_outer().contents();
@@ -390,7 +344,7 @@ var WRTC_Room = (function() {
 				stopStreaming(localStream);
 			}
 		},
-		'addUserToRoom': function addUserToRoom(data, roomInfo) {
+		addUserToRoom: function addUserToRoom (data, roomInfo) {
 			if (!data) return false;
 			var currentUserId = window.pad.getUserId();
 			var $headingRoom = $body_ace_outer().find('#' + data.headingId);
@@ -461,7 +415,7 @@ var WRTC_Room = (function() {
 				}).attr({ 'data-active': true });
 			}
 		},
-		'adoptHeaderYRoom': function adoptHeaderYRoom() {
+		adoptHeaderYRoom: function adoptHeaderYRoom () {
 			// Set all video_heading to be inline with their target REP
 			var $padOuter = $body_ace_outer();
 			if (!$padOuter) return;
@@ -482,7 +436,7 @@ var WRTC_Room = (function() {
 				$el.css({ 'top': getHeaderRoomY($headingEl) + 'px' });
 			});
 		},
-		'findTags': function findTags() {
+		findTags: function findTags () {
 			var hTagList = [];
 			var hTagElements = hElements.join(',');
 			var hTags = $body_ace_outer().find('iframe').contents().find('#innerdocbody').children('div').children(hTagElements);
