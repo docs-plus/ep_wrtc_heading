@@ -10,144 +10,35 @@ var packageJson = require('./package.json');
 var statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
 var VIDEOCHATLIMIT = 4;
 
+const videoChat = require("./server/videoChat")
+const textChat = require("./server/textChat")
+
 
 exports.socketio = function (hookName, args, cb) {
 	socketio = args.io
 	var io = args.io
 
-	// data Structure
-	// "padId:headingId": [{object}]
-	const rooms = {}
 
 	io.of("/heading_chat_room").on("connect", function (socket) {
 
 		socket.on("join pad", function (padId ,userId, callback) {
 			socket.ndHolder = {userId, padId}
 			socket.join(padId)
+			console.log(this, "===================")
+
+			console.log(socket, "==============================")
+			// console.log(JSON.stringify(this) === JSON.stringify(socket))
 		})
 
-		socket.on("userJoin", function (data, callback) {
-			const padId = data.padId
-			const headingId = data.headingId
-			const roomKey = `${padId}:${headingId}`
+		socket.on("userJoin", videoChat.socketUserJoin)
 
-			// if the room does not exist create the room for the first time.
-			if(!rooms[roomKey])
-				rooms[roomKey] = []
-			
-			// does user already joined the room?
-			var isUserInRoom = rooms[roomKey].find(x => x.userId === data.userId)
-			if (isUserInRoom) return false;
+		socket.on("userLeave", videoChat.socketUserLeave)
 
-			var roomInfo = {
-				present: rooms[roomKey].length,
-				list: rooms[roomKey]
-			};
+		socket.on("bulkUpdateRooms", videoChat.socketBulkUpdateRooms)
 
-			if(roomInfo.present < VIDEOCHATLIMIT){
-				rooms[roomKey].push(data);
-				roomInfo.present++
+		socket.on("sendText", textChat.socketSendText)
 
-				socket.broadcast.to(padId).emit("userJoin", data, roomInfo)
-
-				socket.ndHolder = data
-				callback(data, roomInfo)
-			} else {
-				callback(null, roomInfo)
-			}
-
-		})
-
-		// remove the room that not available and excrete user from room
-		// hTagList: [ headingTagId ]
-		socket.on("bulkUpdateRooms", function (padId, hTagList, callback) {
-
-			// remove a pad:headingId, if there is not anymore user in that room 
-			hTagList.forEach(el => {
-				const roomKey = `${padId}:${el.headingId}`
-				if(rooms[roomKey] && rooms[roomKey].length === 0)
-				delete rooms[roomKey];
-			})
-			
-			const roomKeys = Object.keys(rooms).filter(x=> x.includes(padId))
-
-			if(!roomKeys) return true;
-			
-			var roomCollection = {}
-
-			roomKeys.forEach(roomKey => {
-				if(!roomCollection[roomKey])
-					roomCollection[roomKey] = rooms[roomKey]
-			})
-			
-			var roomInfo = {
-				present:  0,
-				list:  []
-			};
-
-			socket.broadcast.to(padId).emit("bulkUpdateRooms", roomCollection, null)
-
-			callback(roomCollection, roomInfo)
-		})
-
-		socket.on("userLeave", function(data, callback){
-			
-			const padId = data.padId
-			const headingId = data.headingId
-			const roomKey = `${padId}:${headingId}` 
-
-			if(!rooms[roomKey]) {
-				callback(null, null)
-				return true;
-			} 
-
-			// remove user in that room
-			rooms[roomKey] = rooms[roomKey].filter(x => !(x.userId === data.userId))
-	
-			// if there is not anymore user in that room, delete room
-			if(rooms[roomKey] && rooms[roomKey].length === 0)
-				delete rooms[roomKey];
-	
-			var roomInfo = {
-				present: rooms[roomKey] ? rooms[roomKey].length : 0,
-				list: rooms[roomKey] || []
-			};
-	
-			socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
-
-			callback(data, roomInfo)
-		})
-
-		socket.on('disconnect', function(){
-		
-			data = socket.ndHolder
-			// in the case when pad does not load plugin properly,
-			// there is no 'ndHolder'(userData)
-			if(!data)
-				return false;
-
-			const padId =    data.padId
-			const headingId = data.headingId
-			const roomKey = `${padId}:${headingId}` 
-
-			if(!rooms[roomKey]) {
-				return true;
-			} 
-
-			// remove user in that room
-			rooms[roomKey] = rooms[roomKey].filter(x => !(x.userId === data.userId))
-	
-			// if there is not anymore user in that room, delete room
-			if(rooms[roomKey] && rooms[roomKey].length === 0)
-				delete rooms[roomKey];
-	
-			var roomInfo = {
-				present: rooms[roomKey] ? rooms[roomKey].length : 0,
-				list: rooms[roomKey] || []
-			};
-	
-			socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
-		})
+		socket.on('disconnect', videoChat.socketDisconnect)
 
 
 		// socket.on('sync user info', (padId, user) => {
