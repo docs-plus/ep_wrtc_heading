@@ -1,6 +1,6 @@
 var eejs = require("ep_etherpad-lite/node/eejs/")
 var settings = require("ep_etherpad-lite/node/utils/Settings")
-var socketio
+let socketIo = null
 var log4js = require("ep_etherpad-lite/node_modules/log4js")
 var sessioninfos = require("ep_etherpad-lite/node/handler/PadMessageHandler").sessioninfos
 var statsLogger = log4js.getLogger("stats")
@@ -8,60 +8,75 @@ var stats = require("ep_etherpad-lite/node/stats")
 var packageJson = require('./package.json');
 // Make sure any updates to this are reflected in README
 var statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
-var VIDEOCHATLIMIT = 4;
+
+let { VIDEOCHATLIMIT } = require("./config")
 
 const videoChat = require("./server/videoChat")
 const textChat = require("./server/textChat")
 
 
 exports.socketio = function (hookName, args, cb) {
-	socketio = args.io
-	var io = args.io
-
+	socketIo = args.io
+	const io = args.io
 
 	io.of("/heading_chat_room").on("connect", function (socket) {
 
 		socket.on("join pad", function (padId ,userId, callback) {
 			socket.ndHolder = {userId, padId}
 			socket.join(padId)
-			console.log(this, "===================")
-
-			console.log(socket, "==============================")
-			// console.log(JSON.stringify(this) === JSON.stringify(socket))
+			callback(null)
 		})
 
-		socket.on("userJoin", videoChat.socketUserJoin)
+		socket.on("userJoin", (padId, userData, callback) => {
 
-		socket.on("userLeave", videoChat.socketUserLeave)
+			const {roomInfo, data, canUserJoin} = videoChat.socketUserJoin(userData)
 
-		socket.on("bulkUpdateRooms", videoChat.socketBulkUpdateRooms)
+			if(canUserJoin) {
+				socket.ndHolder = data
+				socket.broadcast.to(padId).emit("userJoin", data, roomInfo)
+				callback(data, roomInfo)
+			} else {
+				callback(null, roomInfo)
+			}
+		})
 
-		socket.on("sendText", textChat.socketSendText)
+		socket.on("userLeave", (padId, userData, callback) => {
+			const {data, roomInfo} = videoChat.socketUserLeave(userData)
 
-		socket.on('disconnect', videoChat.socketDisconnect)
+			if(!data || !roomInfo) return callback(null, null);
 
+			socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
+			callback(data, roomInfo)
+		})
 
-		// socket.on('sync user info', (padId, user) => {
-		// 	console.log("padId: ", padId)
-		// 	console.log("user: ", user)
-		// 	let roomKeys = Object.keys(rooms).find(x=> x.includes(padId))
-		// 	console.log("roomKeys: ", roomKeys)
+		socket.on("bulkUpdateRooms", (padId, hTagList, callback) => {
+			const {roomCollection, roomInfo} =videoChat.socketBulkUpdateRooms(padId, hTagList)
 
-		// 	console.log(!rooms[roomKeys], !roomKeys)
-		// 	if(!roomKeys || !rooms[roomKeys]) return true;
+			if(!roomCollection || !roomInfo) return false
 
-		// 	console.log("data: ", rooms[roomKeys])
+			socket.broadcast.to(padId).emit("bulkUpdateRooms", roomCollection, null)
+			callback(roomCollection, roomInfo)
+		})
 
-		// 	rooms[roomKeys] = rooms[roomKeys].forEach((el, index) => {
-		// 		if(el.userId === user.userId)
-		// 			rooms[roomKeys][index] = {
-		// 				padId,
-		// 				userId: user.userId,
-		// 				userName: user.name,
-		// 				headingId: user.headingId
-		// 			}
-		// 	})
-		// })
+		socket.on('disconnect', () => {
+			const userData = socket.ndHolder
+			// in the case when pad does not load plugin properly,
+			// there is no 'ndHolder'(userData)
+			if(!userData) return false;
+
+			const {padId, data, roomInfo} = videoChat.socketDisconnect(userData)
+			socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
+		})
+
+		socket.on("sendText", () => {
+			// data = socket.ndHolder
+			// // in the case when pad does not load plugin properly,
+			// // there is no 'ndHolder'(userData)
+			// if(!data) return false;
+
+			// const {data, roomInfo} = textChat.socketSendText
+			// socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
+		})
 
 	})
 }
@@ -149,12 +164,12 @@ function handleRTCMessage (client, payload) {
 	var userId = sessioninfos[client.id].author
 	var to = payload.to
 	var padId = sessioninfos[client.id].padId
-	var room = socketio.sockets.adapter.rooms[padId]
+	var room = socketIo.sockets.adapter.rooms[padId]
 	var clients = []
 
 	if (room && room.sockets) {
 		for (var id in room.sockets) {
-			clients.push(socketio.sockets.sockets[id])
+			clients.push(socketIo.sockets.sockets[id])
 		}
 	}
 

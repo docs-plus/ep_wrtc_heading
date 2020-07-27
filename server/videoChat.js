@@ -1,11 +1,15 @@
+
+const {VIDEOCHATLIMIT} = require("../config")
+
 // data Structure
 // "padId:headingId": [{object}]
 const rooms = {}
 
-const socketUserJoin = (data, callback) => {
+const socketUserJoin = (data) => {
 	const padId = data.padId
 	const headingId = data.headingId
 	const roomKey = `${padId}:${headingId}`
+	let canUserJoin = false
 
 	// if the room does not exist create the room for the first time.
 	if(!rooms[roomKey])
@@ -21,28 +25,31 @@ const socketUserJoin = (data, callback) => {
 	};
 
 	if(roomInfo.present < VIDEOCHATLIMIT){
+		canUserJoin = true
 		rooms[roomKey].push(data);
 		roomInfo.present++
-
-		socket.broadcast.to(padId).emit("userJoin", data, roomInfo)
-
-		socket.ndHolder = data
-		callback(data, roomInfo)
 	} else {
-		callback(null, roomInfo)
+		canUserJoin = false
+	}
+
+	return {
+		canUserJoin,
+		roomInfo,
+		data
 	}
 }
 
 const socketUserLeave = (data, callback) => {
 	const padId = data.padId
 	const headingId = data.headingId
-	const roomKey = `${padId}:${headingId}` 
+	const roomKey = `${padId}:${headingId}`
+	const result = {
+		data: null,
+		roomInfo: null
+	}
 
-	if(!rooms[roomKey]) {
-		callback(null, null)
-		return true;
-	} 
-
+	if(!rooms[roomKey]) return result;
+	
 	// remove user in that room
 	rooms[roomKey] = rooms[roomKey].filter(x => !(x.userId === data.userId))
 
@@ -55,12 +62,18 @@ const socketUserLeave = (data, callback) => {
 		list: rooms[roomKey] || []
 	};
 
-	socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
+	result.data = data
+	result.roomInfo = roomInfo
 
-	callback(data, roomInfo)
+	return result
 }
 
-const socketBulkUpdateRooms = (padId, hTagList, callback) => {
+const socketBulkUpdateRooms = (padId, hTagList) => {
+	const result = {
+		roomCollection: null,
+		roomInfo: null
+	}
+	
 	// remove the room that not available and excrete user from room
 	// hTagList: [ headingTagId ]
 	// remove a pad:headingId, if there is not anymore user in that room 
@@ -72,7 +85,7 @@ const socketBulkUpdateRooms = (padId, hTagList, callback) => {
 	
 	const roomKeys = Object.keys(rooms).filter(x=> x.includes(padId))
 
-	if(!roomKeys) return true;
+	if(!roomKeys) return result;
 	
 	var roomCollection = {}
 
@@ -85,26 +98,25 @@ const socketBulkUpdateRooms = (padId, hTagList, callback) => {
 		present:  0,
 		list:  []
 	};
+	
+	result.roomCollection =  roomCollection
+	result.roomInfo = roomInfo
 
-	socket.broadcast.to(padId).emit("bulkUpdateRooms", roomCollection, null)
-
-	callback(roomCollection, roomInfo)
+	return result
 }
 
-const socketDisconnect = () => {
-	data = socket.ndHolder
-	// in the case when pad does not load plugin properly,
-	// there is no 'ndHolder'(userData)
-	if(!data)
-		return false;
-
+const socketDisconnect = (data) => {
 	const padId =    data.padId
 	const headingId = data.headingId
 	const roomKey = `${padId}:${headingId}` 
+	const result = {
+		data:  null,
+		roomInfo: null,
+		padId
+	}
 
-	if(!rooms[roomKey]) {
-		return true;
-	} 
+	if(!rooms[roomKey]) return result;
+
 
 	// remove user in that room
 	rooms[roomKey] = rooms[roomKey].filter(x => !(x.userId === data.userId))
@@ -118,7 +130,10 @@ const socketDisconnect = () => {
 		list: rooms[roomKey] || []
 	};
 
-	socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
+	result.data = data
+	result.roomInfo = roomInfo
+
+	return result
 }
 
 module.exports = {

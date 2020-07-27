@@ -1,17 +1,20 @@
 'use strict';
 
+const { settings } = require("ep_etherpad-lite/static/js/pad");
+
 var WRTC_Room = (function() {
 	var self = null;
-	var loc = document.location;
-	var port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
-	var url = loc.protocol + '//' + loc.hostname + ':' + port + '/' + 'heading_chat_room';
-	var socket = io.connect(url);
+	var socket = null;
+
 	var currentUserRoom = {};
 	var VIDEOCHATLIMIT = 0;
 	// var $lastJoinButton = null;
 	var prefixHeaderId = 'headingTagId_';
 	var localStream = null;
 	var hElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.h1', '.h2', '.h3', '.h4', '.h5', '.h6'];
+
+
+	/** --------- Helper --------- */
 
 	function mediaDevices() {
 		navigator.mediaDevices.enumerateDevices().then(function(data) {
@@ -32,9 +35,6 @@ var WRTC_Room = (function() {
 			}
 		});
 	}
-
-
-	/** --------- Helper --------- */
 
 	function link2Clipboard(text) {
 		var $temp = $('<input>');
@@ -75,9 +75,10 @@ var WRTC_Room = (function() {
 	function roomBtnHandler(headingId, actions) {
 		headingId = $(this).attr('data-headid') || headingId;
 		actions = $(this).attr('data-action') || actions;
+		var padId = clientVars.padId
 
 		var data = {
-			'padId': clientVars.padId,
+			'padId': padId,
 			'userId': clientVars.userId,
 			'userName': clientVars.userName || 'anonymous',
 			'headingId': headingId
@@ -93,17 +94,17 @@ var WRTC_Room = (function() {
 			isUserMediaAvailable().then(function(stream) {
 				localStream = stream;
 				if (!currentUserRoom.userId) {
-					return socket.emit('userJoin', data, gateway_userJoin);
+					return socket.emit('userJoin', padId, data, gateway_userJoin);
 				}
 
 				// If the user has already joined the video chat, make suer leave that room then join to the new chat room
-				socket.emit('userLeave', currentUserRoom, function(_data, roomInfo) {
+				socket.emit('userLeave', padId, currentUserRoom, function(_data, roomInfo) {
 					gateway_userLeave(_data, roomInfo);
-					socket.emit('userJoin', data, gateway_userJoin);
+					socket.emit('userJoin', padId, data, gateway_userJoin);
 				});
 			});
 		} else {
-			socket.emit('userLeave', data, gateway_userLeave);
+			socket.emit('userLeave', padId, data, gateway_userLeave);
 		}
 	}
 
@@ -307,12 +308,13 @@ var WRTC_Room = (function() {
 		'userLeave': function userLeave(context, callback) {
 			var userId = context.userInfo.userId;
 			var headingId = $body_ace_outer().find(".wbrtc_roomBoxBody ul li[data-id='" + userId + "']").parent().parent().parent();
+			var padId = window.pad.getPadId()
 			var data = {
-				'padId': window.pad.getPadId(),
+				'padId': padId,
 				'userId': userId,
 				'headingId': headingId.attr('id')
 			};
-			socket.emit('userLeave', data, gateway_userLeave);
+			socket.emit('userLeave', padId, data, gateway_userLeave);
 			callback();
 		},
 		'bulkUpdateRooms': function bulkUpdateRooms(hTagList) {
@@ -324,8 +326,12 @@ var WRTC_Room = (function() {
 			var padId = window.pad.getPadId();
 			socket.emit('join pad', padId, userId, function() {});
 		},
-		'init': function init() {
+		'postAceInit': function postAceInit(hook, context, webSocket) {
+			socket = webSocket
 			this._pad = window.pad.getPadId();
+
+			// join the user to WRTC room
+			self.initSocketJoin();
 
 			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
 
