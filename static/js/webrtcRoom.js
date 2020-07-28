@@ -1,6 +1,5 @@
 'use strict';
-
-const { settings } = require("ep_etherpad-lite/static/js/pad");
+var share = require("ep_wrtc_heading/static/js/clientShare")
 
 var WRTC_Room = (function() {
 	var self = null;
@@ -142,14 +141,6 @@ var WRTC_Room = (function() {
 		return user;
 	}
 
-	function scrollDownToLastChatText(force) {
-		if ($('#chatbox').hasClass('visible')) {
-			if (force || !self.lastMessage || !self.lastMessage.position() || self.lastMessage.position().top < $('#chattext').outerHeight() + 20) {
-				$('#chattext').animate({ 'scrollTop': $('#chattext')[0].scrollHeight }, { 'duration': 400, 'queue': false });
-				self.lastMessage = $('#chattext > p').eq(-1);
-			}
-		}
-	}
 
 	function activeEventListener() {
 		// $body_ace_outer().find('iframe[name="ace_inner"]').contents().on("paste", function(e) {})
@@ -217,7 +208,7 @@ var WRTC_Room = (function() {
 		var html = "<p data-headid='" + msg.headId + "' data-authorId='" + msg.userId + "' class='wrtc_text " + msg.headId + ' ' + authorClass + "'><b>" + msg.userName + "</b><span class='time " + authorClass + "'>" + timeStr + '</span> ' + msg.text + '</p>';
 
 		$(document).find('#chatbox #chattext').append(html);
-		scrollDownToLastChatText();
+		share.scrollDownToLastChatText();
 	}
 
 	function stopStreaming(stream) {
