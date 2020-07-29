@@ -4,11 +4,14 @@ const db = require("./dbRepository")
 const { TEXT_CHAT_KEY, TEXT_CHAT_LIMIT } = require("../config")
 const latestTextChatId = {}
 
+console.log(TEXT_CHAT_LIMIT,":222222222222222222")
 
-
-exports.obtainMessages = (padId, headId, {limit = TEXT_CHAT_LIMIT, offset = 0}) => {
-	const dbKey = "textChat:" + padId + ":" + headingId
+exports.getMessages = async (padId, headId, {limit = TEXT_CHAT_LIMIT, offset = 0} = {limit , offset}) => {
+	const dbKey = TEXT_CHAT_KEY + padId + ":" + headId
 	
+	const lastMessageId = await db.getLatestId(dbKey+":*")
+
+	return db.getLastMessages(dbKey, lastMessageId, {limit, offset})
 }
 
 // WRTC:TEXT:padId:headingId:textId
@@ -19,7 +22,7 @@ exports.save = async function (padId, headId, message) {
 
 	if(!existMessageId){
 		let lastMessageId = await db.getLatestId(messageKey+":*")
-		lastMessageId = Number(lastMessageId.split(":").pop()) || 1
+		lastMessageId = lastMessageId ? lastMessageId : 1
 
 		if(!latestTextChatId[padId])
 			latestTextChatId[padId] = {}

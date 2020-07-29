@@ -12,6 +12,29 @@ exports.getLatestId = async key => {
 	const result = await db.findKeys(key, ":*").catch(error => {
 		throw new Error("[repository]: getLatestId has an error," + error.message)
 	})
+	return result.length ? Number(result.pop().split(":").pop()) : 0
+}
 
-	return result.pop()
+
+exports.getLastMessages = async (key, lastMessageId, {limit, offset}) => {
+
+	const results = []
+	const rowOfIds = []
+
+	let startPoint = lastMessageId 
+	let endPoint = 1
+
+	if(lastMessageId > limit) {
+		startPoint = lastMessageId - offset
+		endPoint = startPoint - limit
+	}
+
+	for(let id = startPoint; id >= endPoint; id--) rowOfIds.push(id)
+
+	rowOfIds.reverse().map(id => results.push(db.get(key+":"+id)) ) 
+	
+	console.log(key, results, rowOfIds)
+
+	return Promise.all(results)
+
 }

@@ -69,9 +69,9 @@ exports.socketio = function (hookName, args, cb) {
 			socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
 		})
 
-		socket.on('getTextMessages', (padId, headId, pagination, callback) => {
+		socket.on('getTextMessages', async (padId, headId, pagination, callback) => {
 			// get last message id, then get last newest message, then send to client
-			const messages = await textChat.obtainMessages(padId, headId, pagination)
+			const messages = await textChat.getMessages(padId, headId, pagination)
 					.catch(error => {
 						throw new Error('[socket]: get text messages has an error, ' + error.message)
 					})
@@ -88,8 +88,10 @@ exports.socketio = function (hookName, args, cb) {
 						throw new Error('[socket]: send text message has an error, ' + error.message)
 					})
 
-				socket.broadcast.to(padId).emit("getTextMessage", message)
-				callback(message)
+				
+
+				socket.broadcast.to(padId).emit("receiveTextMessage", message)
+				callback(message, messageId)
 		})
 
 	})
