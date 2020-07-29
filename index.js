@@ -6,10 +6,11 @@ var sessioninfos = require("ep_etherpad-lite/node/handler/PadMessageHandler").se
 var statsLogger = log4js.getLogger("stats")
 var stats = require("ep_etherpad-lite/node/stats")
 var packageJson = require('./package.json');
+const db = require("./server/dbRepository")
 // Make sure any updates to this are reflected in README
 var statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
 
-let { VIDEOCHATLIMIT } = require("./config")
+let { VIDEO_CHAT_LIMIT } = require("./config")
 
 const videoChat = require("./server/videoChat")
 const textChat = require("./server/textChat")
@@ -68,14 +69,27 @@ exports.socketio = function (hookName, args, cb) {
 			socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
 		})
 
-		socket.on("sendText", () => {
-			// data = socket.ndHolder
-			// // in the case when pad does not load plugin properly,
-			// // there is no 'ndHolder'(userData)
-			// if(!data) return false;
+		socket.on('getTextMessages', (padId, headId, pagination, callback) => {
+			// get last message id, then get last newest message, then send to client
+			const messages = await textChat.obtainMessages(padId, headId, pagination)
+					.catch(error => {
+						throw new Error('[socket]: get text messages has an error, ' + error.message)
+					})
 
-			// const {data, roomInfo} = textChat.socketSendText
-			// socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
+			callback(messages)
+		})
+
+		socket.on("sendTextMessage", async (padId, headId, message, callback) =>  {
+				// save text message and get messageId
+				// combine message with messageId then past back to user
+				// then broad cast to pad
+				const messageId = await textChat.save(padId, headId, message)
+					.catch(error => {
+						throw new Error('[socket]: send text message has an error, ' + error.message)
+					})
+
+				socket.broadcast.to(padId).emit("getTextMessage", message)
+				callback(message)
 		})
 
 	})
@@ -118,13 +132,13 @@ exports.clientVars = function (hook, context, callback) {
 	}
 
 	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoChatLimit) {
-		VIDEOCHATLIMIT = settings.ep_wrtc_heading.videoChatLimit
+		VIDEO_CHAT_LIMIT = settings.ep_wrtc_heading.videoChatLimit
 	}
 
 	var result = {
 		webrtc: {
 			version: packageJson.version,
-			videoChatLimit: VIDEOCHATLIMIT,
+			videoChatLimit: VIDEO_CHAT_LIMIT,
 			iceServers: iceServers,
 			enabled: enabled,
 			video: video,

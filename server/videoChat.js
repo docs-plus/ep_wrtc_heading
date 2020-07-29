@@ -1,5 +1,5 @@
 
-const {VIDEOCHATLIMIT} = require("../config")
+const {VIDEO_CHAT_LIMIT} = require("../config")
 
 // data Structure
 // "padId:headingId": [{object}]
@@ -24,7 +24,7 @@ const socketUserJoin = (data) => {
 		list: rooms[roomKey]
 	};
 
-	if(roomInfo.present < VIDEOCHATLIMIT){
+	if(roomInfo.present < VIDEO_CHAT_LIMIT){
 		canUserJoin = true
 		rooms[roomKey].push(data);
 		roomInfo.present++

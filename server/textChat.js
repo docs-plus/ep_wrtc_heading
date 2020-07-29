@@ -1,26 +1,38 @@
-var db = require('ep_etherpad-lite/node/db/DB').db;
+const { findNextId } = require("./utiles").shortSequentialId()
+const { objectHasPath } = require("./utiles")
+const db = require("./dbRepository")
+const { TEXT_CHAT_KEY, TEXT_CHAT_LIMIT } = require("../config")
+const latestTextChatId = {}
 
-// save the chat entry in the database
-db.set("pad:" + this.id + ":chat:" + this.chatHead, { "text": text, "userId": userId, "time": time });
 
-// textChat:padId:headingId
 
-const saveTextChatMessage = (padId, headingId, message) => {
-	const dbKey = "textChat:" + padId + ":" + headingId
-	const dbValue = {text: message.text, userId: message.userId, time: message.time}
-	db.set(dbKey, dbValue)
-}
-
-const getTextChat = (padId, headingId) => {
+exports.obtainMessages = (padId, headId, {limit = TEXT_CHAT_LIMIT, offset = 0}) => {
 	const dbKey = "textChat:" + padId + ":" + headingId
 	
 }
 
-const socketSendText = (data, padId, callback) => {
-	io.emit('updateTextChat', socket.username, data)
-}
-
-module.exports = {
-	socketSendText,
+// WRTC:TEXT:padId:headingId:textId
+exports.save = async function (padId, headId, message) {
+	let messageKey = TEXT_CHAT_KEY + padId + ":" + headId 
 	
+	const existMessageId = ((((latestTextChatId || {})[padId]) || {})[headId]) 
+
+	if(!existMessageId){
+		let lastMessageId = await db.getLatestId(messageKey+":*")
+		lastMessageId = Number(lastMessageId.split(":").pop()) || 1
+
+		if(!latestTextChatId[padId])
+			latestTextChatId[padId] = {}
+
+		latestTextChatId[padId][headId] = lastMessageId 
+	} else {
+		latestTextChatId[padId][headId] = latestTextChatId[padId][headId] + 1
+	}
+	
+	const newMessageId = latestTextChatId[padId][headId]
+	messageKey = messageKey + ":" + newMessageId
+	
+	await db.set(messageKey, message)
+	
+	return newMessageId
 }

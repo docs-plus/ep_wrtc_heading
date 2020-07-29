@@ -1,5 +1,4 @@
 'use strict';
-var share = require("ep_wrtc_heading/static/js/clientShare")
 
 var textChat = (function (){
 	var socket = null
@@ -29,6 +28,11 @@ var textChat = (function (){
 			var textMessage = $(this).val()
 			$(this).val('')
 			createAndAppendMessage(textMessage)
+
+			socket.emit("sendText", "padID", "headId" , "message" ,  function(data, and){
+				console.log(data,"====================", and)
+			})
+	
 		}
 	}
 
@@ -43,6 +47,13 @@ var textChat = (function (){
 		var textChatBox = $('#wrtc_textChatBox').tmpl();
 		$('body').append(textChatBox)
 		eventLister()
+
+
+		socket.emit("sendText", "padID", "headId" , "message" ,  function(data, and){
+			console.log(data,"====================", and)
+		})
+
+
 	}
 
 
