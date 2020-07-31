@@ -17,10 +17,10 @@ exports.getLatestId = async key => {
 
 
 exports.getLastMessages = async (key, lastMessageId, {limit, offset}) => {
-
 	const results = []
 	const rowOfIds = []
 
+	// pagination
 	let startPoint = lastMessageId 
 	let endPoint = 1
 
@@ -33,8 +33,5 @@ exports.getLastMessages = async (key, lastMessageId, {limit, offset}) => {
 
 	rowOfIds.reverse().map(id => results.push(db.get(key+":"+id)) ) 
 	
-	console.log(key, results, rowOfIds)
-
 	return Promise.all(results)
-
 }

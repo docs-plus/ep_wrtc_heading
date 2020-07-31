@@ -344,16 +344,53 @@
 
 /* textChat */
 #wrtc_textChatWrapper{
-	position: absolute;
-	top: 60px;
-	left: 200px;
-	width: 460px;
-	height: 230px;
+	position: fixed;
+	bottom: 25px;
+	right: 22px;
+	width: 400px;
+	height: 200px;
 	background-color: white;
 	z-index: 100000;
-	border: 1px solid;
+	border: 1px solid #ccc;
+	box-shadow: 1px 1px 10px rgb(204, 204, 204, .6);
+	border-radius: 4px;
 	display: flex;
 	flex-direction: column;
+	font-family: Quicksand;
+	font-style: normal;
+	opacity: 0;
+	transform: scale(0.7);
+	transition: all 0.3s cubic-bezier(0.74, -0.05, 0.27, 1.75);
+}
+
+#wrtc_textChatWrapper.active {
+	transform: scale(1);
+	opacity: 1;
+	visibility: visible;
+}
+
+
+.textChatToolbar {
+	padding: 4px 8px;
+	border-bottom: 1px solid #ccc;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	cursor: move;
+}
+.textChatToolbar .chatIcon {
+	width: 19px;
+	display: inline-block;
+	margin-right: 6px;
+	line-height: 0;
+}
+
+.textChatToolbar b{
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 220px;
+	margin-left: 5px;
 }
 
 #wrtc_textChat{
@@ -384,7 +421,7 @@
 	order: 2;
 	flex-grow: 1;
 	padding: 7px;
-	border-top: 1px solid #aaa;
+	border-top: 1px solid #ccc;
 	max-height: 50px;
 }
 #wrtc_textChatInputBox input{

@@ -88,9 +88,7 @@ exports.socketio = function (hookName, args, cb) {
 						throw new Error('[socket]: send text message has an error, ' + error.message)
 					})
 
-				
-
-				socket.broadcast.to(padId).emit("receiveTextMessage", message)
+				socket.broadcast.to(padId).emit(`receiveTextMessage:${headId}`, headId, message)
 				callback(message, messageId)
 		})
 
