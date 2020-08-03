@@ -65,10 +65,13 @@ var WRTC = function () {
 				var $parent = $(this).parent().parent();
 				var action = $(this).attr('data-action');
 				var videoBox = $('#wrtc_modal .videoWrapper').innerHeight();
+
+				$(this).find('.fa_arrow-from-top').toggle();
+				$(this).find('.fa_arrow-to-top').toggle();
+
 				if (action === 'collapse') {
-					$parent.find('.bnt_expand').removeAttr('active');
-					$(this).removeClass('active');
-					$parent.find('[data-action="expand"]').addClass('active');
+					$(this).attr({'data-action': "expand"});
+					$parent.find('.btn_enlarge').removeAttr('active');
 					$('#wrtc_modal').css({
 						'transform': 'translate(-50%, -' + videoBox + 'px)'
 					});
@@ -277,7 +280,7 @@ var WRTC = function () {
 					if (videoEnlarged) {
 						enlargedVideos.add(userId);
 					} else {
-						enlargedVideos.delete(userId);
+						enlargedVideos['delete'](userId);
 					}
 
 					$largeVideo.attr('title', videoEnlarged ? 'Make video smaller' : 'Make video larger').toggleClass('large', videoEnlarged);
@@ -464,6 +467,8 @@ var WRTC = function () {
 			if (videoSource) {
 				mediaConstraints.video = { 'deviceId': { 'exact': videoSource } };
 			}
+
+			localStorage.setItem('videoSettings', JSON.stringify({video: videoSource, audio: audioSource}))
 
 			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
 				localStream = stream;

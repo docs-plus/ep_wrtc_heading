@@ -18,6 +18,12 @@ var WRTC_Room = function () {
 
 	function mediaDevices() {
 		navigator.mediaDevices.enumerateDevices().then(function (data) {
+			var videoSettings = localStorage.getItem('videoSettings') || {video: null, audio: null}
+			
+			if(typeof videoSettings === "string") {
+				videoSettings = JSON.parse(videoSettings);
+			}
+
 			var audioInputSelect = document.querySelector('select#audioSource');
 			var videoSelect = document.querySelector('select#videoSource');
 
@@ -26,10 +32,14 @@ var WRTC_Room = function () {
 				var option = document.createElement('option');
 				option.value = deviceInfo.deviceId;
 				if (deviceInfo.kind === 'audioinput') {
-					option.text = deviceInfo.label || "microphone " + (audioInputSelect.length + 1);
+					option.text = deviceInfo.label || 'microphone ' + (audioInputSelect.length + 1);
+					if(videoSettings.audio === deviceInfo.deviceId)
+						option.selected = true
 					audioInputSelect.appendChild(option);
 				} else if (deviceInfo.kind === 'videoinput') {
-					option.text = deviceInfo.label || "camera " + (videoSelect.length + 1);
+					option.text = deviceInfo.label || 'camera ' + (videoSelect.length + 1);
+					if(videoSettings.video === deviceInfo.deviceId)
+						option.selected = true
 					videoSelect.appendChild(option);
 				}
 			}
@@ -65,7 +75,7 @@ var WRTC_Room = function () {
 	}
 
 	function isUserMediaAvailable() {
-		return window.navigator.mediaDevices.getUserMedia({ 'audio': true, 'video': true }).catch(function (err) {
+		return window.navigator.mediaDevices.getUserMedia({ 'audio': true, 'video': true })['catch'](function (err) {
 			WRTC.showUserMediaError(err);
 			console.error(err);
 		});
@@ -146,10 +156,11 @@ var WRTC_Room = function () {
 
 		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink, #wrtc_textChatWrapper .btn_leave', roomBtnHandler);
 
-		$(document).on('click', '.bnt_expand', function () {
+		$(document).on('click', '#werc_toolbar .btn_enlarge', function () {
 			if (!$(this).attr('active')) return true;
 
 			$(this).toggleClass('large');
+
 			$('#wrtc_modal .video-container .enlarge-btn').each(function () {
 				$(this).trigger('click');
 			});
