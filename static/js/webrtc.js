@@ -76,12 +76,12 @@ var WRTC = function () {
 						'transform': 'translate(-50%, -' + videoBox + 'px)'
 					});
 				} else {
-					$(this).removeClass('active');
-					$parent.find('.bnt_expand').attr({ 'active': true });
-					$parent.find('[data-action="collapse"]').addClass('active');
+					$(this).attr({'data-action': "collapse"});
+					$parent.find('.btn_enlarge').attr({ 'active': true });
 					$('#wrtc_modal').css({
 						'transform': 'translate(-50%, 0)'
 					});
+
 				}
 			});
 		},

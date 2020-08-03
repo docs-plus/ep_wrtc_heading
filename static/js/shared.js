@@ -17,9 +17,6 @@ var collectContentPre = function(hook, context) {
 		context.state.lineAttributes.heading = tags[tagIndex];
 		var jsx = /(?:^| )jsx-([A-Za-z0-9]*)/.exec(context.cls);
 
-		// console.log(context)
-		// console.log(context.state.author, context.state.lineAttribute, existTagId)
-
 		// when copy header form clipboard, call headingTagId to set
 		if ((context.styl && context.styl.length > 10) || (jsx && jsx[1])) {
 			context.cc.doAttrib(context.state, 'headingTagId::' + randomString(16));
