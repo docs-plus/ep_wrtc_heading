@@ -1,6 +1,7 @@
 "use strict";
 
-exports.scrollDownToLastChatText = function scrollDownToLastChatText(selector, force) {
+exports.scrollDownToLastChatText = function scrollDownToLastChatText(selector) {
+	if(!selector) return true;
 	$(selector).animate({ 'scrollTop': $(selector)[0].scrollHeight }, { 'duration': 400, 'queue': false });
 };
 

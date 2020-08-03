@@ -47,52 +47,6 @@ var textChat = function () {
 
 	function eventListers() {
 		$(document).on("keypress", "#wrtc_textChatInputBox input", eventTextChatInput);
-
-		dragElement(document.getElementById("wrtc_textChatWrapper"));
-
-		function dragElement(elmnt) {
-			var initialX = 0;
-			var initialY = 0;
-			var xOffset = 0;
-			var yOffset = 0;
-			var currentX;
-			var currentY;
-			var initialX;
-			var initialY;
-			document.querySelector(".textChatToolbar").onmousedown = dragMouseDown;
-
-			function dragMouseDown(e) {
-				e = e || window.event;
-				e.preventDefault();
-				// get the mouse cursor position at startup:
-				initialX = e.clientX - xOffset;
-				initialY = e.clientY - yOffset;
-				document.onmouseup = closeDragElement;
-				// call a function whenever the cursor moves:
-				document.onmousemove = elementDrag;
-			}
-
-			function elementDrag(e) {
-				e = e || window.event;
-				e.preventDefault();
-				// calculate the new cursor position:
-
-				currentX = e.clientX - initialX;
-				currentY = e.clientY - initialY;
-
-				xOffset = currentX;
-				yOffset = currentY;
-				elmnt.style.transition = "all 0s";
-				elmnt.style.transform = "translate3d(" + xOffset + "px, " + yOffset + "px, 0)";
-			}
-
-			function closeDragElement() {
-				/* stop moving when mouse button is released:*/
-				elmnt.style.transition = "all 0.3s cubic-bezier(0.74, -0.05, 0.27, 1.75)";
-				document.onmouseup = null;
-				document.onmousemove = null;
-			}
-		}
 	}
 
 	function deactivateModal() {
@@ -100,10 +54,7 @@ var textChat = function () {
 		var $TextChatWrapper = $(document).find("#wrtc_textChatWrapper");
 		$TextChatWrapper.removeClass('active');
 
-		// animation pop down
-		setTimeout(function () {
-			$TextChatWrapper.remove();
-		}, 300);
+		$TextChatWrapper.find("#wrtc_textChat p").remove();
 
 		socket.removeListener('receiveTextMessage:' + headId);
 
@@ -114,14 +65,18 @@ var textChat = function () {
 		headId = headingId || window.headingId;
 
 		if (!headId) return false;
+		var existTextChat = $(document).find("#wrtc_textChatWrapper")
+		
+		if(!existTextChat.length){
+			var textChatBox = $('#wrtc_textChatBox').tmpl({
+				headId: headId,
+				videoChatLimit: VIDEOCHATLIMIT,
+				headTitle: headTitle,
+				userCount: userCount
+			});
+			$('body').append(textChatBox);
+		}
 
-		var textChatBox = $('#wrtc_textChatBox').tmpl({
-			headId: headId,
-			videoChatLimit: VIDEOCHATLIMIT,
-			headTitle: headTitle,
-			userCount: userCount
-		});
-		$('body').append(textChatBox);
 
 		// for animation pop up
 		setTimeout(function () {

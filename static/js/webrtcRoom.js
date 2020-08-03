@@ -144,7 +144,7 @@ var WRTC_Room = function () {
 
 		$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_door', roomBtnHandler);
 
-		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
+		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink, #wrtc_textChatWrapper .btn_leave', roomBtnHandler);
 
 		$(document).on('click', '.bnt_expand', function () {
 			if (!$(this).attr('active')) return true;
@@ -499,7 +499,7 @@ var WRTC_Room = function () {
 				} else {
 					$(document).find('[data-headid=' + data.headingTagId + '].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-headid=' + data.headingTagId + ']').text(data.headTitle);
 					target.find('.wbrtc_roomBox[id=' + data.headingTagId + '] .wbrtc_roomBoxHeader b').text(data.headTitle);
-					$(document).find("#wrtc_textChatWrapper .textChatToolbar b").text(data.headTitle);
+					$(document).find('#wrtc_textChatWrapper[data-headid='+ data.headingTagId +'] .nd_title b').text(data.headTitle);
 				}
 
 				hTagList.push(data);
