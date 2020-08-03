@@ -154,7 +154,7 @@ var WRTC_Room = function () {
 
 		$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_door', roomBtnHandler);
 
-		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink, #wrtc_textChatWrapper .btn_leave', roomBtnHandler);
+		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink, #wrtc_textChatWrapper .btn_controllers .btn_leave', roomBtnHandler);
 
 		$(document).on('click', '#werc_toolbar .btn_enlarge', function () {
 			if (!$(this).attr('active')) return true;
