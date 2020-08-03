@@ -75,6 +75,12 @@ var textChat = function () {
 				userCount: userCount
 			});
 			$('body').append(textChatBox);
+		} else {
+			// TODO: change this to template
+			existTextChat.attr({"data-headid": headId})
+			existTextChat.find(".nd_title b").text(headTitle)
+			existTextChat.find(".userCount").text(userCount)
+			existTextChat.find(".btn_leave").attr({"data-headid": headId})
 		}
 
 
