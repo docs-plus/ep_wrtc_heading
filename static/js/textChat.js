@@ -3,7 +3,6 @@
 var textChat = function () {
 	var socket = null;
 	var padId = null;
-	var headId = null;
 	var VIDEOCHATLIMIT = 4;
 
 	function createAndAppendMessage(msg) {
@@ -49,44 +48,40 @@ var textChat = function () {
 		$(document).on("keypress", "#wrtc_textChatInputBox input", eventTextChatInput);
 	}
 
-	function deactivateModal() {
+	function deactivateModal(headerId) {
 
 		var $TextChatWrapper = $(document).find("#wrtc_textChatWrapper");
 		$TextChatWrapper.removeClass('active');
 
 		$TextChatWrapper.find("#wrtc_textChat p").remove();
 
-		socket.removeListener('receiveTextMessage:' + headId);
+		socket.removeListener('receiveTextMessage:' + headerId);
 
-		headId = null;
+		headerId = null;
 	}
 
-	function activateModal(headingId, headTitle, userCount) {
-		headId = headingId || window.headingId;
-
-		if (!headId) return false;
+	function activateModal(headerId, headTitle, userCount) {
+		if (!headerId) return false;
 		var existTextChat = $(document).find("#wrtc_textChatWrapper")
 		
 		if(!existTextChat.length){
 			var textChatBox = $('#wrtc_textChatBox').tmpl({
-				headId: headId,
-				videoChatLimit: VIDEOCHATLIMIT,
+				headId: headerId,
 				headTitle: headTitle,
 				userCount: userCount
 			});
 			$('body').append(textChatBox);
 		} else {
 			// TODO: change this to template
-			existTextChat.attr({"data-headid": headId})
+			existTextChat.attr({"data-headid": headerId}).find(".btn_leave").attr({"data-headid": headerId})
 			existTextChat.find(".nd_title b").text(headTitle)
 			existTextChat.find(".userCount").text(userCount)
-			existTextChat.find(".btn_leave").attr({"data-headid": headId})
 		}
 
 
 		// for animation pop up
 		setTimeout(function () {
-			$(document).find("#wrtc_textChatWrapper").addClass("active");
+			existTextChat.addClass("active");
 		}, 250);
 
 		socket.on("receiveTextMessage:" + headId, function (headingId, msg) {
@@ -104,6 +99,45 @@ var textChat = function () {
 		eventListers();
 	}
 
+	function addUserToRoom(data, roomInfo) {
+		var headerId = data.headId
+		var $headingRoom = $body_ace_outer().find('#' + headerId);
+		var headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
+		var userCount = roomInfo.present;
+		$headingRoom.find('.textChatCount').text(userCount);
+
+		if (roomInfo.list) {
+			roomInfo.list.forEach(function reOrderUserList(el) {
+				var userInList = share.getUserFromId(el.userId);
+				$headingRoom.find('.wrtc_content.textChat ul').append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
+			});
+		}
+
+		activateModal(headerId, headTitle, userCount)
+	}
+
+	function removeUserFromRoom(data, roomInfo) {
+		var headerId = data.headId
+		var $headingRoom = $body_ace_outer().find('#' + headerId);
+
+		if (roomInfo.list) {
+			roomInfo.list.forEach(function reOrderUserList(el) {
+				var userInList = share.getUserFromId(el.userId);
+				$headingRoom.find('.wrtc_content.textChat ul').append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
+			});
+		}
+
+		deactivateModal(data.headId)
+	}
+
+	function userJoin(headId, userData) {
+		socket.emit('userJoin', padId, userData, "text", addUserToRoom);
+	}
+
+	function userLeave(headId, userData) {
+		socket.emit('userLeave', padId, userData, "text", removeUserFromRoom);
+	}
+
 	function postAceInit(hook, context, webSocket) {
 		socket = webSocket;
 		VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
@@ -113,7 +147,9 @@ var textChat = function () {
 	return {
 		postAceInit: postAceInit,
 		activateModal: activateModal,
-		deactivateModal: deactivateModal
+		deactivateModal: deactivateModal,
+		userJoin: userJoin,
+		userLeave: userLeave
 	};
 }();
 

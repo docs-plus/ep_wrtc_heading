@@ -5,7 +5,7 @@ const {VIDEO_CHAT_LIMIT} = require("../config")
 // "padId:headingId": [{object}]
 const rooms = {}
 
-const socketUserJoin = (data) => {
+const socketUserJoin = data => {
 	const padId = data.padId
 	const headingId = data.headingId
 	const roomKey = `${padId}:${headingId}`
@@ -16,36 +16,36 @@ const socketUserJoin = (data) => {
 		rooms[roomKey] = []
 	
 	// does user already joined the room?
-	var isUserInRoom = rooms[roomKey].find(x => x.userId === data.userId)
+	const isUserInRoom = rooms[roomKey].find(x => x.userId === data.userId)
 	if (isUserInRoom) return false;
 
-	var roomInfo = {
+	const info = {
 		present: rooms[roomKey].length,
 		list: rooms[roomKey]
 	};
 
-	if(roomInfo.present < VIDEO_CHAT_LIMIT){
+	if(info.present < VIDEO_CHAT_LIMIT){
 		canUserJoin = true
 		rooms[roomKey].push(data);
-		roomInfo.present++
+		info.present++
 	} else {
 		canUserJoin = false
 	}
 
 	return {
 		canUserJoin,
-		roomInfo,
+		info,
 		data
 	}
 }
 
-const socketUserLeave = (data, callback) => {
+const socketUserLeave = data => {
 	const padId = data.padId
 	const headingId = data.headingId
 	const roomKey = `${padId}:${headingId}`
 	const result = {
 		data: null,
-		roomInfo: null
+		info: null
 	}
 
 	if(!rooms[roomKey]) return result;
@@ -57,13 +57,13 @@ const socketUserLeave = (data, callback) => {
 	if(rooms[roomKey] && rooms[roomKey].length === 0)
 		delete rooms[roomKey];
 
-	var roomInfo = {
+	const info = {
 		present: rooms[roomKey] ? rooms[roomKey].length : 0,
 		list: rooms[roomKey] || []
 	};
 
 	result.data = data
-	result.roomInfo = roomInfo
+	result.info = info
 
 	return result
 }
