@@ -9,9 +9,9 @@ var videoChat = (function () {
 
 	function mediaDevices() {
 		navigator.mediaDevices.enumerateDevices().then(function (data) {
-			var videoSettings = localStorage.getItem('videoSettings') || {video: null, audio: null}
-			
-			if(typeof videoSettings === "string") {
+			var videoSettings = localStorage.getItem('videoSettings') || { video: null, audio: null };
+
+			if (typeof videoSettings === "string") {
 				videoSettings = JSON.parse(videoSettings);
 			}
 
@@ -24,13 +24,11 @@ var videoChat = (function () {
 				option.value = deviceInfo.deviceId;
 				if (deviceInfo.kind === 'audioinput') {
 					option.text = deviceInfo.label || 'microphone ' + (audioInputSelect.length + 1);
-					if(videoSettings.audio === deviceInfo.deviceId)
-						option.selected = true
+					if (videoSettings.audio === deviceInfo.deviceId) option.selected = true;
 					audioInputSelect.appendChild(option);
 				} else if (deviceInfo.kind === 'videoinput') {
 					option.text = deviceInfo.label || 'camera ' + (videoSelect.length + 1);
-					if(videoSettings.video === deviceInfo.deviceId)
-						option.selected = true
+					if (videoSettings.video === deviceInfo.deviceId) option.selected = true;
 					videoSelect.appendChild(option);
 				}
 			}
@@ -44,13 +42,9 @@ var videoChat = (function () {
 		});
 	}
 
-	function activateModal(){
+	function activateModal() {}
 
-	}
-
-	function deactivateModal(){
-
-	}
+	function deactivateModal() {}
 
 	function addTextChatMessage(msg) {
 		var authorClass = 'author-' + msg.userId.replace(/[^a-y0-9]/g, function (c) {
@@ -75,21 +69,21 @@ var videoChat = (function () {
 		if (!data || !roomInfo) return false;
 		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
-		var $videoChatUserList = $headingRoom.find('.wrtc_content.videoChat ul')
+		var $videoChatUserList = $headingRoom.find('.wrtc_content.videoChat ul');
 
 		if (roomInfo.list) {
-			$videoChatUserList.find('li').remove()
+			$videoChatUserList.find('li').remove();
 			roomInfo.list.forEach(function reOrderUserList(el) {
 				var userInList = share.getUserFromId(el.userId);
 				$videoChatUserList.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
 			});
 		}
-		
+
 		var userCount = roomInfo.present;
 		$headingRoom.find('.videoChatCount').text(userCount);
 		$('#werc_toolbar .nd_title .nd_count,  #wrtc_textChatWrapper .userCount').text(userCount);
 
-		if(userCount === 0){
+		if (userCount === 0) {
 			$videoChatUserList.append('<li class="empty">Be the first to join the <b class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="video">text-chat</b></li>');
 		}
 
@@ -108,7 +102,7 @@ var videoChat = (function () {
 			// 	'disabled': false
 			// }).addClass('active').removeClass('deactivate').text('JOIN');
 
-			// $('#rtcbox .chatTitle').remove(); 
+			// $('#rtcbox .chatTitle').remove();
 
 			$('#wrtc_modal').css({
 				'transform': 'translate(-50%, -100%)',
@@ -118,15 +112,15 @@ var videoChat = (function () {
 			stopStreaming(localStream);
 			// textChat.deactivateModal();
 		}
-		if(cb && typeof cb === 'function') cb();
+		if (cb && typeof cb === 'function') cb();
 	}
 
 	function addUserToRoom(data, roomInfo) {
 		if (!data) return false;
-		var headerId = data.headerId
+		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 		var headerTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
-		
+
 		var user = share.getUserFromId(data.userId);
 		// some user may session does exist but the user info does not available in all over the current pad
 		if (!user) return true;
@@ -135,7 +129,6 @@ var videoChat = (function () {
 		var IsUserInRooms = $headingRoom.find(".wrtc_content.videoChat ul li[data-id='" + user.userId + "']").text();
 		if (IsUserInRooms) return false;
 
-
 		var userCount = roomInfo.present;
 		$headingRoom.find('.videoChatCount').text(userCount);
 
@@ -143,10 +136,10 @@ var videoChat = (function () {
 
 		$(document).find("#wrtc_textChatWrapper .textChatToolbar .userCount").text(userCount);
 
-		var $vidoeChatUserList = $headingRoom.find('.wrtc_content.videoChat ul')
+		var $vidoeChatUserList = $headingRoom.find('.wrtc_content.videoChat ul');
 
 		if (roomInfo.list) {
-			$vidoeChatUserList.find('li').remove()
+			$vidoeChatUserList.find('li').remove();
 			roomInfo.list.forEach(function reOrderUserList(el) {
 				var userInList = share.getUserFromId(el.userId);
 				$vidoeChatUserList.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
@@ -202,18 +195,18 @@ var videoChat = (function () {
 		}
 	}
 
-	function userJoin(headerId, data){
+	function userJoin(headerId, data) {
 		// check if user already in that room
 		if (currentRoom && currentRoom.headerId === headerId && currentRoom.userId === userData.userId) return false;
 
 		isUserMediaAvailable().then(function (stream) {
 			localStream = stream;
-			if(!currentRoom.userId || (currentRoom && currentRoom.headerId !== headerId)){
+			if (!currentRoom.userId || currentRoom && currentRoom.headerId !== headerId) {
 				return socket.emit('userJoin', padId, data, "video", gateway_userJoin);
 			} else {
 				// If the user has already joined the video chat, make suer leave that room then join to the new chat room
 				socket.emit('userLeave', padId, currentRoom, "video", function (_data, roomInfo) {
-					gateway_userLeave(_data, roomInfo, function(){
+					gateway_userLeave(_data, roomInfo, function () {
 						socket.emit('userJoin', padId, data, "video", gateway_userJoin);
 					});
 				});
@@ -221,7 +214,7 @@ var videoChat = (function () {
 		});
 	}
 
-	function userLeave(headerId, data){
+	function userLeave(headerId, data) {
 		socket.emit('userLeave', padId, data, 'video', gateway_userLeave);
 	}
 
@@ -265,7 +258,7 @@ var videoChat = (function () {
  *
  *	@returns
   */
- function gateway_userJoin(data, roomInfo, showAlert, bulkUpdate) {
+	function gateway_userJoin(data, roomInfo, showAlert, bulkUpdate) {
 		if (!data) return reachedVideoRoomSize(null, true, false);
 
 		if (data && reachedVideoRoomSize(roomInfo, showAlert, bulkUpdate)) {

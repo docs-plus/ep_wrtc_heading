@@ -59,9 +59,9 @@ var textChat = (function () {
 
 	function activateModal(headerId, headTitle, userCount) {
 		if (!headerId) return false;
-		var existTextChat = $(document).find("#wrtc_textChatWrapper")
-		
-		if(!existTextChat.length){
+		var existTextChat = $(document).find("#wrtc_textChatWrapper");
+
+		if (!existTextChat.length) {
 			var textChatBox = $('#wrtc_textChatBox').tmpl({
 				headId: headerId,
 				headTitle: headTitle,
@@ -70,11 +70,10 @@ var textChat = (function () {
 			$('body').append(textChatBox);
 		} else {
 			// TODO: change this to template
-			existTextChat.attr({"data-id": headerId}).find(".btn_leave").attr({"data-id": headerId})
-			existTextChat.find(".nd_title b").text(headTitle)
-			existTextChat.find(".userCount").text(userCount)
+			existTextChat.attr({ "data-id": headerId }).find(".btn_leave").attr({ "data-id": headerId });
+			existTextChat.find(".nd_title b").text(headTitle);
+			existTextChat.find(".userCount").text(userCount);
 		}
-
 
 		// for animation pop up
 		setTimeout(function () {
@@ -97,17 +96,17 @@ var textChat = (function () {
 	}
 
 	function addUserToRoom(data, roomInfo) {
-		if(!data) return true;
-		var headerId = data.headerId
+		if (!data) return true;
+		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 		var headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
 
-		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul')
+		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
 		if (roomInfo.list) {
-			$textChatUserList.find('li').remove()
+			$textChatUserList.find('li').remove();
 			roomInfo.list.forEach(function reOrderUserList(el) {
 				var userInList = share.getUserFromId(el.userId);
 				$textChatUserList.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
@@ -115,50 +114,50 @@ var textChat = (function () {
 		}
 
 		if (data.userId === clientVars.userId) {
-			currentRoom = data
-			activateModal(headerId, headTitle, userCount)
+			currentRoom = data;
+			activateModal(headerId, headTitle, userCount);
 		}
 	}
 
-	function removeUserFromRoom(data, roomInfo, target , cb) {
+	function removeUserFromRoom(data, roomInfo, target, cb) {
 		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
 
-		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul')
+		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
 		if (roomInfo.list) {
-			$textChatUserList.find('li').remove()
+			$textChatUserList.find('li').remove();
 			roomInfo.list.forEach(function reOrderUserList(el) {
 				var userInList = share.getUserFromId(el.userId);
 				$textChatUserList.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
 			});
 		}
 
-		if(userCount === 0){
+		if (userCount === 0) {
 			$textChatUserList.append('<li class="empty">Be the first to join the <b class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text">text-chat</b></li>');
 		}
 		if (data.userId === clientVars.userId) {
-			currentRoom = {}
+			currentRoom = {};
 			deactivateModal(data.headId);
 		}
-		if(cb && typeof cb === 'function') cb();
+		if (cb && typeof cb === 'function') cb();
 	}
 
 	function userJoin(headerId, userData) {
 
 		// check if user already in that room
 		if (currentRoom && currentRoom.headerId === headerId && currentRoom.userId === userData.userId) return false;
-		
-		if(!currentRoom.userId){
+
+		if (!currentRoom.userId) {
 			socket.emit('userJoin', padId, userData, "text", addUserToRoom);
 		} else {
 			socket.emit('userLeave', padId, currentRoom, "text", function (data, roomInfo, target) {
-				removeUserFromRoom(data, roomInfo, "text", function(){
+				removeUserFromRoom(data, roomInfo, "text", function () {
 					socket.emit('userJoin', padId, userData, "text", addUserToRoom);
-				})
+				});
 			});
 		}
 	}
@@ -181,7 +180,7 @@ var textChat = (function () {
 		// bind roomInfo and send user to gateway_userJoin
 		Object.keys(rooms).forEach(function (headerId) {
 			rooms[headerId].forEach(function (user) {
-				textChat.addUserToRoom(user, roomsInfo[headerId], 'text')
+				textChat.addUserToRoom(user, roomsInfo[headerId], 'text');
 			});
 		});
 	}

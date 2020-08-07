@@ -1,16 +1,21 @@
+'use strict';
+
 var $ = require('ep_etherpad-lite/static/js/rjquery').$;
 var _ = require('ep_etherpad-lite/static/js/underscore');
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 var events = require('ep_wrtc_heading/static/js/copyPasteEvents');
 var textChat = require("ep_wrtc_heading/static/js/textChat");
 var videoChat = require('ep_wrtc_heading/static/js/videoChat');
-const { pad } = require('ep_etherpad-lite/static/js/pad');
+
+var _require = require('ep_etherpad-lite/static/js/pad');
+
+var pad = _require.pad;
 
 /** **********************************************************************/
 /*                              Plugin                                  */
 /** **********************************************************************/
 
-var EPwrtcHeading = (function() {
+var EPwrtcHeading = (function () {
 	var padOuter = null;
 	var padInner = null;
 	var outerBody = null;
@@ -46,25 +51,25 @@ var EPwrtcHeading = (function() {
 		$target.prepend('<div id="wbrtc_chatBox"></div>');
 
 		// module settings
-		$('#options-wrtc-heading').on('change', function() {
+		$('#options-wrtc-heading').on('change', function () {
 			$('#options-wrtc-heading').is(':checked') ? enableWrtcHeading() : disableWrtcHeading();
 		});
 
 		$('#options-wrtc-heading').trigger('change');
 
 		if (browser.chrome || browser.firefox) {
-			padInner.contents().on('copy', function(e) {
+			padInner.contents().on('copy', function (e) {
 				events.addTextOnClipboard(e, ace, padInner, false);
 			});
 
-			padInner.contents().on('cut', function(e) {
+			padInner.contents().on('cut', function (e) {
 				events.addTextOnClipboard(e, ace, padInner, true);
 			});
 
-			padInner.contents().on('paste', function(e) {
-				setTimeout(function(){
+			padInner.contents().on('paste', function (e) {
+				setTimeout(function () {
 					WRTC_Room.adoptHeaderYRoom();
-				},250);
+				}, 250);
 			});
 		}
 
@@ -81,7 +86,7 @@ var EPwrtcHeading = (function() {
 /** **********************************************************************/
 
 var hooks = {
-	postAceInit: function postAceInit (hook, context) {
+	postAceInit: function postAceInit(hook, context) {
 
 		if (!$("#editorcontainerbox").hasClass("flex-layout")) {
 			$.gritter.add({
@@ -96,25 +101,24 @@ var hooks = {
 		var userId = window.pad.getUserId();
 		var padId = window.pad.getPadId();
 
-		var socket = EPwrtcHeading.init(ace, padId, userId)
-		WRTC.postAceInit(hook, context)
-		WRTC_Room.postAceInit(hook, context, socket, padId)
-		textChat.postAceInit(hook, context, socket, padId)
-		videoChat.postAceInit(hook, context, socket, padId)
+		var socket = EPwrtcHeading.init(ace, padId, userId);
+		WRTC.postAceInit(hook, context);
+		WRTC_Room.postAceInit(hook, context, socket, padId);
+		textChat.postAceInit(hook, context, socket, padId);
+		videoChat.postAceInit(hook, context, socket, padId);
 
-		$('#editorcontainer iframe').ready(function() {
+		$('#editorcontainer iframe').ready(function () {
 			WRTC.appendInterfaceLayout();
-			setTimeout(function() {
+			setTimeout(function () {
 				WRTC_Room.findTags();
 			}, 250);
 		});
 
-		$(window).resize(_.debounce(function() {
+		$(window).resize(_.debounce(function () {
 			WRTC_Room.adoptHeaderYRoom();
 		}, 100));
-		
 	},
-	aceEditEvent: function aceEditEvent (hook, context) {
+	aceEditEvent: function aceEditEvent(hook, context) {
 		var eventType = context.callstack.editEvent.eventType;
 
 		// ignore these types
@@ -125,7 +129,7 @@ var hooks = {
 
 		// apply changes to the other user
 		if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
-			setTimeout(function() {
+			setTimeout(function () {
 				WRTC_Room.findTags();
 			}, 250);
 		}
@@ -135,39 +139,39 @@ var hooks = {
 			// unfortunately "setAttributesRange" takes a little time to set attribute
 			// also ep_headings2 plugin has setTimeout about 250 ms to set and update H tag
 			// more info: https://github.com/ether/ep_headings2/blob/6827f1f0b64d99c3f3082bc0477d87187073a74f/static/js/index.js#L71
-			setTimeout(function() {
+			setTimeout(function () {
 				WRTC_Room.findTags();
 			}, 250);
 		}
 	},
-	aceAttribsToClasses: function aceAttribsToClasses (hook, context) {
+	aceAttribsToClasses: function aceAttribsToClasses(hook, context) {
 		if (context.key === "headingTagId") {
 			return ["headingTagId_" + context.value];
 		}
 	},
-	aceEditorCSS: function aceEditorCSS () {
+	aceEditorCSS: function aceEditorCSS() {
 		var version = clientVars.webrtc.version || 1;
 		return ['ep_wrtc_heading/static/css/wrtcRoom.css?v=' + version + ''];
 	},
-	aceSetAuthorStyle: function aceSetAuthorStyle (hook, context) {
+	aceSetAuthorStyle: function aceSetAuthorStyle(hook, context) {
 		WRTC_Room.aceSetAuthorStyle(context);
 		WRTC.aceSetAuthorStyle(context);
 	},
-	userLeave: function userLeave (hook, context, callback) {
+	userLeave: function userLeave(hook, context, callback) {
 		WRTC_Room.userLeave(context, callback);
 		WRTC.userLeave(hook, context, callback);
 	},
-	handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE (hook, context) {
+	handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
 		WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
 	},
-	aceSelectionChanged: function aceSelectionChanged (rep, context) {
+	aceSelectionChanged: function aceSelectionChanged(rep, context) {
 		if (context.callstack.type === "insertheading") {
 			rep = context.rep;
 			var headingTagId = ["headingTagId", randomString(16)];
 			context.documentAttributeManager.setAttributesOnRange(rep.selStart, rep.selEnd, [headingTagId]);
 		}
 	},
-	aceInitialized: function aceInitialized (hook, context) {
+	aceInitialized: function aceInitialized(hook, context) {
 		var editorInfo = context.editorInfo;
 		editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
 	}

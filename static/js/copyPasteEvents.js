@@ -101,9 +101,9 @@ function getSelectionHtml() {
 function selectionMultipleLine() {
 	var rawHtml = getSelectionHtml();
 	rawHtml = $('<div></div>').append(rawHtml);
-	rawHtml.find(':header span').removeClass(function(index, css) {
+	rawHtml.find(':header span').removeClass(function (index, css) {
 		return (css.match(/\headingTagId_\S+/g) || []).join(' ');
-	}).addClass(function(index, css) {
+	}).addClass(function (index, css) {
 		return 'headingTagId_' + randomString(16) + ' ' + css;
 	});
 	return rawHtml.html();
@@ -118,11 +118,11 @@ function selectionOneLine(headerId) {
 	return rawHtml.html();
 }
 
-exports.addTextOnClipboard = function(e, aces, inner, removeSelection) {
+exports.addTextOnClipboard = function (e, aces, inner, removeSelection) {
 	padInner = inner;
 
 	var selection;
-	aces.callWithAce(function(ace) {
+	aces.callWithAce(function (ace) {
 		selection = ace.ace_hasHeaderOnSelection();
 	});
 

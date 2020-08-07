@@ -4,7 +4,7 @@ var share = require("ep_wrtc_heading/static/js/clientShare");
 var textChat = require("ep_wrtc_heading/static/js/textChat");
 var videoChat = require("ep_wrtc_heading/static/js/videoChat");
 
-var WRTC_Room = function () {
+var WRTC_Room = (function () {
 	var self = null;
 	var socket = null;
 	var padId = null;
@@ -40,27 +40,27 @@ var WRTC_Room = function () {
 	}
 
 	function joinChatRoom(headId, userInfo) {
-		textChat.userJoin(headId, userInfo)
-		videoChat.userJoin(headId, userInfo)
+		textChat.userJoin(headId, userInfo);
+		videoChat.userJoin(headId, userInfo);
 	}
 
 	function leaveChatRoom(headId, userInfo) {
-		textChat.userLeave(headId, userInfo)
-		videoChat.userLeave(headId, userInfo)
+		textChat.userLeave(headId, userInfo);
+		videoChat.userLeave(headId, userInfo);
 	}
 
 	/**
-	 * 
-	 * @param {string} actions @enum (JOIN|LEAVE)
-	 * @param {string} headerId 
-	 * @param {string} target @enum (chatRoom|video|text)
-	 */
+  * 
+  * @param {string} actions @enum (JOIN|LEAVE)
+  * @param {string} headerId 
+  * @param {string} target @enum (chatRoom|video|text)
+  */
 	function roomBtnHandler(actions, headerId, target) {
 		headerId = $(this).attr('data-id') || headerId;
 		actions = $(this).attr('data-action') || actions;
 		target = $(this).attr('data-join') || target;
 
-		console.log(headerId, actions, target)
+		console.log(headerId, actions, target);
 
 		var userInfo = {
 			'padId': clientVars.padId,
@@ -70,16 +70,15 @@ var WRTC_Room = function () {
 			'target': target
 		};
 
-		if(actions === 'JOIN') {
-			if(target === "chatRoom")	joinChatRoom(headerId, userInfo);
-			if(target === "video")		videoChat.userJoin(headerId, userInfo);
-			if(target === "text")			textChat.userJoin(headerId, userInfo);
-		} else if(actions === 'LEAVE') {
-			if(target === "chatRoom") 	leaveChatRoom(headerId, userInfo);
-			if(target === "video") 			videoChat.userLeave(headerId, userInfo);
-			if(target === "text")				textChat.userLeave(headerId, userInfo);
+		if (actions === 'JOIN') {
+			if (target === "chatRoom") joinChatRoom(headerId, userInfo);
+			if (target === "video") videoChat.userJoin(headerId, userInfo);
+			if (target === "text") textChat.userJoin(headerId, userInfo);
+		} else if (actions === 'LEAVE') {
+			if (target === "chatRoom") leaveChatRoom(headerId, userInfo);
+			if (target === "video") videoChat.userLeave(headerId, userInfo);
+			if (target === "text") textChat.userLeave(headerId, userInfo);
 		}
-
 	}
 
 	function joinByQueryString() {
@@ -100,11 +99,11 @@ var WRTC_Room = function () {
 		var headId = $(this).attr("data-id");
 		var target = $(this).attr("data-join");
 		var title = share.$body_ace_outer().find(".wbrtc_roomBox." + headId + " .titleRoom").text();
-		
+
 		var origin = window.location.origin;
 		var pathName = window.location.pathname;
-		var link = origin  + pathName + '?header=' + share.slugify(title) + '&id=' + headId + '&target=' + target + '&join=true';
-		
+		var link = origin + pathName + '?header=' + share.slugify(title) + '&id=' + headId + '&target=' + target + '&join=true';
+
 		var $temp = $('<input>');
 		$('body').append($temp);
 		$temp.val(link).select();
@@ -154,10 +153,8 @@ var WRTC_Room = function () {
 		share.$body_ace_outer().on('click', '.wbrtc_roomBox  .btn_joinChat_chatRoom', roomBtnHandler);
 		share.$body_ace_outer().on('click', '.wbrtc_roomBox button.btn_shareRoom', shareRoomsLink);
 
-		$(document).on('click','#wrtc_textChatWrapper .btn_leave', roomBtnHandler)
+		$(document).on('click', '#wrtc_textChatWrapper .btn_leave', roomBtnHandler);
 		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
-
-
 
 		share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function () {
 			$(this).addClass('active').find('.wrtc_contentBody, .wrtc_wrapper').css({ 'display': 'block' });
@@ -174,7 +171,6 @@ var WRTC_Room = function () {
 			var headerId = $(this).attr('data-headid');
 			scroll2Header(headerId);
 		});
-
 
 		$(document).on('click', '#werc_toolbar .btn_enlarge', function () {
 			if (!$(this).attr('active')) return true;
@@ -215,29 +211,28 @@ var WRTC_Room = function () {
 		},
 		'bulkUpdateRooms': function bulkUpdateRooms(hTagList) {
 			var padId = window.pad.getPadId();
-			socket.emit('bulkUpdateRooms', padId, hTagList, 'video' , socketBulkUpdateRooms);
-			textChat.bulkUpdateRooms(hTagList)
+			socket.emit('bulkUpdateRooms', padId, hTagList, 'video', socketBulkUpdateRooms);
+			textChat.bulkUpdateRooms(hTagList);
 		},
 		'postAceInit': function postAceInit(hook, context, webSocket, docId) {
 			socket = webSocket;
 			padId = docId || window.pad.getPadId();
 
 			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
-			
-			
+
 			socket.on('userJoin', function (data, roomInfo, target) {
-				if(target === "video"){
+				if (target === "video") {
 					videoChat.gateway_userJoin(data, roomInfo, false);
 				} else {
-					textChat.addUserToRoom(data, roomInfo, target)
+					textChat.addUserToRoom(data, roomInfo, target);
 				}
 			});
 
 			socket.on('userLeave', function (data, roomInfo, target) {
-				if(target === "video"){
+				if (target === "video") {
 					videoChat.gateway_userLeave(data, roomInfo, target);
 				} else {
-					textChat.removeUserFromRoom(data, roomInfo, target)
+					textChat.removeUserFromRoom(data, roomInfo, target);
 				}
 			});
 
@@ -307,7 +302,7 @@ var WRTC_Room = function () {
 				} else {
 					$(document).find('[data-headid=' + data.headingTagId + '].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-headid=' + data.headingTagId + ']').text(data.headTitle);
 					target.find('.wbrtc_roomBox[id=' + data.headingTagId + '] .wbrtc_roomBoxHeader b').text(data.headTitle);
-					$(document).find('#wrtc_textChatWrapper[data-headid='+ data.headingTagId +'] .nd_title b').text(data.headTitle);
+					$(document).find('#wrtc_textChatWrapper[data-headid=' + data.headingTagId + '] .nd_title b').text(data.headTitle);
 				}
 
 				hTagList.push(data);
@@ -324,4 +319,4 @@ var WRTC_Room = function () {
 	};
 
 	return self;
-}();
+})();

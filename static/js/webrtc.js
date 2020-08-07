@@ -18,7 +18,7 @@
 require('ep_wrtc_heading/static/js/adapter');
 require('ep_wrtc_heading/static/js/getUserMediaPolyfill');
 
-var WRTC = function () {
+var WRTC = (function () {
 	var videoSizes = { 'large': '260px', 'small': '160px' };
 	var pcConfig = {};
 	var audioInputSelect = null;
@@ -72,18 +72,17 @@ var WRTC = function () {
 				$(this).find('.fa_arrow-to-top').toggle();
 
 				if (action === 'collapse') {
-					$(this).attr({'data-action': "expand"});
+					$(this).attr({ 'data-action': "expand" });
 					$parent.find('.btn_enlarge').removeAttr('active');
 					$('#wrtc_modal').css({
 						'transform': 'translate(-50%, -' + videoBox + 'px)'
 					});
 				} else {
-					$(this).attr({'data-action': "collapse"});
+					$(this).attr({ 'data-action': "collapse" });
 					$parent.find('.btn_enlarge').attr({ 'active': true });
 					$('#wrtc_modal').css({
 						'transform': 'translate(-50%, 0)'
 					});
-
 				}
 			});
 		},
@@ -363,7 +362,7 @@ var WRTC = function () {
 					if (p) {
 						p.then(function () {
 							// Do stuff when the candidate is successfully passed to the ICE agent
-						}).catch(function () {
+						})['catch'](function () {
 							console.error('Error: Failure during addIceCandidate()', data);
 						});
 					}
@@ -470,7 +469,7 @@ var WRTC = function () {
 				mediaConstraints.video = { 'deviceId': { 'exact': videoSource } };
 			}
 
-			localStorage.setItem('videoSettings', JSON.stringify({video: videoSource, audio: audioSource}))
+			localStorage.setItem('videoSettings', JSON.stringify({ video: videoSource, audio: audioSource }));
 
 			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
 				localStream = stream;
@@ -483,7 +482,7 @@ var WRTC = function () {
 						self.call(user.userId, headerId);
 					}
 				});
-			}).catch(function (err) {
+			})['catch'](function (err) {
 				self.showUserMediaError(err);
 			});
 		},
@@ -611,4 +610,4 @@ var WRTC = function () {
 
 	self.pc = pc;
 	return self;
-}();
+})();
