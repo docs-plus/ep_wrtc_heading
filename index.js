@@ -23,7 +23,10 @@ exports.socketio = function (hookName, args, cb) {
 	io.of("/heading_chat_room").on("connect", function (socket) {
 
 		socket.on("join pad", function (padId ,userId, callback) {
-			socket.ndHolder = {userId, padId}
+			socket.ndHolder = {video: {}, text: {}}
+
+			socket.ndHolder.video = {userId, padId}
+			socket.ndHolder.text = {userId, padId}
 			socket.join(padId)
 			callback(null)
 		})
@@ -31,13 +34,15 @@ exports.socketio = function (hookName, args, cb) {
 		socket.on("userJoin", (padId, userData, target, callback) => {
 			let room = null
 
-			if(target === "video")
+			if(target === "video"){
 				room = videoChat.socketUserJoin(userData)
-			else
+				socket.ndHolder.video = room.data
+			}else{
 				room = textChat.socketUserJoin(userData)
+				socket.ndHolder.text = room.data
+			}
 
 			if(room.canUserJoin) {
-				socket.ndHolder = room.data
 				socket.broadcast.to(padId).emit("userJoin", room.data, room.info, target)
 				callback(room.data, room.info, target)
 			} else {
@@ -55,7 +60,7 @@ exports.socketio = function (hookName, args, cb) {
 
 			if(!room.data || !room.info) return callback(null, null, target);
 
-			socket.broadcast.to(padId).emit("userLeave", room.data, room.Info, target)
+			socket.broadcast.to(padId).emit("userLeave", room.data, room.info, target)
 			callback(room.data, room.info, target)
 		})
 
@@ -82,25 +87,43 @@ exports.socketio = function (hookName, args, cb) {
 				callback(message, messageId)
 		})
 
-		socket.on("bulkUpdateRooms", (padId, hTagList, callback) => {
-			const {roomCollection, roomInfo} =videoChat.socketBulkUpdateRooms(padId, hTagList)
+		socket.on("bulkUpdateRooms", (padId, hTagList, target, callback) => {
+			
+			let room = null;
 
-			if(!roomCollection || !roomInfo) return false
+			if(target === 'video'){
+				room = videoChat.socketBulkUpdateRooms(padId, hTagList)
+			} else {
+				room = textChat.socketBulkUpdateRooms(padId, hTagList)
+			}
 
-			socket.broadcast.to(padId).emit("bulkUpdateRooms", roomCollection, null)
-			callback(roomCollection, roomInfo)
+			if(!room.collection || !room.info) return false
+
+			socket.broadcast.to(padId).emit("bulkUpdateRooms", room.collection, room.info, target)
+			callback(room.collection, room.info, target)
 		})
 
 		socket.on('disconnect', () => {
 			// remove the user from text and video chat
-
 			const userData = socket.ndHolder
+
 			// in the case when pad does not load plugin properly,
 			// there is no 'ndHolder'(userData)
-			if(!userData) return false;
+			if(!userData || !userData.text || !userData.video) return false;
 
-			const {padId, data, roomInfo} = videoChat.socketDisconnect(userData)
-			socket.broadcast.to(padId).emit("userLeave", data, roomInfo)
+			const targetRoom = Object.keys(userData).filter(room => userData[room].headerId && room)
+
+			targetRoom.forEach(chatRoom => {
+				let room = null
+				if(chatRoom === "video")
+					room = videoChat.socketDisconnect(userData[chatRoom])
+				else if (chatRoom === "text")
+					room = textChat.socketDisconnect(userData[chatRoom])
+				
+				if(room && room.padId)
+					socket.broadcast.to(room.padId).emit("userLeave", room.data, room.roomInfo, chatRoom)
+			})
+
 		})
 
 	})

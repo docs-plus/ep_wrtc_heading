@@ -22,3 +22,11 @@ exports.slugify = function slugify(text) {
 	.replace(/^-+/, '') // Trim - from start of text
 	.replace(/-+$/, ''); // Trim - from end of text
 };
+
+exports.$body_ace_outer = function $body_ace_outer() {
+	return $(document).find('iframe[name="ace_outer"]').contents();
+}
+
+exports.createShareLink = function createShareLink(headingTagId, headerText) {
+	return window.location.origin + window.location.pathname + '?header=' + exports.slugify(headerText) + '&headerId=' + headingTagId + '&joinvideo=true';
+}

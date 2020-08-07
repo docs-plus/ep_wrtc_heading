@@ -2,13 +2,13 @@
 const {VIDEO_CHAT_LIMIT} = require("../config")
 
 // data Structure
-// "padId:headingId": [{object}]
+// "padId:headerId": [{object}]
 const rooms = {}
 
 const socketUserJoin = data => {
 	const padId = data.padId
-	const headingId = data.headingId
-	const roomKey = `${padId}:${headingId}`
+	const headerId = data.headerId
+	const roomKey = `${padId}:${headerId}`
 	let canUserJoin = false
 
 	// if the room does not exist create the room for the first time.
@@ -41,8 +41,8 @@ const socketUserJoin = data => {
 
 const socketUserLeave = data => {
 	const padId = data.padId
-	const headingId = data.headingId
-	const roomKey = `${padId}:${headingId}`
+	const headerId = data.headerId
+	const roomKey = `${padId}:${headerId}`
 	const result = {
 		data: null,
 		info: null
@@ -76,9 +76,9 @@ const socketBulkUpdateRooms = (padId, hTagList) => {
 	
 	// remove the room that not available and excrete user from room
 	// hTagList: [ headingTagId ]
-	// remove a pad:headingId, if there is not anymore user in that room 
+	// remove a pad:headerId, if there is not anymore user in that room 
 	hTagList.forEach(el => {
-		const roomKey = `${padId}:${el.headingId}`
+		const roomKey = `${padId}:${el.headerId}`
 		if(rooms[roomKey] && rooms[roomKey].length === 0)
 		delete rooms[roomKey];
 	})
@@ -99,16 +99,16 @@ const socketBulkUpdateRooms = (padId, hTagList) => {
 		list:  []
 	};
 	
-	result.roomCollection =  roomCollection
-	result.roomInfo = roomInfo
+	result.collection =  roomCollection
+	result.Info = roomInfo
 
 	return result
 }
 
 const socketDisconnect = (data) => {
 	const padId =    data.padId
-	const headingId = data.headingId
-	const roomKey = `${padId}:${headingId}` 
+	const headerId = data.headerId
+	const roomKey = `${padId}:${headerId}` 
 	const result = {
 		data:  null,
 		roomInfo: null,

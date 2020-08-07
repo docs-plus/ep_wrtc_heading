@@ -130,6 +130,15 @@
 	cursor: pointer;
 }
 
+.wrtc_box .wrtc_contentBody .wrtc_content ul {
+	list-style-type: decimal;
+}
+
+.wrtc_box .wrtc_contentBody .wrtc_content ul > li {
+	border-right: 6px solid transparent;
+	margin-bottom: 4px;
+}
+
 .wbrtc_roomBox .shareLink:hover{
 	color: #78909c;
 }
@@ -160,14 +169,7 @@
 	display: none;
 }
 
-.wbrtc_roomBoxBody ul {
-	list-style-type: decimal;
-}
-
-.wbrtc_roomBoxBody ul > li {
-	border-right: 6px solid transparent;
-	margin-bottom: 4px;
-} */
+ */
 
 /* .wbrtc_roomBox > .wbrtc_roomBoxFooter > button.active {
 	background: #64d29b;

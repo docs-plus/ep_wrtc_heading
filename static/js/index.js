@@ -2,7 +2,9 @@ var $ = require('ep_etherpad-lite/static/js/rjquery').$;
 var _ = require('ep_etherpad-lite/static/js/underscore');
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 var events = require('ep_wrtc_heading/static/js/copyPasteEvents');
-var textChat = require("ep_wrtc_heading/static/js/textChat")
+var textChat = require("ep_wrtc_heading/static/js/textChat");
+var videoChat = require('ep_wrtc_heading/static/js/videoChat');
+const { pad } = require('ep_etherpad-lite/static/js/pad');
 
 /** **********************************************************************/
 /*                              Plugin                                  */
@@ -24,12 +26,14 @@ var EPwrtcHeading = (function() {
 		WRTC_Room.hangupAll();
 	}
 
-	function init(ace) {
+	function init(ace, padId, userId) {
 
 		var loc = document.location;
 		var port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
 		var url = loc.protocol + '//' + loc.hostname + ':' + port + '/' + 'heading_chat_room';
 		var socket = io.connect(url);
+
+		socket.emit('join pad', padId, userId, function () {});
 
 		// find containers
 		padOuter = $('iframe[name="ace_outer"]').contents();
@@ -89,11 +93,14 @@ var hooks = {
 		}
 
 		var ace = context.ace;
+		var userId = window.pad.getUserId();
+		var padId = window.pad.getPadId();
 
-		var socket = EPwrtcHeading.init(ace)
+		var socket = EPwrtcHeading.init(ace, padId, userId)
 		WRTC.postAceInit(hook, context)
-		WRTC_Room.postAceInit(hook, context, socket)
-		textChat.postAceInit(hook, context, socket)
+		WRTC_Room.postAceInit(hook, context, socket, padId)
+		textChat.postAceInit(hook, context, socket, padId)
+		videoChat.postAceInit(hook, context, socket, padId)
 
 		$('#editorcontainer iframe').ready(function() {
 			WRTC.appendInterfaceLayout();

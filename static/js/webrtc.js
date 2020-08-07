@@ -55,8 +55,10 @@ var WRTC = function () {
 			self.init(context.pad);
 		},
 		'appendInterfaceLayout': function appendInterfaceLayout() {
+			// TODO: legacy code, move it to template
 			var werc_toolbar = $('#wertc_modal_toolbar').tmpl({
-				'videoChatLimit': clientVars.webrtc.videoChatLimit
+				'videoChatLimit': clientVars.webrtc.videoChatLimit,
+				headerId: ""
 			});
 			var $wrtc_modal = $('<div id="wrtc_modal"><div class="videoWrapper" class="thin-scrollbar"></div></div');
 			$wrtc_modal.append(werc_toolbar);
@@ -103,7 +105,7 @@ var WRTC = function () {
 			callback();
 		},
 		'handleClientMessage_RTC_MESSAGE': function handleClientMessage_RTC_MESSAGE(hook, context) {
-			if (context.payload.data.headingId === window.headingId) self.receiveMessage(context.payload);
+			if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
 		},
 		// END OF API HOOKS
 		'show': function show() {
@@ -168,15 +170,15 @@ var WRTC = function () {
 			userId = userId.split('.')[1];
 			$('#rtcbox').find('#video_a_' + userId).parent().remove();
 		},
-		'activate': function activate(headingId) {
+		'activate': function activate(headerId) {
 			self.show();
 			self.hangupAll();
-			self.getUserMedia(headingId);
+			self.getUserMedia(headerId);
 		},
-		'deactivate': function deactivate(userId, headingId) {
+		'deactivate': function deactivate(userId, headerId) {
 			self.hide(userId);
-			self.hangupAll(headingId);
-			self.hangup(userId, true, headingId);
+			self.hangupAll(headerId);
+			self.hangup(userId, true, headerId);
 			if (localStream) {
 				localStream.getTracks().forEach(function (track) {
 					track.stop();
@@ -325,9 +327,9 @@ var WRTC = function () {
 			} else if (type === 'offer') {
 				if (pc[peer]) {
 					self.hangup(peer, true);
-					self.createPeerConnection(peer, data.headingId);
+					self.createPeerConnection(peer, data.headerId);
 				} else {
-					self.createPeerConnection(peer, data.headingId);
+					self.createPeerConnection(peer, data.headerId);
 				}
 				if (localStream) {
 					if (pc[peer].getLocalStreams) {
@@ -345,7 +347,7 @@ var WRTC = function () {
 					pc[peer].createAnswer(function (desc) {
 						desc.sdp = cleanupSdp(desc.sdp);
 						pc[peer].setLocalDescription(desc, function () {
-							self.sendMessage(peer, { 'type': 'answer', 'answer': desc, 'headingId': data.headingId });
+							self.sendMessage(peer, { 'type': 'answer', 'answer': desc, 'headerId': data.headerId });
 						}, logError);
 					}, logError, sdpConstraints);
 				}, logError);
@@ -370,24 +372,24 @@ var WRTC = function () {
 				console.error('unknown message', data);
 			}
 		},
-		'hangupAll': function hangupAll(_headingId) {
+		'hangupAll': function hangupAll(_headerId) {
 			Object.keys(pc).forEach(function (userId) {
-				self.hangup(userId, true, _headingId);
+				self.hangup(userId, true, _headerId);
 			});
 		},
 		'getUserId': function getUserId() {
 			return self._pad && self._pad.getUserId();
 		},
-		'hangup': function hangup(userId, notify, headingId) {
+		'hangup': function hangup(userId, notify, headerId) {
 			notify = arguments.length === 1 ? true : notify;
 			if (pc[userId] && userId !== self.getUserId()) {
 				self.setStream(userId, '');
 				pc[userId].close();
 				delete pc[userId];
-				if (notify) self.sendMessage(userId, { 'type': 'hangup', 'headingId': headingId });
+				if (notify) self.sendMessage(userId, { 'type': 'hangup', 'headerId': headerId });
 			}
 		},
-		'call': function call(userId, headingId) {
+		'call': function call(userId, headerId) {
 			if (!localStream) {
 				callQueue.push(userId);
 				return;
@@ -404,17 +406,17 @@ var WRTC = function () {
 			constraints = mergeConstraints(constraints, sdpConstraints);
 
 			if (!pc[userId]) {
-				self.createPeerConnection(userId, headingId);
+				self.createPeerConnection(userId, headerId);
 			}
 			pc[userId].addStream(localStream);
 			pc[userId].createOffer(function (desc) {
 				desc.sdp = cleanupSdp(desc.sdp);
 				pc[userId].setLocalDescription(desc, function () {
-					self.sendMessage(userId, { 'type': 'offer', 'offer': desc, 'headingId': headingId });
+					self.sendMessage(userId, { 'type': 'offer', 'offer': desc, 'headerId': headerId });
 				}, logError);
 			}, logError, constraints);
 		},
-		'createPeerConnection': function createPeerConnection(userId, headingId) {
+		'createPeerConnection': function createPeerConnection(userId, headerId) {
 			if (pc[userId]) {
 				console.warn('WARNING creating PC connection even though one exists', userId);
 			}
@@ -423,7 +425,7 @@ var WRTC = function () {
 				if (event.candidate) {
 					self.sendMessage(userId, {
 						'type': 'icecandidate',
-						'headingId': headingId,
+						'headerId': headerId,
 						'candidate': event.candidate
 					});
 				}
@@ -441,9 +443,9 @@ var WRTC = function () {
 				track.stop();
 			});
 
-			self.getUserMedia(window.headingId);
+			self.getUserMedia(window.headerId);
 		},
-		'getUserMedia': function getUserMedia(headingId) {
+		'getUserMedia': function getUserMedia(headerId) {
 			audioInputSelect = document.querySelector('select#audioSource');
 			videoSelect = document.querySelector('select#videoSource');
 
@@ -476,9 +478,9 @@ var WRTC = function () {
 				self._pad.collabClient.getConnectedUsers().forEach(function (user) {
 					if (user.userId !== self.getUserId()) {
 						if (pc[user.userId]) {
-							self.hangup(user.userId, false, headingId);
+							self.hangup(user.userId, false, headerId);
 						}
-						self.call(user.userId, headingId);
+						self.call(user.userId, headerId);
 					}
 				});
 			}).catch(function (err) {
