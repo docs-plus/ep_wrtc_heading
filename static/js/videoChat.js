@@ -81,7 +81,7 @@ var videoChat = (function () {
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.videoChatCount').text(userCount);
-		$('#werc_toolbar .nd_title .nd_count,  #wrtc_textChatWrapper .userCount').text(userCount);
+		$('#werc_toolbar .nd_title .nd_count').text(userCount);
 
 		if (userCount === 0) {
 			$videoChatUserList.append('<li class="empty">Be the first to join the <b class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="video">text-chat</b></li>');
@@ -91,7 +91,7 @@ var videoChat = (function () {
 		$(".wrtc_text[data-authorid='" + data.userId + "'][data-headid='" + data.headerId + "']").remove();
 
 		if (data.userId === clientVars.userId) {
-			// $headingRoom.find('span.videoIcon').removeClass('active');
+			$headingRoom.find('.btn_joinChat_chatRoom').removeClass('active');
 			WRTC.deactivate(data.userId, data.headerId);
 			window.headerId = null;
 			currentRoom = {};
@@ -170,9 +170,13 @@ var videoChat = (function () {
 		}
 
 		if (data.userId === clientVars.userId) {
+			$headingRoom.find('.btn_joinChat_chatRoom').addClass('active');
+
+			
 			$('#werc_toolbar p').attr({ 'data-id': data.headerId }).text(headerTitle);
 			$('#werc_toolbar .btn_leave').attr({ 'data-id': data.headerId });
-			$headingRoom.find('span.videoIcon').addClass('active');
+
+
 			window.headerId = data.headerId;
 			WRTC.activate(data.headerId, user.userId);
 			currentRoom = data;
@@ -244,6 +248,31 @@ var videoChat = (function () {
 		return false;
 	}
 
+	function socketBulkUpdateRooms(rooms, info, target) {
+		var roomsInfo = {};
+		// create a roomInfo for each individual room
+		Object.keys(rooms).forEach(function (headerId) {
+			var roomInfo = {
+				'present': rooms[headerId].length,
+				'list': rooms[headerId]
+			};
+			roomsInfo[headerId] = roomInfo;
+		});
+
+		console.log(roomsInfo)
+
+		// bind roomInfo and send user to gateway_userJoin
+		Object.keys(rooms).forEach(function (headerId) {
+			rooms[headerId].forEach(function (user) {
+				videoChat.gateway_userJoin(user, roomsInfo[headerId], true);
+			});
+		});
+	}
+
+	function bulkUpdateRooms(hTagList){
+		socket.emit('bulkUpdateRooms', padId, hTagList, 'video', socketBulkUpdateRooms);
+	}
+
 	/**
   *
   * @param {Object} data @requires
@@ -288,7 +317,8 @@ var videoChat = (function () {
 		userJoin: userJoin,
 		userLeave: userLeave,
 		gateway_userJoin: gateway_userJoin,
-		gateway_userLeave: gateway_userLeave
+		gateway_userLeave: gateway_userLeave,
+		bulkUpdateRooms: bulkUpdateRooms
 	};
 })();
 

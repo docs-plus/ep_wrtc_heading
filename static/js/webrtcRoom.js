@@ -60,7 +60,7 @@ var WRTC_Room = (function () {
 		actions = $(this).attr('data-action') || actions;
 		target = $(this).attr('data-join') || target;
 
-		console.log(headerId, actions, target);
+		if(!headerId || !target) return true;
 
 		var userInfo = {
 			'padId': clientVars.padId,
@@ -71,11 +71,11 @@ var WRTC_Room = (function () {
 		};
 
 		if (actions === 'JOIN') {
-			if (target === "chatRoom") joinChatRoom(headerId, userInfo);
+			if (target === "plus") joinChatRoom(headerId, userInfo);
 			if (target === "video") videoChat.userJoin(headerId, userInfo);
 			if (target === "text") textChat.userJoin(headerId, userInfo);
 		} else if (actions === 'LEAVE') {
-			if (target === "chatRoom") leaveChatRoom(headerId, userInfo);
+			if (target === "plus") leaveChatRoom(headerId, userInfo);
 			if (target === "video") videoChat.userLeave(headerId, userInfo);
 			if (target === "text") textChat.userLeave(headerId, userInfo);
 		}
@@ -125,25 +125,6 @@ var WRTC_Room = (function () {
 		var aceOuterPadding = parseInt(paddingTop, 10);
 		var offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
 		return offsetTop + height / 2 - 14;
-	}
-
-	function socketBulkUpdateRooms(rooms) {
-		var roomsInfo = {};
-		// create a roomInfo for each individual room
-		Object.keys(rooms).forEach(function (headerId) {
-			var roomInfo = {
-				'present': rooms[headerId].length,
-				'list': rooms[headerId]
-			};
-			roomsInfo[headerId] = roomInfo;
-		});
-
-		// bind roomInfo and send user to gateway_userJoin
-		Object.keys(rooms).forEach(function (headerId) {
-			rooms[headerId].forEach(function (user) {
-				videoChat.gateway_userJoin(user, roomsInfo[headerId], true);
-			});
-		});
 	}
 
 	function activeEventListener() {
@@ -210,8 +191,7 @@ var WRTC_Room = (function () {
 			callback();
 		},
 		'bulkUpdateRooms': function bulkUpdateRooms(hTagList) {
-			var padId = window.pad.getPadId();
-			socket.emit('bulkUpdateRooms', padId, hTagList, 'video', socketBulkUpdateRooms);
+			videoChat.bulkUpdateRooms(hTagList);
 			textChat.bulkUpdateRooms(hTagList);
 		},
 		'postAceInit': function postAceInit(hook, context, webSocket, docId) {
@@ -300,9 +280,9 @@ var WRTC_Room = (function () {
 					target.find('#wbrtc_chatBox').append(box);
 					newHTagAdded = true;
 				} else {
-					$(document).find('[data-headid=' + data.headingTagId + '].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-headid=' + data.headingTagId + ']').text(data.headTitle);
+					$(document).find('[data-headid=' + data.headingTagId + '].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-id=' + data.headingTagId + ']').text(data.headTitle);
 					target.find('.wbrtc_roomBox[id=' + data.headingTagId + '] .wbrtc_roomBoxHeader b').text(data.headTitle);
-					$(document).find('#wrtc_textChatWrapper[data-headid=' + data.headingTagId + '] .nd_title b').text(data.headTitle);
+					$(document).find('#wrtc_textChatWrapper[data-id=' + data.headingTagId + '] .nd_title b').text(data.headTitle);
 				}
 
 				hTagList.push(data);

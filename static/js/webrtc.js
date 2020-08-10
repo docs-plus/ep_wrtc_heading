@@ -63,7 +63,7 @@ var WRTC = (function () {
 			var $wrtc_modal = $('<div id="wrtc_modal"><div class="videoWrapper" class="thin-scrollbar"></div></div');
 			$wrtc_modal.append(werc_toolbar);
 			$('body').prepend($wrtc_modal);
-			$(document).on('click', '.btn_toggle_modal', function () {
+			$(document).on('click', '#wrtc_modal .btn_toggle_modal', function () {
 				var $parent = $(this).parent().parent();
 				var action = $(this).attr('data-action');
 				var videoBox = $('#wrtc_modal .videoWrapper').innerHeight();

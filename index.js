@@ -36,9 +36,17 @@ exports.socketio = function (hookName, args, cb) {
 
 			if(target === "video"){
 				room = videoChat.socketUserJoin(userData)
+		
+				if(socket.ndHolder && !socket.ndHolder.video)
+					socket.ndHolder.video = {}
+
 				socket.ndHolder.video = room.data
 			}else{
 				room = textChat.socketUserJoin(userData)
+
+				if(socket.ndHolder && !socket.ndHolder.text)
+					socket.ndHolder.text = {}
+
 				socket.ndHolder.text = room.data
 			}
 
@@ -99,7 +107,7 @@ exports.socketio = function (hookName, args, cb) {
 
 			if(!room.collection || !room.info) return false
 
-			socket.broadcast.to(padId).emit("bulkUpdateRooms", room.collection, room.info, target)
+			// socket.broadcast.to(padId).emit(`bulkUpdateRooms:${target}`, room.collection, room.info, target)
 			callback(room.collection, room.info, target)
 		})
 

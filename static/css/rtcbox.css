@@ -8,7 +8,7 @@
 	height: auto;
 	z-index: 10;
 	min-width: 400px;
-	font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+	font-family: Quicksand, Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 	font-style: normal;
 	color: rgb(32, 33, 36);
 	font-size: 14px;
@@ -30,6 +30,7 @@
 	display: flex;
 	align-items: center;
 	border-top: 1px solid rgb(218, 220, 224);
+	font-weight: bold;
 }
 #werc_toolbar .nd_title, .textChatToolbar .nd_title{
 	display: flex;
@@ -38,7 +39,7 @@
 	flex-grow: 8;
 }
 #werc_toolbar .nd_title .fa_video{
-	width: 16px;
+	width: 18px;
 	margin-bottom: -5px;
 }
 #werc_toolbar .nd_title .nd_count {
@@ -61,10 +62,12 @@
 	display: flex;
 	flex-direction: row-reverse;
 	flex-grow: 1;
+	align-items: center;
 }
 
-.btn_controllers span{
-	cursor: pointer;
+
+.btn_controllers .btn_leave{
+	padding: 1px;
 }
 
 .ndbtn{
@@ -103,7 +106,7 @@
 	content: "\e83f";
 }
 
-#werc_toolbar span[class*='fa_'], .textChatToolbar span[class*='fa_']{
+#werc_toolbar span[class*='fa_']{
 	width: 13px;
 	display: inline-block;
 	margin: 0 8px;
@@ -375,21 +378,22 @@
 	width: 80%;
 	height: 200px;
 	background-color: white;
+	box-shadow: -1px 0px 2px rgb(87, 98, 115, .1), 1px 7px 2px rgb(87, 98, 115, .1);
+	border: 1px solid #e6e7e7;
 	z-index: 100000;
-	border: 1px solid #ccc;
-	box-shadow: 1px 1px 10px rgb(204, 204, 204, .6);
 	border-radius: 4px 4px 0 0;
 	border-bottom: none;
 	display: flex;
 	flex-direction: column;
-	font-family: Quicksand;
-	font-style: normal;
 	opacity: 0;
 	transition: all 0.3s linear;
 	bottom: 0;
 	left: 50%;
-	font-size:14px;
-  transform: translate(-50%, 100%) scale(0.7);
+	transform: translate(-50%, 100%) scale(0.7);
+	font-family: Quicksand, Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+	font-style: normal;
+	color: rgb(32, 33, 36);
+	font-size: 14px;
 }
 
 #wrtc_textChatWrapper.active {
@@ -400,8 +404,8 @@
 
 
 .textChatToolbar {
-	padding: 8px;
-	border-bottom: 1px solid #ccc;
+	padding: 4px;
+	border-bottom: 1px solid  rgb(218, 220, 224);
 	font-weight: bold;
 	display: flex;
 	align-items: center;

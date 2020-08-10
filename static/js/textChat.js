@@ -46,15 +46,43 @@ var textChat = (function () {
 
 	function eventListers() {
 		$(document).on("keypress", "#wrtc_textChatInputBox input", eventTextChatInput);
+
+		$(document).on('click', '#wrtc_textChatWrapper .btn_toggle_modal', function () {
+
+			var action = $(this).attr('data-action');
+			var chatBox = $('#wrtc_textChat').innerHeight() + $('#wrtc_textChatInputBox').innerHeight() + 1
+
+			$(this).find('.fa_arrow-from-top').toggle();
+			$(this).find('.fa_arrow-to-top').toggle();
+
+			if (action === 'collapse') {
+				$(this).attr({ 'data-action': "expand" });
+				$('#wrtc_textChatWrapper').css({
+					'transform': 'translate(-50%, ' + chatBox  + 'px)'
+				});
+			} else {
+				$(this).attr({ 'data-action': "collapse" });
+				$('#wrtc_textChatWrapper').css({
+					'transform': 'translate(-50%, 0)'
+				});
+			}
+		});
+
+
 	}
 
 	function deactivateModal(headerId) {
 		var $TextChatWrapper = $(document).find("#wrtc_textChatWrapper");
-		$TextChatWrapper.removeClass('active');
-
+		
+		$TextChatWrapper.removeClass('active').removeAttr('style');
 		$TextChatWrapper.find("#wrtc_textChat p").remove();
-
 		socket.removeListener('receiveTextMessage:' + headerId);
+
+		var $btn = $(document).find("#wrtc_textChatWrapper .btn_toggle_modal");
+		$btn.attr({'data-action': "collapse"});
+		$btn.find('.fa_arrow-from-top').toggle();
+		$btn.find('.fa_arrow-to-top').toggle();
+		
 	}
 
 	function activateModal(headerId, headTitle, userCount) {
@@ -63,7 +91,7 @@ var textChat = (function () {
 
 		if (!existTextChat.length) {
 			var textChatBox = $('#wrtc_textChatBox').tmpl({
-				headId: headerId,
+				headerId: headerId,
 				headTitle: headTitle,
 				userCount: userCount
 			});
@@ -92,7 +120,7 @@ var textChat = (function () {
 			});
 		});
 
-		eventListers();
+
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -102,6 +130,7 @@ var textChat = (function () {
 		var headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
+		$(".textChatToolbar .textChat").text(userCount)
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
@@ -115,6 +144,7 @@ var textChat = (function () {
 
 		if (data.userId === clientVars.userId) {
 			currentRoom = data;
+			$headingRoom.find('.btn_joinChat_chatRoom').addClass('active');
 			activateModal(headerId, headTitle, userCount);
 		}
 	}
@@ -125,6 +155,7 @@ var textChat = (function () {
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
+		$(".textChatToolbar .textChat").text(userCount)
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
@@ -140,6 +171,7 @@ var textChat = (function () {
 			$textChatUserList.append('<li class="empty">Be the first to join the <b class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text">text-chat</b></li>');
 		}
 		if (data.userId === clientVars.userId) {
+			$headingRoom.find('.btn_joinChat_chatRoom').removeClass('active');
 			currentRoom = {};
 			deactivateModal(data.headId);
 		}
@@ -166,7 +198,8 @@ var textChat = (function () {
 		socket.emit('userLeave', padId, userData, "text", removeUserFromRoom);
 	}
 
-	function socketBulkUpdateRooms(rooms) {
+	function socketBulkUpdateRooms(rooms, info, target) {
+		console.log(rooms, info, target)
 		var roomsInfo = {};
 		// create a roomInfo for each individual room
 		Object.keys(rooms).forEach(function (headerId) {
@@ -192,6 +225,7 @@ var textChat = (function () {
 	function postAceInit(hook, context, webSocket, docId) {
 		socket = webSocket;
 		padId = docId || window.pad.getPadId();
+		eventListers();
 	}
 
 	return {

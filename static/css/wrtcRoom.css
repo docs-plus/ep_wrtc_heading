@@ -139,10 +139,13 @@
 	margin-bottom: 4px;
 }
 
+.wbrtc_roomBox .btn_joinChat_chatRoom.active
+
 .wbrtc_roomBox .shareLink:hover{
 	color: #78909c;
 }
-.wbrtc_roomBox .btn_joinChat_chatRoom:hover{
+.wbrtc_roomBox .btn_joinChat_chatRoom:hover,
+.wbrtc_roomBox .btn_joinChat_chatRoom.active{
 	color: #2678ff;
 }
 .wbrtc_roomBox .btn_joinChat_video:hover{

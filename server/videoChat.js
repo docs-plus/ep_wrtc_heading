@@ -87,21 +87,19 @@ const socketBulkUpdateRooms = (padId, hTagList) => {
 
 	if(!roomKeys) return result;
 	
-	var roomCollection = {}
+	const roomCollection = {}
 
 	roomKeys.forEach(roomKey => {
 		if(!roomCollection[roomKey])
 			roomCollection[roomKey] = rooms[roomKey]
 	})
 	
-	var roomInfo = {
+	result.collection =  roomCollection
+	result.info = {
 		present:  0,
 		list:  []
 	};
 	
-	result.collection =  roomCollection
-	result.Info = roomInfo
-
 	return result
 }
 
