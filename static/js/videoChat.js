@@ -6,6 +6,7 @@ var videoChat = (function () {
 	var currentRoom = {};
 	var localStream = null;
 	var VIDEOCHATLIMIT = 0;
+	var $joinBtn = null;
 
 	function mediaDevices() {
 		navigator.mediaDevices.enumerateDevices().then(function (data) {
@@ -84,7 +85,7 @@ var videoChat = (function () {
 		$('#werc_toolbar .nd_title .nd_count').text(userCount);
 
 		if (userCount === 0) {
-			$videoChatUserList.append('<li class="empty">Be the first to join the <b class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="video">text-chat</b></li>');
+			$videoChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="video"><b>text-chat</b></button></li>');
 		}
 
 		// remove the text-chat notification
@@ -96,13 +97,6 @@ var videoChat = (function () {
 			window.headerId = null;
 			currentRoom = {};
 
-			// $headingRoom.find('.wbrtc_roomBoxFooter button.btn_door').attr({
-			// 	'data-userId': data.userId,
-			// 	'data-action': 'JOIN',
-			// 	'disabled': false
-			// }).addClass('active').removeClass('deactivate').text('JOIN');
-
-			// $('#rtcbox .chatTitle').remove();
 
 			$('#wrtc_modal').css({
 				'transform': 'translate(-50%, -100%)',
@@ -110,7 +104,6 @@ var videoChat = (function () {
 			}).attr({ 'data-active': false });
 
 			stopStreaming(localStream);
-			// textChat.deactivateModal();
 		}
 		if (cb && typeof cb === 'function') cb();
 	}
@@ -170,23 +163,15 @@ var videoChat = (function () {
 		}
 
 		if (data.userId === clientVars.userId) {
+
 			$headingRoom.find('.btn_joinChat_chatRoom').addClass('active');
 
-			
 			$('#werc_toolbar p').attr({ 'data-id': data.headerId }).text(headerTitle);
 			$('#werc_toolbar .btn_leave').attr({ 'data-id': data.headerId });
-
 
 			window.headerId = data.headerId;
 			WRTC.activate(data.headerId, user.userId);
 			currentRoom = data;
-
-			// var $button = $headingRoom.find('.wbrtc_roomBoxFooter button.btn_door');
-			// $button.attr({
-			// 	'data-userId': user.userId,
-			// 	'data-action': 'LEAVE',
-			// 	'disabled': false
-			// }).removeClass('deactivate active').html('LEAVE');
 
 			$('#rtcbox').prepend('<h4 class="chatTitle">' + headerTitle + '</h4>');
 
@@ -195,13 +180,18 @@ var videoChat = (function () {
 				'opacity': 1
 			}).attr({ 'data-active': true });
 
-			// textChat.activateModal(data.headerId, headerTitle, userCount);
+			if ($joinBtn && $joinBtn.length) $joinBtn.prop('disabled', false);
 		}
 	}
 
-	function userJoin(headerId, data) {
+	function userJoin(headerId, data, $joinButton) {
+		$joinBtn = $joinButton;
+		$joinBtn.prop('disabled', true);
 		// check if user already in that room
-		if (currentRoom && currentRoom.headerId === headerId && currentRoom.userId === userData.userId) return false;
+		if (currentRoom && currentRoom.headerId === headerId) {
+			if ($joinBtn.length) $joinBtn.prop('disabled', false);
+			return false;
+		}
 
 		isUserMediaAvailable().then(function (stream) {
 			localStream = stream;
@@ -259,8 +249,6 @@ var videoChat = (function () {
 			roomsInfo[headerId] = roomInfo;
 		});
 
-		console.log(roomsInfo)
-
 		// bind roomInfo and send user to gateway_userJoin
 		Object.keys(rooms).forEach(function (headerId) {
 			rooms[headerId].forEach(function (user) {
@@ -269,7 +257,7 @@ var videoChat = (function () {
 		});
 	}
 
-	function bulkUpdateRooms(hTagList){
+	function bulkUpdateRooms(hTagList) {
 		socket.emit('bulkUpdateRooms', padId, hTagList, 'video', socketBulkUpdateRooms);
 	}
 

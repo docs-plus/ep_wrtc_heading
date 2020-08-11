@@ -4,6 +4,7 @@ var textChat = (function () {
 	var socket = null;
 	var padId = null;
 	var currentRoom = {};
+	var $joinBtn = null;
 
 	function createAndAppendMessage(msg) {
 		if (!msg) return true;
@@ -50,7 +51,7 @@ var textChat = (function () {
 		$(document).on('click', '#wrtc_textChatWrapper .btn_toggle_modal', function () {
 
 			var action = $(this).attr('data-action');
-			var chatBox = $('#wrtc_textChat').innerHeight() + $('#wrtc_textChatInputBox').innerHeight() + 1
+			var chatBox = $('#wrtc_textChat').innerHeight() + $('#wrtc_textChatInputBox').innerHeight() + 1;
 
 			$(this).find('.fa_arrow-from-top').toggle();
 			$(this).find('.fa_arrow-to-top').toggle();
@@ -58,7 +59,7 @@ var textChat = (function () {
 			if (action === 'collapse') {
 				$(this).attr({ 'data-action': "expand" });
 				$('#wrtc_textChatWrapper').css({
-					'transform': 'translate(-50%, ' + chatBox  + 'px)'
+					'transform': 'translate(-50%, ' + chatBox + 'px)'
 				});
 			} else {
 				$(this).attr({ 'data-action': "collapse" });
@@ -67,22 +68,19 @@ var textChat = (function () {
 				});
 			}
 		});
-
-
 	}
 
 	function deactivateModal(headerId) {
 		var $TextChatWrapper = $(document).find("#wrtc_textChatWrapper");
-		
+
 		$TextChatWrapper.removeClass('active').removeAttr('style');
 		$TextChatWrapper.find("#wrtc_textChat p").remove();
 		socket.removeListener('receiveTextMessage:' + headerId);
 
 		var $btn = $(document).find("#wrtc_textChatWrapper .btn_toggle_modal");
-		$btn.attr({'data-action': "collapse"});
+		$btn.attr({ 'data-action': "collapse" });
 		$btn.find('.fa_arrow-from-top').toggle();
 		$btn.find('.fa_arrow-to-top').toggle();
-		
 	}
 
 	function activateModal(headerId, headTitle, userCount) {
@@ -120,7 +118,7 @@ var textChat = (function () {
 			});
 		});
 
-
+		if ($joinBtn && $joinBtn.length && !$joinBtn.targetPlus) $joinBtn.prop('disabled', false);
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -130,7 +128,7 @@ var textChat = (function () {
 		var headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
-		$(".textChatToolbar .textChat").text(userCount)
+		$(".textChatToolbar .textChat").text(userCount);
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
@@ -155,7 +153,7 @@ var textChat = (function () {
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
-		$(".textChatToolbar .textChat").text(userCount)
+		$(".textChatToolbar .textChat").text(userCount);
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
@@ -168,7 +166,7 @@ var textChat = (function () {
 		}
 
 		if (userCount === 0) {
-			$textChatUserList.append('<li class="empty">Be the first to join the <b class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text">text-chat</b></li>');
+			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text"><b>text-chat</b></button></li>');
 		}
 		if (data.userId === clientVars.userId) {
 			$headingRoom.find('.btn_joinChat_chatRoom').removeClass('active');
@@ -178,10 +176,14 @@ var textChat = (function () {
 		if (cb && typeof cb === 'function') cb();
 	}
 
-	function userJoin(headerId, userData) {
+	function userJoin(headerId, userData, $joinButton) {
+		$joinBtn = $joinButton;
 
 		// check if user already in that room
-		if (currentRoom && currentRoom.headerId === headerId && currentRoom.userId === userData.userId) return false;
+		if (currentRoom && currentRoom.headerId === headerId) {
+			if ($joinBtn && $joinBtn.length) $joinBtn.prop('disabled', false);
+			return false;
+		}
 
 		if (!currentRoom.userId) {
 			socket.emit('userJoin', padId, userData, "text", addUserToRoom);
@@ -199,7 +201,7 @@ var textChat = (function () {
 	}
 
 	function socketBulkUpdateRooms(rooms, info, target) {
-		console.log(rooms, info, target)
+		console.log(rooms, info, target);
 		var roomsInfo = {};
 		// create a roomInfo for each individual room
 		Object.keys(rooms).forEach(function (headerId) {

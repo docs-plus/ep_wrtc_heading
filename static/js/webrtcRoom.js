@@ -39,14 +39,14 @@ var WRTC_Room = (function () {
 		});
 	}
 
-	function joinChatRoom(headId, userInfo) {
-		textChat.userJoin(headId, userInfo);
-		videoChat.userJoin(headId, userInfo);
+	function joinChatRoom(headerId, userInfo, $joinBtn) {
+		textChat.userJoin(headerId, userInfo, $joinBtn);
+		videoChat.userJoin(headerId, userInfo, $joinBtn);
 	}
 
-	function leaveChatRoom(headId, userInfo) {
-		textChat.userLeave(headId, userInfo);
-		videoChat.userLeave(headId, userInfo);
+	function leaveChatRoom(headerId, userInfo) {
+		textChat.userLeave(headerId, userInfo);
+		videoChat.userLeave(headerId, userInfo);
 	}
 
 	/**
@@ -60,7 +60,9 @@ var WRTC_Room = (function () {
 		actions = $(this).attr('data-action') || actions;
 		target = $(this).attr('data-join') || target;
 
-		if(!headerId || !target) return true;
+		if (!headerId || !target) return true;
+
+		var $joinBtn = $(this);
 
 		var userInfo = {
 			'padId': clientVars.padId,
@@ -71,13 +73,31 @@ var WRTC_Room = (function () {
 		};
 
 		if (actions === 'JOIN') {
-			if (target === "plus") joinChatRoom(headerId, userInfo);
-			if (target === "video") videoChat.userJoin(headerId, userInfo);
-			if (target === "text") textChat.userJoin(headerId, userInfo);
+			if ($joinBtn.length) $joinBtn.prop('disabled', true);
+			switch (target) {
+				case 'chatRoom':
+					$joinBtn.targetPlus = true;
+					joinChatRoom(headerId, userInfo, $joinBtn);
+					break;
+				case 'video':
+					videoChat.userJoin(headerId, userInfo, $joinBtn);
+					break;
+				case 'text':
+					textChat.userJoin(headerId, userInfo, $joinBtn);
+					break;
+			}
 		} else if (actions === 'LEAVE') {
-			if (target === "plus") leaveChatRoom(headerId, userInfo);
-			if (target === "video") videoChat.userLeave(headerId, userInfo);
-			if (target === "text") textChat.userLeave(headerId, userInfo);
+			switch (target) {
+				case 'plus':
+					leaveChatRoom(headerId, userInfo);
+					break;
+				case 'video':
+					videoChat.userLeave(headerId, userInfo);
+					break;
+				case 'text':
+					textChat.userLeave(headerId, userInfo);
+					break;
+			}
 		}
 	}
 
@@ -124,7 +144,7 @@ var WRTC_Room = (function () {
 		var paddingTop = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
 		var aceOuterPadding = parseInt(paddingTop, 10);
 		var offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
-		return offsetTop + height / 2 - 14;
+		return offsetTop + height / 2 - 16;
 	}
 
 	function activeEventListener() {
@@ -269,12 +289,12 @@ var WRTC_Room = (function () {
 					'positionLeft': newX,
 					'headTitle': linkText,
 					'lineNumber': lineNumber,
-					'url': share.createShareLink(headingTagId[1], linkText),
 					'videoChatLimit': VIDEOCHATLIMIT
 				};
 
 				// if the header does not exists then adde to list
 				// otherwise update textHeader
+				// TODO: performance issue
 				if (target.find('#' + data.headingTagId).length <= 0) {
 					var box = $('#wertc_roomBox').tmpl(data);
 					target.find('#wbrtc_chatBox').append(box);

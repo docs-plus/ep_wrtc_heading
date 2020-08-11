@@ -124,6 +124,12 @@
 .wrtc_box .wrtc_contentBody .wrtc_content li.empty{
 	color: #cccccc;
 }
+.wrtc_box .wrtc_contentBody .wrtc_content li.empty button{
+	padding: 0;
+	line-height: inherit;
+	font-size: 11px;
+	display: inline;
+}
 .wrtc_box .wrtc_contentBody .wrtc_content li.empty b{
 	color: #2678ff;
 	text-decoration: underline;
