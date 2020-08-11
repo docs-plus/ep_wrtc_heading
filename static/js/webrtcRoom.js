@@ -111,6 +111,7 @@ var WRTC_Room = (function () {
 			scroll2Header(headerId);
 		}
 		if (join === 'true') {
+			if(target === 'plus') target = 'chatRoom';
 			roomBtnHandler('JOIN', headerId, target);
 		}
 	}
@@ -169,7 +170,7 @@ var WRTC_Room = (function () {
 		});
 
 		$(document).on('click', '#werc_toolbar p', function () {
-			var headerId = $(this).attr('data-headid');
+			var headerId = $(this).attr('data-id');
 			scroll2Header(headerId);
 		});
 
@@ -301,7 +302,7 @@ var WRTC_Room = (function () {
 					newHTagAdded = true;
 				} else {
 					$(document).find('[data-headid=' + data.headingTagId + '].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-id=' + data.headingTagId + ']').text(data.headTitle);
-					target.find('.wbrtc_roomBox[id=' + data.headingTagId + '] .wbrtc_roomBoxHeader b').text(data.headTitle);
+					target.find('.wbrtc_roomBox[id=' + data.headingTagId + '] .titleRoom').text(data.headTitle);
 					$(document).find('#wrtc_textChatWrapper[data-id=' + data.headingTagId + '] .nd_title b').text(data.headTitle);
 				}
 
