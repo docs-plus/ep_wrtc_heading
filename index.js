@@ -123,11 +123,12 @@ exports.socketio = function (hookName, args, cb) {
 
 			targetRoom.forEach(chatRoom => {
 				let room = null
+
 				if(chatRoom === "video")
 					room = videoChat.socketDisconnect(userData[chatRoom])
 				else if (chatRoom === "text")
 					room = textChat.socketDisconnect(userData[chatRoom])
-				
+
 				if(room && room.padId)
 					socket.broadcast.to(room.padId).emit("userLeave", room.data, room.roomInfo, chatRoom)
 			})

@@ -74,6 +74,8 @@ var WRTC_Room = (function () {
 
 		if (actions === 'JOIN') {
 			if ($joinBtn.length) $joinBtn.prop('disabled', true);
+			share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
+
 			switch (target) {
 				case 'chatRoom':
 					$joinBtn.targetPlus = true;
@@ -230,6 +232,7 @@ var WRTC_Room = (function () {
 			});
 
 			socket.on('userLeave', function (data, roomInfo, target) {
+				console.log(data, roomInfo, target)
 				if (target === "video") {
 					videoChat.gateway_userLeave(data, roomInfo, target);
 				} else {

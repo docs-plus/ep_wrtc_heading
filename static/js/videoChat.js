@@ -95,8 +95,8 @@ var videoChat = (function () {
 			$headingRoom.find('.btn_joinChat_chatRoom').removeClass('active');
 			WRTC.deactivate(data.userId, data.headerId);
 			window.headerId = null;
-			currentRoom = {};
 
+			currentRoom = {};
 
 			$('#wrtc_modal').css({
 				'transform': 'translate(-50%, -100%)',
@@ -195,7 +195,8 @@ var videoChat = (function () {
 
 		isUserMediaAvailable().then(function (stream) {
 			localStream = stream;
-			if (!currentRoom.userId || currentRoom && currentRoom.headerId !== headerId) {
+
+			if (!currentRoom.userId) {
 				return socket.emit('userJoin', padId, data, "video", gateway_userJoin);
 			} else {
 				// If the user has already joined the video chat, make suer leave that room then join to the new chat room
