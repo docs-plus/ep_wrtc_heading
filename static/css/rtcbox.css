@@ -10,7 +10,7 @@
 	min-width: 400px;
 	font-family: Quicksand, Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 	font-style: normal;
-	color: rgb(32, 33, 36);
+	color: #333333;
 	font-size: 14px;
 	transition: all .3s;
 	border-radius: 0 0 6px 6px;
@@ -317,13 +317,13 @@
 	cursor: pointer;
 }
 
-.wrtc_text .videoIcon{
+.wrtc_text .videoIcon, .wrtc_text .textIcon{
 	width: 16px;
 	display: inline-block;
 	margin: 0 2px 0 6px;
 	height: 17px;
 }
-.wrtc_text .videoIcon svg {display: inline-block;margin-bottom: -2px;}
+.wrtc_text .videoIcon svg, .wrtc_text .textIcon svg {display: inline-block;margin-bottom: -2px;}
 
 /*=== wrtc_settings ===*/
 
@@ -392,7 +392,7 @@
 	transform: translate(-50%, 100%) scale(0.7);
 	font-family: Quicksand, Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 	font-style: normal;
-	color: rgb(32, 33, 36);
+	color: #333333;
 	font-size: 14px;
 }
 

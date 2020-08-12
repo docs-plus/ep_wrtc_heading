@@ -140,9 +140,24 @@ var textChat = (function () {
 			});
 		}
 
+		var user = share.getUserFromId(data.userId);
+
+		// notify, a user join the video-chat room
+		var msg = {
+			'time': new Date(),
+			'userId': user.userId,
+			'userName': user.name,
+			'headerId': data.headerId,
+			'userCount': userCount,
+			'headerTitle': headTitle
+		};
+
+		share.notifyNewUserJoined("text", msg);
+
 		if (data.userId === clientVars.userId) {
 			currentRoom = data;
-			$headingRoom.find('.btn_joinChat_chatRoom').addClass('active');
+			$headingRoom.attr({ 'data-text': true });
+			share.roomBoxIconActive();
 			activateModal(headerId, headTitle, userCount);
 		}
 	}
@@ -168,8 +183,13 @@ var textChat = (function () {
 		if (userCount === 0) {
 			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text"><b>text-chat</b></button></li>');
 		}
+
+		// remove the text-chat notification
+		$(".wrtc_text[data-target='text'][data-authorid='" + data.userId + "'][data-id='" + headerId + "']").remove();
+
 		if (data.userId === clientVars.userId) {
-			$headingRoom.find('.btn_joinChat_chatRoom').removeClass('active');
+			$headingRoom.removeAttr('data-text');
+			share.roomBoxIconActive();
 			currentRoom = {};
 			deactivateModal(data.headId);
 		}
@@ -184,6 +204,8 @@ var textChat = (function () {
 			if ($joinBtn && $joinBtn.length) $joinBtn.prop('disabled', false);
 			return false;
 		}
+
+		share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
 
 		if (!currentRoom.userId) {
 			socket.emit('userJoin', padId, userData, "text", addUserToRoom);

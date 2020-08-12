@@ -3,9 +3,9 @@
 	order: -1;
 	position: relative;
 	z-index: 20;
-	left: 30px;
+	left: 40px;
 	overflow: hidden;
-	width: 24px;
+	width: 26px;
 }
 
 #wbrtc_chatBox:hover {
@@ -35,19 +35,20 @@
 	font-family: Quicksand;
 	font-style: normal;
 	font-weight: bold;
-	font-size: 12px;
-	line-height: 15px;
+	font-size: 14px;
+	line-height: 16px;
 	/* margin-left: 14px; */
+	color: #333333;
 	width: 100%;
-	max-width: 360px;
-	min-width: 230px;
+	max-width: 390px;
+	min-width: 260px;
 }
 
 
 .wbrtc_roomBox > .wbrtc_roomBoxHeader {
 	padding: 6px;
 	overflow: hidden;
-	line-height: 15px;
+	line-height: 16px;
 	display: flex;
 	align-items: center;
 	flex-direction: row;
@@ -85,23 +86,47 @@
 	height: 20px;
 	padding: 0 2px;
 	margin-right: 4px;
+	transition: all .2s linear;
+	display: flex;
+	align-items: center;
+	color: #333333;
+}
+.wrtc_box .wrtc_header .btn_icon svg{
+	width: 18px;
+	height: 18px;
+}
+
+.wrtc_box .wrtc_header .btn_icon.btn_joinChat_chatRoom:hover{
+	background-color: #78909c;
+	color: #fff;
+	border-radius: 100%;
+	display: flex;
+	align-items: center;
+}
+
+.wrtc_box .wrtc_header .btn_icon.btn_joinChat_chatRoom:hover svg{
+	width: 20px;
+	height: 14px;
 }
 
 .wrtc_box .wrtc_header b {	
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
-	max-width: 160px;
+	max-width: 200px;
 	display: inline-block;
+	line-height: 22px;
 }
 
 .wrtc_box .wrtc_header .shareLink{
 	float: right;
-	padding: 0 4px;
+	padding: 0 3px;
 }
 
 .wrtc_box .wrtc_wrapper{
 	width: 100%;
+	display: flex;
+	align-items: center;
 }
 
 #wbrtc_chatBox .wrtc_box .wrtc_contentBody, #wbrtc_chatBox .wrtc_wrapper{
@@ -113,7 +138,7 @@
 }
 
 .wrtc_box .wrtc_contentBody:hover .wrtc_header .shareLink {
-	display: block;
+	display: flex;
 }
 
 .wrtc_box .wrtc_contentBody .wrtc_content{

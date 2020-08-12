@@ -74,7 +74,6 @@ var WRTC_Room = (function () {
 
 		if (actions === 'JOIN') {
 			if ($joinBtn.length) $joinBtn.prop('disabled', true);
-			share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
 
 			switch (target) {
 				case 'chatRoom':
@@ -113,7 +112,7 @@ var WRTC_Room = (function () {
 			scroll2Header(headerId);
 		}
 		if (join === 'true') {
-			if(target === 'plus') target = 'chatRoom';
+			if (target === 'plus') target = 'chatRoom';
 			roomBtnHandler('JOIN', headerId, target);
 		}
 	}
@@ -156,9 +155,9 @@ var WRTC_Room = (function () {
 		share.$body_ace_outer().on('click', '.wbrtc_roomBox  .btn_joinChat_video', roomBtnHandler);
 		share.$body_ace_outer().on('click', '.wbrtc_roomBox  .btn_joinChat_chatRoom', roomBtnHandler);
 		share.$body_ace_outer().on('click', '.wbrtc_roomBox button.btn_shareRoom', shareRoomsLink);
+		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
 
 		$(document).on('click', '#wrtc_textChatWrapper .btn_leave', roomBtnHandler);
-		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
 
 		share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function () {
 			$(this).addClass('active').find('.wrtc_contentBody, .wrtc_wrapper').css({ 'display': 'block' });
@@ -232,7 +231,7 @@ var WRTC_Room = (function () {
 			});
 
 			socket.on('userLeave', function (data, roomInfo, target) {
-				console.log(data, roomInfo, target)
+				console.log(data, roomInfo, target);
 				if (target === "video") {
 					videoChat.gateway_userLeave(data, roomInfo, target);
 				} else {

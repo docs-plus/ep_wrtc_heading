@@ -47,25 +47,6 @@ var videoChat = (function () {
 
 	function deactivateModal() {}
 
-	function addTextChatMessage(msg) {
-		var authorClass = 'author-' + msg.userId.replace(/[^a-y0-9]/g, function (c) {
-			if (c === '.') return '-';
-			return 'z' + c.charCodeAt(0) + 'z';
-		});
-
-		// create the time string
-		var minutes = '' + new Date(msg.time).getMinutes();
-		var hours = '' + new Date(msg.time).getHours();
-		if (minutes.length === 1) minutes = '0' + minutes;
-		if (hours.length === 1) hours = '0' + hours;
-		var timeStr = hours + ':' + minutes;
-
-		var html = "<p data-headid='" + msg.headId + "' data-authorId='" + msg.userId + "' class='wrtc_text " + msg.headId + ' ' + authorClass + "'><b>" + msg.userName + "</b><span class='time " + authorClass + "'>" + timeStr + '</span> ' + msg.text + '</p>';
-
-		$(document).find('#chatbox #chattext').append(html);
-		share.scrollDownToLastChatText('#chatbox #chattext');
-	}
-
 	function removeUserFromRoom(data, roomInfo, cb) {
 		if (!data || !roomInfo) return false;
 		var headerId = data.headerId;
@@ -89,10 +70,11 @@ var videoChat = (function () {
 		}
 
 		// remove the text-chat notification
-		$(".wrtc_text[data-authorid='" + data.userId + "'][data-headid='" + data.headerId + "']").remove();
+		$(".wrtc_text[data-target='video'][data-authorid='" + data.userId + "'][data-id='" + data.headerId + "']").remove();
 
 		if (data.userId === clientVars.userId) {
-			$headingRoom.find('.btn_joinChat_chatRoom').removeClass('active');
+			$headingRoom.removeAttr('data-video');
+			share.roomBoxIconActive();
 			WRTC.deactivate(data.userId, data.headerId);
 			window.headerId = null;
 
@@ -139,18 +121,18 @@ var videoChat = (function () {
 			});
 		}
 
-		var videoIcon = '<span class="videoIcon"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="video" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-video fa-w-18 fa-2x"><path fill="currentColor" d="M336.2 64H47.8C21.4 64 0 85.4 0 111.8v288.4C0 426.6 21.4 448 47.8 448h288.4c26.4 0 47.8-21.4 47.8-47.8V111.8c0-26.4-21.4-47.8-47.8-47.8zm189.4 37.7L416 177.3v157.4l109.6 75.5c21.2 14.6 50.4-.3 50.4-25.8V127.5c0-25.4-29.1-40.4-50.4-25.8z" class=""></path></svg></span>';
-		var roomCounter = "<span class='userCount'>(" + userCount + '/' + VIDEOCHATLIMIT + ')</span>';
-		var btnJoin = "<span class='wrtc_roomLink' data-action='JOIN' data-headid='" + data.headerId + "' title='Join' data-url='" + share.createShareLink(data.headerId, headerTitle) + "'>" + headerTitle + '</span>';
 		// notify, a user join the video-chat room
 		var msg = {
 			'time': new Date(),
 			'userId': user.userId,
-			'text': '<span>joins</span>' + videoIcon + btnJoin + roomCounter,
 			'userName': user.name,
-			'headId': data.headerId
+			'headerId': data.headerId,
+			'userCount': userCount,
+			'headerTitle': headerTitle,
+			'VIDEOCHATLIMIT': VIDEOCHATLIMIT
 		};
-		addTextChatMessage(msg);
+
+		share.notifyNewUserJoined("video", msg);
 
 		if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
 			$.gritter.add({
@@ -164,7 +146,8 @@ var videoChat = (function () {
 
 		if (data.userId === clientVars.userId) {
 
-			$headingRoom.find('.btn_joinChat_chatRoom').addClass('active');
+			$headingRoom.attr({ 'data-video': true });
+			share.roomBoxIconActive();
 
 			$('#werc_toolbar p').attr({ 'data-id': data.headerId }).text(headerTitle);
 			$('#werc_toolbar .btn_leave').attr({ 'data-id': data.headerId });
@@ -192,6 +175,8 @@ var videoChat = (function () {
 			if ($joinBtn.length) $joinBtn.prop('disabled', false);
 			return false;
 		}
+
+		share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
 
 		isUserMediaAvailable().then(function (stream) {
 			localStream = stream;
