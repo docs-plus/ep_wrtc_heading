@@ -81,6 +81,8 @@ var textChat = (function () {
 		$btn.attr({ 'data-action': "collapse" });
 		$btn.find('.fa_arrow-from-top').toggle();
 		$btn.find('.fa_arrow-to-top').toggle();
+
+		share.toggleRoomBtnHandler($joinBtn, "JOIN");
 	}
 
 	function activateModal(headerId, headTitle, userCount) {
@@ -117,8 +119,12 @@ var textChat = (function () {
 				createAndAppendMessage(el);
 			});
 		});
+		
 
-		if ($joinBtn && $joinBtn.length && !$joinBtn.targetPlus) $joinBtn.prop('disabled', false);
+		if ($joinBtn && $joinBtn.length && !$joinBtn.targetPlus){
+			$joinBtn.prop('disabled', false);
+		} 
+		share.toggleRoomBtnHandler($joinBtn, "LEAVE");
 	}
 
 	function addUserToRoom(data, roomInfo) {

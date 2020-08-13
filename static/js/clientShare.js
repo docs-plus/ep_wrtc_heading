@@ -1,8 +1,9 @@
 "use strict";
 
 exports.scrollDownToLastChatText = function scrollDownToLastChatText(selector) {
-	if (!selector) return true;
-	$(selector).animate({ 'scrollTop': $(selector)[0].scrollHeight }, { 'duration': 400, 'queue': false });
+	var $element = $(selector)[0];
+	if (!selector && $element.length) return true;
+	$element.animate({ 'scrollTop': $element.scrollHeight }, { 'duration': 400, 'queue': false });
 };
 
 exports.getUserFromId = function getUserFromId(userId) {
@@ -67,6 +68,26 @@ exports.notifyNewUserJoined = function notifyNewUserJoined(target, msg) {
 
 	addTextChatMessage(msg);
 };
+
+exports.toggleRoomBtnHandler = function toggleRoomBtnHandler($joinLeaveBtn, action) {
+	var join = $joinLeaveBtn.attr("data-join");
+	var headerId = $joinLeaveBtn.attr("data-id");
+	var $btnText = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='text']")
+	var $btnVideo = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='video']")
+
+	 $joinLeaveBtn.attr({"data-action": action});
+
+	 if(join === "chatRoom"){
+		$btnText.attr({"data-action": action});
+		$btnVideo.attr({"data-action": action});
+	} else {
+		if($btnText.attr("data-action") === "LEAVE" || $btnVideo.attr("data-action") === "LEAVE") {
+			exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='chatRoom']").attr({"data-action": "LEAVE"});
+		}else {
+			exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='chatRoom']").attr({"data-action": "JOIN"});
+		}
+	}
+}
 
 exports.roomBoxIconActive = function roomBoxIconActive() {
 	exports.$body_ace_outer().find(".wbrtc_roomBox").each(function (index, val) {

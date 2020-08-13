@@ -44,9 +44,9 @@ var WRTC_Room = (function () {
 		videoChat.userJoin(headerId, userInfo, $joinBtn);
 	}
 
-	function leaveChatRoom(headerId, userInfo) {
-		textChat.userLeave(headerId, userInfo);
-		videoChat.userLeave(headerId, userInfo);
+	function leaveChatRoom(headerId, userInfo, $joinBtn) {
+		textChat.userLeave(headerId, userInfo, $joinBtn);
+		videoChat.userLeave(headerId, userInfo, $joinBtn);
 	}
 
 	/**
@@ -59,6 +59,8 @@ var WRTC_Room = (function () {
 		headerId = $(this).attr('data-id') || headerId;
 		actions = $(this).attr('data-action') || actions;
 		target = $(this).attr('data-join') || target;
+
+		console.log(headerId, actions, target)
 
 		if (!headerId || !target) return true;
 
@@ -89,14 +91,14 @@ var WRTC_Room = (function () {
 			}
 		} else if (actions === 'LEAVE') {
 			switch (target) {
-				case 'plus':
-					leaveChatRoom(headerId, userInfo);
+				case 'chatRoom':
+					leaveChatRoom(headerId, userInfo, $joinBtn);
 					break;
 				case 'video':
-					videoChat.userLeave(headerId, userInfo);
+					videoChat.userLeave(headerId, userInfo, $joinBtn);
 					break;
 				case 'text':
-					textChat.userLeave(headerId, userInfo);
+					textChat.userLeave(headerId, userInfo, $joinBtn);
 					break;
 			}
 		}
@@ -151,18 +153,22 @@ var WRTC_Room = (function () {
 
 	function activeEventListener() {
 
-		share.$body_ace_outer().on('click', '.wbrtc_roomBox  .btn_joinChat_text', roomBtnHandler);
-		share.$body_ace_outer().on('click', '.wbrtc_roomBox  .btn_joinChat_video', roomBtnHandler);
-		share.$body_ace_outer().on('click', '.wbrtc_roomBox  .btn_joinChat_chatRoom', roomBtnHandler);
-		share.$body_ace_outer().on('click', '.wbrtc_roomBox button.btn_shareRoom', shareRoomsLink);
-		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
+		var $wbrtc_roomBox = share.$body_ace_outer()
 
+		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_text', roomBtnHandler);
+		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_video', roomBtnHandler);
+		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_chatRoom', roomBtnHandler);
+
+		$wbrtc_roomBox.on('click', '.wbrtc_roomBox button.btn_shareRoom', shareRoomsLink);
+
+		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
+		
 		$(document).on('click', '#wrtc_textChatWrapper .btn_leave', roomBtnHandler);
 
 		share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function () {
-			$(this).addClass('active').find('.wrtc_contentBody, .wrtc_wrapper').css({ 'display': 'block' });
+			$(this).addClass('active').find('.wrtc_contentBody').css({ 'display': 'block' });
 		}).on('mouseleave', '.wbrtc_roomBox', function () {
-			$(this).removeClass('active').find('.wrtc_contentBody, .wrtc_wrapper').css({ 'display': 'none' });
+			$(this).removeClass('active').find('.wrtc_contentBody').css({ 'display': 'none' });
 		});
 
 		share.$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_share', function () {

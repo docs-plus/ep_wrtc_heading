@@ -86,6 +86,7 @@ var videoChat = (function () {
 			}).attr({ 'data-active': false });
 
 			stopStreaming(localStream);
+			share.toggleRoomBtnHandler($joinBtn, "JOIN");
 		}
 		if (cb && typeof cb === 'function') cb();
 	}
@@ -163,7 +164,10 @@ var videoChat = (function () {
 				'opacity': 1
 			}).attr({ 'data-active': true });
 
-			if ($joinBtn && $joinBtn.length) $joinBtn.prop('disabled', false);
+			if ($joinBtn && $joinBtn.length) {
+				$joinBtn.prop('disabled', false);
+			}
+			share.toggleRoomBtnHandler($joinBtn, "LEAVE");
 		}
 	}
 

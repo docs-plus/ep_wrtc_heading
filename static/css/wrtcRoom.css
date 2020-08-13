@@ -5,7 +5,7 @@
 	z-index: 20;
 	left: 40px;
 	overflow: hidden;
-	width: 26px;
+	width: 30px;
 }
 
 #wbrtc_chatBox:hover {
@@ -45,6 +45,10 @@
 }
 
 
+.wbrtc_roomBox:hover .wrtc_wrapper{
+	display: flex!important;
+}
+
 .wbrtc_roomBox > .wbrtc_roomBoxHeader {
 	padding: 6px;
 	overflow: hidden;
@@ -82,9 +86,9 @@
 
 .wrtc_box .wrtc_header .btn_icon{
 	outline: none;
-	width: 20px;
-	height: 20px;
-	padding: 0 2px;
+	width: 26px;
+	height: 26px;
+	padding: 0 6px;
 	margin-right: 4px;
 	transition: all .2s linear;
 	display: flex;
@@ -92,35 +96,34 @@
 	color: #333333;
 }
 .wrtc_box .wrtc_header .btn_icon svg{
-	width: 18px;
-	height: 18px;
+	width: 16px;
+	height: 16px;
 }
 
 .wrtc_box .wrtc_header .btn_icon.btn_joinChat_chatRoom:hover{
-	background-color: #78909c;
+	background-color: #2678ff;
 	color: #fff;
 	border-radius: 100%;
-	display: flex;
-	align-items: center;
 }
 
-.wrtc_box .wrtc_header .btn_icon.btn_joinChat_chatRoom:hover svg{
-	width: 20px;
-	height: 14px;
+
+.wrtc_box .wrtc_header .btn_icon.btn_joinChat_chatRoom:active{
+	color: inherit;
+	background-color: inherit;
 }
+
 
 .wrtc_box .wrtc_header b {	
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
-	max-width: 200px;
+	max-width: 188px;
 	display: inline-block;
 	line-height: 22px;
 }
 
 .wrtc_box .wrtc_header .shareLink{
-	float: right;
-	padding: 0 3px;
+	margin-left: auto;
 }
 
 .wrtc_box .wrtc_wrapper{
@@ -139,6 +142,7 @@
 
 .wrtc_box .wrtc_contentBody:hover .wrtc_header .shareLink {
 	display: flex;
+
 }
 
 .wrtc_box .wrtc_contentBody .wrtc_content{
@@ -179,12 +183,29 @@
 .wbrtc_roomBox .btn_joinChat_chatRoom.active{
 	color: #2678ff;
 }
-.wbrtc_roomBox .btn_joinChat_video:hover{
+
+
+.wrtc_box .wrtc_header .btn_icon.btn_joinChat_video:hover,
+.wrtc_box .wrtc_header .btn_icon.btn_joinChat_text:hover{
+	background-color: #2678ff;
+	color: #fff;
+	border-radius: 100%;
+}
+
+
+.wrtc_box .wrtc_header .btn_icon.btn_joinChat_video:active,
+.wrtc_box .wrtc_header .btn_icon.btn_joinChat_text:active{
+	color: inherit;
+	background-color: inherit;
+}
+
+
+/* .wbrtc_roomBox .btn_joinChat_video:hover{
 	color: #f44336;
-}
-.wbrtc_roomBox .btn_joinChat_text:hover{
+} */
+/* .wbrtc_roomBox .btn_joinChat_text:hover{
 	color: #4caf50;
-}
+} */
 /* .wbrtc_roomBox > .wbrtc_roomBoxFooter {
 	padding: 8px;
 	display: none;

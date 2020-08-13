@@ -12,7 +12,7 @@
 	font-style: normal;
 	color: #333333;
 	font-size: 14px;
-	transition: all .3s;
+	transition: all .3s linear;
 	border-radius: 0 0 6px 6px;
 	box-shadow: 1px 1px 4px rgb(87, 98, 115, .1);
 	border: 1px solid #e6e8e9;
@@ -381,7 +381,7 @@
 	box-shadow: -1px 0px 2px rgb(87, 98, 115, .1), 1px 7px 2px rgb(87, 98, 115, .1);
 	border: 1px solid #e6e7e7;
 	z-index: 100000;
-	border-radius: 4px 4px 0 0;
+	border-radius: 6px 6px 0 0;
 	border-bottom: none;
 	display: flex;
 	flex-direction: column;
@@ -389,7 +389,7 @@
 	transition: all 0.3s linear;
 	bottom: 0;
 	left: 50%;
-	transform: translate(-50%, 100%) scale(0.7);
+	transform: translate(-50%, 100%);
 	font-family: Quicksand, Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 	font-style: normal;
 	color: #333333;
@@ -397,7 +397,7 @@
 }
 
 #wrtc_textChatWrapper.active {
-	transform: translate(-50%, 0) scale(1);
+	transform: translate(-50%, 0);
 	opacity: 1;
 	visibility: visible;
 }
@@ -417,7 +417,6 @@
 	display: inline-block;
 	margin-right: 6px;
 	line-height: 0;
-	color: #2678ff;
 }
 
 .textChatToolbar b{
