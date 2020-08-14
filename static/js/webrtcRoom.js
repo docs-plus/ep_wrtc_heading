@@ -60,7 +60,6 @@ var WRTC_Room = (function () {
 		actions = $(this).attr('data-action') || actions;
 		target = $(this).attr('data-join') || target;
 
-		console.log(headerId, actions, target);
 
 		if (!headerId || !target) return true;
 
@@ -238,7 +237,6 @@ var WRTC_Room = (function () {
 			});
 
 			socket.on('userLeave', function (data, roomInfo, target) {
-				console.log(data, roomInfo, target);
 				if (target === "video") {
 					videoChat.gateway_userLeave(data, roomInfo, target);
 				} else {

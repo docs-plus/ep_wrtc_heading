@@ -47,14 +47,6 @@ module.exports.shortSequentialId = function () {
   return Object.freeze({ findNextId })
 }
 
-// const { findNextId } = shortSequentialId()
-// let stringID = '0a'
-// for (let i = 1; i <= 20; i++) {
-//   stringID = findNextId(stringID)
-//   console.log(`[${i + 1}]`, stringID)
-// }
-
-
 exports.objectHasPath = (obj, prop) => {
   if (typeof obj === 'object' && obj !== null) { // only performs property checks on objects (taking care of the corner case for null as well)
     if (obj.hasOwnProperty(prop)) {              // if this object already contains the property, we are done

@@ -81,7 +81,6 @@ var videoChat = (function () {
 
 			stopStreaming(localStream);
 			share.toggleRoomBtnHandler($joinBtn, "JOIN");
-			console.log("what is?", $joinBtn, "JOIN");
 		}
 		if (cb && typeof cb === 'function') cb();
 	}
