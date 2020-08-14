@@ -425,6 +425,7 @@
 	overflow: hidden;
 	max-width: 80%;
 	margin-left: 5px;
+	cursor: pointer;
 }
 
 #wrtc_textChat{

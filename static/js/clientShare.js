@@ -75,9 +75,11 @@ exports.toggleRoomBtnHandler = function toggleRoomBtnHandler($joinLeaveBtn, acti
 	var $btnText = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='text']")
 	var $btnVideo = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='video']")
 
-	 $joinLeaveBtn.attr({"data-action": action});
+	$joinLeaveBtn.attr({"data-action": action});
 
-	 if(join === "chatRoom"){
+	if(join === "chatRoom"){
+		$btnVideo.prop('disabled', false)
+		$btnText.prop('disabled', false)
 		$btnText.attr({"data-action": action});
 		$btnVideo.attr({"data-action": action});
 	} else {
@@ -100,3 +102,17 @@ exports.roomBoxIconActive = function roomBoxIconActive() {
 		}
 	});
 };
+
+exports.appendUserList = function appendUserList(roomInfo, $element) {
+	if (roomInfo.list) {
+		$element.find('li').remove();
+		roomInfo.list.forEach(function reOrderUserList(el) {
+			var userInList = share.getUserFromId(el.userId);
+			var avatarUrl = "../static/plugins/ep_profile_modal/static/img/user.png"
+			if(clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]){
+				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+			} 
+			$element.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'><div class='avatar'><img src='" + avatarUrl + "'></div>" + userInList.name + '</li>');
+		});
+	}
+}

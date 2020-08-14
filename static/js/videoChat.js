@@ -53,13 +53,7 @@ var videoChat = (function () {
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 		var $videoChatUserList = $headingRoom.find('.wrtc_content.videoChat ul');
 
-		if (roomInfo.list) {
-			$videoChatUserList.find('li').remove();
-			roomInfo.list.forEach(function reOrderUserList(el) {
-				var userInList = share.getUserFromId(el.userId);
-				$videoChatUserList.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
-			});
-		}
+		share.appendUserList(roomInfo, $videoChatUserList)
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.videoChatCount').text(userCount);
@@ -87,6 +81,7 @@ var videoChat = (function () {
 
 			stopStreaming(localStream);
 			share.toggleRoomBtnHandler($joinBtn, "JOIN");
+			console.log("what is?", $joinBtn, "JOIN")
 		}
 		if (cb && typeof cb === 'function') cb();
 	}
@@ -114,13 +109,7 @@ var videoChat = (function () {
 
 		var $vidoeChatUserList = $headingRoom.find('.wrtc_content.videoChat ul');
 
-		if (roomInfo.list) {
-			$vidoeChatUserList.find('li').remove();
-			roomInfo.list.forEach(function reOrderUserList(el) {
-				var userInList = share.getUserFromId(el.userId);
-				$vidoeChatUserList.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
-			});
-		}
+		share.appendUserList(roomInfo, $vidoeChatUserList)
 
 		// notify, a user join the video-chat room
 		var msg = {
@@ -174,7 +163,8 @@ var videoChat = (function () {
 	function userJoin(headerId, data, $joinButton) {
 		$joinBtn = $joinButton;
 		$joinBtn.prop('disabled', true);
-		// check if user already in that room
+
+		// check if has user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
 			if ($joinBtn.length) $joinBtn.prop('disabled', false);
 			return false;
@@ -198,7 +188,8 @@ var videoChat = (function () {
 		});
 	}
 
-	function userLeave(headerId, data) {
+	function userLeave(headerId, data, $joinButton) {
+		$joinBtn = $joinButton;
 		socket.emit('userLeave', padId, data, 'video', gateway_userLeave);
 	}
 

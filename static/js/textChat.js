@@ -138,13 +138,7 @@ var textChat = (function () {
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
-		if (roomInfo.list) {
-			$textChatUserList.find('li').remove();
-			roomInfo.list.forEach(function reOrderUserList(el) {
-				var userInList = share.getUserFromId(el.userId);
-				$textChatUserList.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
-			});
-		}
+		share.appendUserList(roomInfo, $textChatUserList)
 
 		var user = share.getUserFromId(data.userId);
 
@@ -169,7 +163,8 @@ var textChat = (function () {
 	}
 
 	function removeUserFromRoom(data, roomInfo, target, cb) {
-		var headerId = data.headerId;
+		if(!data) return true;
+		var headerId = data.headerId
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 
 		var userCount = roomInfo.present;
@@ -178,13 +173,7 @@ var textChat = (function () {
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
-		if (roomInfo.list) {
-			$textChatUserList.find('li').remove();
-			roomInfo.list.forEach(function reOrderUserList(el) {
-				var userInList = share.getUserFromId(el.userId);
-				$textChatUserList.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'>" + userInList.name + '</li>');
-			});
-		}
+		share.appendUserList(roomInfo, $textChatUserList)
 
 		if (userCount === 0) {
 			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text"><b>text-chat</b></button></li>');
@@ -224,12 +213,12 @@ var textChat = (function () {
 		}
 	}
 
-	function userLeave(headerId, userData) {
+	function userLeave(headerId, userData, $joinButton) {
+		$joinBtn = $joinButton;
 		socket.emit('userLeave', padId, userData, "text", removeUserFromRoom);
 	}
 
 	function socketBulkUpdateRooms(rooms, info, target) {
-		console.log(rooms, info, target);
 		var roomsInfo = {};
 		// create a roomInfo for each individual room
 		Object.keys(rooms).forEach(function (headerId) {

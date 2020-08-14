@@ -150,6 +150,21 @@
 	padding: 6px 4px;
 }
 
+.wrtc_box .wrtc_contentBody .wrtc_content li .avatar {
+	width: 24px;
+	border: 2px solid #ddd;
+	height: 24px;
+	border-radius: 100%;
+	float: left;
+	margin: 0 5px 0 0;
+	overflow: hidden;
+}
+
+.wrtc_box .wrtc_contentBody .wrtc_content li .avatar img{
+	width: 100%;
+	height: auto;
+}
+
 .wrtc_box .wrtc_contentBody .wrtc_content li.empty{
 	color: #cccccc;
 }
@@ -172,6 +187,7 @@
 .wrtc_box .wrtc_contentBody .wrtc_content ul > li {
 	border-right: 6px solid transparent;
 	margin-bottom: 4px;
+	line-height: 22px;
 }
 
 .wbrtc_roomBox .btn_joinChat_chatRoom.active
