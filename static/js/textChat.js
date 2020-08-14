@@ -119,11 +119,10 @@ var textChat = (function () {
 				createAndAppendMessage(el);
 			});
 		});
-		
 
-		if ($joinBtn && $joinBtn.length && !$joinBtn.targetPlus){
+		if ($joinBtn && $joinBtn.length && !$joinBtn.targetPlus) {
 			$joinBtn.prop('disabled', false);
-		} 
+		}
 		share.toggleRoomBtnHandler($joinBtn, "LEAVE");
 	}
 
@@ -138,7 +137,7 @@ var textChat = (function () {
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
-		share.appendUserList(roomInfo, $textChatUserList)
+		share.appendUserList(roomInfo, $textChatUserList);
 
 		var user = share.getUserFromId(data.userId);
 
@@ -163,8 +162,8 @@ var textChat = (function () {
 	}
 
 	function removeUserFromRoom(data, roomInfo, target, cb) {
-		if(!data) return true;
-		var headerId = data.headerId
+		if (!data) return true;
+		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 
 		var userCount = roomInfo.present;
@@ -173,7 +172,7 @@ var textChat = (function () {
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
-		share.appendUserList(roomInfo, $textChatUserList)
+		share.appendUserList(roomInfo, $textChatUserList);
 
 		if (userCount === 0) {
 			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text"><b>text-chat</b></button></li>');

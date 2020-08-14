@@ -53,7 +53,7 @@ var videoChat = (function () {
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 		var $videoChatUserList = $headingRoom.find('.wrtc_content.videoChat ul');
 
-		share.appendUserList(roomInfo, $videoChatUserList)
+		share.appendUserList(roomInfo, $videoChatUserList);
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.videoChatCount').text(userCount);
@@ -81,7 +81,7 @@ var videoChat = (function () {
 
 			stopStreaming(localStream);
 			share.toggleRoomBtnHandler($joinBtn, "JOIN");
-			console.log("what is?", $joinBtn, "JOIN")
+			console.log("what is?", $joinBtn, "JOIN");
 		}
 		if (cb && typeof cb === 'function') cb();
 	}
@@ -109,7 +109,7 @@ var videoChat = (function () {
 
 		var $vidoeChatUserList = $headingRoom.find('.wrtc_content.videoChat ul');
 
-		share.appendUserList(roomInfo, $vidoeChatUserList)
+		share.appendUserList(roomInfo, $vidoeChatUserList);
 
 		// notify, a user join the video-chat room
 		var msg = {

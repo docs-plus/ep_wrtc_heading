@@ -86,7 +86,7 @@ var EPwrtcHeading = (function () {
 /** **********************************************************************/
 
 function getSocket() {
-  return window.pad && window.pad.socket;
+	return window.pad && window.pad.socket;
 }
 
 var hooks = {
@@ -101,21 +101,21 @@ var hooks = {
 			});
 		}
 
-		window.clientVars.ep_profile_list = {}
-		getSocket().on('message', function(obj){
-			if(obj.type === 'COLLABROOM' & obj.data.type === 'CUSTOM'){
-				var data = obj.data.payload
-				if(data.action === "EP_PROFILE_USERS_LIST"){
-					data.list.forEach(function(el) {
-						if(!window.clientVars.ep_profile_list[el.userId]) window.clientVars.ep_profile_list[el.userId] = {};
-						window.clientVars.ep_profile_list[el.userId] = el
+		window.clientVars.ep_profile_list = {};
+		getSocket().on('message', function (obj) {
+			if (obj.type === 'COLLABROOM' & obj.data.type === 'CUSTOM') {
+				var data = obj.data.payload;
+				if (data.action === "EP_PROFILE_USERS_LIST") {
+					data.list.forEach(function (el) {
+						if (!window.clientVars.ep_profile_list[el.userId]) window.clientVars.ep_profile_list[el.userId] = {};
+						window.clientVars.ep_profile_list[el.userId] = el;
 					});
 				}
-				if(data.action === "EP_PROFILE_USER_LOGIN_UPDATE"){
-					window.clientVars.ep_profile_list[data.userId] = data
+				if (data.action === "EP_PROFILE_USER_LOGIN_UPDATE") {
+					window.clientVars.ep_profile_list[data.userId] = data;
 				}
 			}
-		})
+		});
 
 		var ace = context.ace;
 		var userId = window.pad.getUserId();
