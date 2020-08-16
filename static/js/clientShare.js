@@ -70,25 +70,25 @@ exports.notifyNewUserJoined = function notifyNewUserJoined(target, msg) {
 };
 
 exports.toggleRoomBtnHandler = function toggleRoomBtnHandler($joinLeaveBtn, action) {
-	var join = $joinLeaveBtn.attr("data-join");
-	var headerId = $joinLeaveBtn.attr("data-id");
-	var $btnText = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='text']")
-	var $btnVideo = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='video']")
+	// var join = $joinLeaveBtn.attr("data-join");
+	// var headerId = $joinLeaveBtn.attr("data-id");
+	// var $btnText = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='text']")
+	// var $btnVideo = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='video']")
 
-	$joinLeaveBtn.attr({"data-action": action});
+	// $joinLeaveBtn.attr({"data-action": action});
 
-	if(join === "chatRoom"){
-		$btnVideo.prop('disabled', false)
-		$btnText.prop('disabled', false)
-		$btnText.attr({"data-action": action});
-		$btnVideo.attr({"data-action": action});
-	} else {
-		if($btnText.attr("data-action") === "LEAVE" || $btnVideo.attr("data-action") === "LEAVE") {
-			exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='chatRoom']").attr({"data-action": "LEAVE"});
-		}else {
-			exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='chatRoom']").attr({"data-action": "JOIN"});
-		}
-	}
+	// if(join === "chatRoom"){
+	// 	$btnVideo.prop('disabled', false)
+	// 	$btnText.prop('disabled', false)
+	// 	$btnText.attr({"data-action": action});
+	// 	$btnVideo.attr({"data-action": action});
+	// } else {
+	// 	if($btnText.attr("data-action") === "LEAVE" || $btnVideo.attr("data-action") === "LEAVE") {
+	// 		exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='chatRoom']").attr({"data-action": "LEAVE"});
+	// 	}else {
+	// 		exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='chatRoom']").attr({"data-action": "JOIN"});
+	// 	}
+	// }
 }
 
 exports.roomBoxIconActive = function roomBoxIconActive() {

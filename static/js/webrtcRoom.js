@@ -79,7 +79,7 @@ var WRTC_Room = (function () {
 			switch (target) {
 				case 'chatRoom':
 					$joinBtn.targetPlus = true;
-					share.$body_ace_outer().find(".btn_joinChat_chatRoom[data-id='" + headerId + "'] , .btn_joinChat_video[data-id='" + headerId + "'], .btn_joinChat_text[data-id='" + headerId + "']").prop('disabled', true);
+					// share.$body_ace_outer().find(".btn_joinChat_chatRoom[data-id='" + headerId + "'] , .btn_joinChat_video[data-id='" + headerId + "'], .btn_joinChat_text[data-id='" + headerId + "']").prop('disabled', true);
 					joinChatRoom(headerId, userInfo, $joinBtn);
 					break;
 				case 'video':
