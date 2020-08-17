@@ -1,4 +1,5 @@
 var eejs = require("ep_etherpad-lite/node/eejs/")
+const _ = require('lodash');
 var settings = require("ep_etherpad-lite/node/utils/Settings")
 let socketIo = null
 var log4js = require("ep_etherpad-lite/node_modules/log4js")
@@ -10,11 +11,12 @@ const db = require("./server/dbRepository")
 // Make sure any updates to this are reflected in README
 var statErrorNames = ["Abort", "Hardware", "NotFound", "NotSupported", "Permission", "SecureConnection", "Unknown"]
 
-let { VIDEO_CHAT_LIMIT } = require("./config")
+let Config = require("./config")
 
 const videoChat = require("./server/videoChat")
 const textChat = require("./server/textChat")
 
+let VIDEO_CHAT_LIMIT = Config.get("VIDEO_CHAT_LIMIT")
 
 exports.socketio = function (hookName, args, cb) {
 	socketIo = args.io
@@ -37,14 +39,14 @@ exports.socketio = function (hookName, args, cb) {
 			if(target === "video"){
 				room = videoChat.socketUserJoin(userData)
 		
-				if(socket.ndHolder && !socket.ndHolder.video)
+				if(!_.has(socket, 'ndHolder.video'))
 					socket.ndHolder.video = {}
 
 				socket.ndHolder.video = room.data
 			}else{
 				room = textChat.socketUserJoin(userData)
 
-				if(socket.ndHolder && !socket.ndHolder.text)
+				if(!_.has(socket, 'ndHolder.text'))
 					socket.ndHolder.text = {}
 
 				socket.ndHolder.text = room.data
@@ -175,13 +177,13 @@ exports.clientVars = function (hook, context, callback) {
 	}
 
 	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoChatLimit) {
-		VIDEO_CHAT_LIMIT = settings.ep_wrtc_heading.videoChatLimit
+		VIDEO_CHAT_LIMIT = Config.update("VIDEO_CHAT_LIMIT", settings.ep_wrtc_heading.videoChatLimit)
 	}
 
 	var result = {
 		webrtc: {
 			version: packageJson.version,
-			videoChatLimit: VIDEO_CHAT_LIMIT,
+			videoChatLimit: Config.get("VIDEO_CHAT_LIMIT"),
 			iceServers: iceServers,
 			enabled: enabled,
 			video: video,

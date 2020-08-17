@@ -3,9 +3,9 @@
 	order: -1;
 	position: relative;
 	z-index: 20;
-	left: 40px;
+	left: 44px;
 	overflow: hidden;
-	width: 30px;
+	width: 32px;
 }
 
 #wbrtc_chatBox:hover {
@@ -214,52 +214,6 @@
 	color: inherit;
 	background-color: inherit;
 }
-
-
-/* .wbrtc_roomBox .btn_joinChat_video:hover{
-	color: #f44336;
-} */
-/* .wbrtc_roomBox .btn_joinChat_text:hover{
-	color: #4caf50;
-} */
-/* .wbrtc_roomBox > .wbrtc_roomBoxFooter {
-	padding: 8px;
-	display: none;
-}
-
-.wbrtc_roomBox > .wbrtc_roomBoxFooter .btn_share {
-	border: 1px solid;
-	padding: 5px 8px;
-	float: right;
-} */
-
-/* .wbrtc_roomBoxBody {
-	padding: 8px;
-	border-top: 1px solid #f2f3f4;
-	border-bottom: 1px solid #f2f3f4;
-	display: none;
-}
-
- */
-
-/* .wbrtc_roomBox > .wbrtc_roomBoxFooter > button.active {
-	background: #64d29b;
-	color: #ffffff;
-}
-.wbrtc_roomBox > .wbrtc_roomBoxFooter > button.deactivate{
-	background: #576273;
-}
-
-
-.wbrtc_roomBox > .wbrtc_roomBoxFooter > button {
-	border-radius: 3px;
-	font-family: Quicksand;
-	font-style: normal;
-	font-weight: bold;
-	font-size: 10px;
-	line-height: 9px;
-	outline: none;
-} */
 
 .wbrtc_roomBox .loader {
   border: 16px solid #f3f3f3; /* Light grey */

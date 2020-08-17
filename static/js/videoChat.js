@@ -128,7 +128,7 @@ var videoChat = (function () {
 				'text': '<span class="author-name">' + user.name + '</span>' + 'has joined the video-chat, <b><i> "' + headerTitle + '"</b></i>',
 				'sticky': false,
 				'time': 3000,
-				'position': 'bottom',
+				'position': 'center',
 				'class_name': 'chat-gritter-msg'
 			});
 		}

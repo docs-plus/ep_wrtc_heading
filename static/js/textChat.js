@@ -85,7 +85,7 @@ var textChat = (function () {
 		share.toggleRoomBtnHandler($joinBtn, "JOIN");
 	}
 
-	function activateModal(headerId, headTitle, userCount) {
+	function activateModal(headerId, headTitle, userCount, roomInfo) {
 		if (!headerId) return false;
 		var existTextChat = $(document).find("#wrtc_textChatWrapper");
 
@@ -124,6 +124,9 @@ var textChat = (function () {
 			$joinBtn.prop('disabled', false);
 		}
 		share.toggleRoomBtnHandler($joinBtn, "LEAVE");
+
+		var $textChatModalUserList = $(document).find("#wrtc_textChatWrapper  #textChatUserModal ul");
+		share.appendUserList(roomInfo, $textChatModalUserList);
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -136,8 +139,10 @@ var textChat = (function () {
 		$(".textChatToolbar .textChat").text(userCount);
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
-
 		share.appendUserList(roomInfo, $textChatUserList);
+
+		var $textChatModalUserList = $(document).find("#wrtc_textChatWrapper  #textChatUserModal ul");
+		share.appendUserList(roomInfo, $textChatModalUserList);
 
 		var user = share.getUserFromId(data.userId);
 
@@ -153,11 +158,21 @@ var textChat = (function () {
 
 		share.notifyNewUserJoined("text", msg);
 
+		if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
+			$.gritter.add({
+				'text': '<span class="author-name">' + user.name + '</span>' + 'has joined the text-chat, <b><i> "' + headTitle + '"</b></i>',
+				'sticky': false,
+				'time': 3000,
+				'position': 'center',
+				'class_name': 'chat-gritter-msg'
+			});
+		}
+
 		if (data.userId === clientVars.userId) {
 			currentRoom = data;
 			$headingRoom.attr({ 'data-text': true });
 			share.roomBoxIconActive();
-			activateModal(headerId, headTitle, userCount);
+			activateModal(headerId, headTitle, userCount, roomInfo);
 		}
 	}
 
@@ -171,8 +186,10 @@ var textChat = (function () {
 		$(".textChatToolbar .textChat").text(userCount);
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
+		var $textChatModalUserList = $(document).find("#wrtc_textChatWrapper #textChatUserModal ul");
 
 		share.appendUserList(roomInfo, $textChatUserList);
+		share.appendUserList(roomInfo, $textChatModalUserList);
 
 		if (userCount === 0) {
 			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text"><b>text-chat</b></button></li>');
