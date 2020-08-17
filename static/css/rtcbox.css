@@ -489,6 +489,7 @@
 	box-shadow: 1px 1px 8px rgb(87, 98, 115, .1);
 	display: none;
 	transition: all 0.3s linear;
+	z-index: 1;
 }
 
 
