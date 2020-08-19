@@ -38,18 +38,12 @@ exports.socketio = function (hookName, args, cb) {
 
 			if(target === "video"){
 				room = videoChat.socketUserJoin(userData)
-		
-				if(!_.has(socket, 'ndHolder.video'))
-					socket.ndHolder.video = {}
-
-				socket.ndHolder.video = room.data
+	
+				_.set(socket, 'ndHolder.video', room.data)
 			}else{
 				room = textChat.socketUserJoin(userData)
 
-				if(!_.has(socket, 'ndHolder.text'))
-					socket.ndHolder.text = {}
-
-				socket.ndHolder.text = room.data
+				_.set(socket, 'ndHolder.text', room.data)
 			}
 
 			if(room.canUserJoin) {
