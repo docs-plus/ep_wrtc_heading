@@ -394,6 +394,7 @@
 	font-style: normal;
 	color: #333333;
 	font-size: 14px;
+	min-width: 500px;
 }
 
 #wrtc_textChatWrapper.active {
@@ -404,7 +405,7 @@
 
 
 .textChatToolbar {
-	padding: 4px;
+	padding: 4px 8px;
 	border-bottom: 1px solid  rgb(218, 220, 224);
 	font-weight: bold;
 	display: flex;
@@ -415,7 +416,7 @@
 .textChatToolbar .chatIcon {
 	width: 19px;
 	display: inline-block;
-	margin-right: 6px;
+	margin-right: 8px;
 	line-height: 0;
 }
 
@@ -424,7 +425,6 @@
 	white-space: nowrap;
 	overflow: hidden;
 	max-width: 80%;
-	margin-left: 5px;
 	cursor: pointer;
 }
 
@@ -464,14 +464,14 @@
 }
 .titleWrapper{
 	display: flex;
-  align-items: center;
+	align-items: center;
 }
 .titleWrapper:hover + #textChatUserModal{
-	display: block;
+	/* display: block; */
 }
 
 #textChatUserModal:hover{
-	display: block;
+	/* display: block; */
 
 }
 #textChatUserModal{
@@ -497,9 +497,8 @@
 	overflow: hidden;
 	display: flex;
 	flex-direction: row;
-	/* align-items: baseline; */
 	width: 100%;
-	padding: 6px 3px 2px;
+	padding: 6px 4px;
 	justify-content: start;
 }
 
@@ -534,19 +533,21 @@
 	padding: 6px 4px;
 }
 
-.wrtc_box .wrtc_contentBody .wrtc_content li .avatar {
+.wrtc_box .wrtc_contentBody .wrtc_content li .avatar,
+#wrtc_inlineAvatars .avatar {
 	width: 24px;
 	border: 2px solid #ddd;
 	height: 24px;
-	border-radius: 100%;
+	border-radius: 50%;
 	float: left;
 	margin: 0 5px 0 0;
 	overflow: hidden;
 }
 
-.wrtc_box .wrtc_contentBody .wrtc_content li .avatar img{
-	width: 100%;
-	height: auto;
+.wrtc_box .wrtc_contentBody .wrtc_content li .avatar img,
+#wrtc_inlineAvatars .avatar img{
+	width: auto;
+	height: 100%;
 }
 
 .wrtc_box .wrtc_contentBody .wrtc_content ul {
@@ -557,5 +558,50 @@
 	border-right: 6px solid transparent;
 	margin-bottom: 4px;
 	line-height: 22px;
+}
+
+/* inline avater*/
+#wrtc_inlineAvatars{
+	display: flex;
+	flex-direction: row;
+	margin: 0 8px 0 0;
+	padding-left: 8px;
+	max-width: 220px;
+}
+
+#wrtc_inlineAvatars > .avatar {
+	float:left;
+	margin: 0 0 0 -8px;
+	position: relative;
+	transition: all 0.2s cubic-bezier(0,.71,.47,1.1);
+	background-color: #fff;
+	display: flex;
+	flex-direction: row;
+}
+#wrtc_inlineAvatars > .avatar img{
+	float: left;
+}
+#wrtc_inlineAvatars:first-child{
+	margin: 0;
+}
+
+#wrtc_inlineAvatars > .avatar:hover{
+	border-color: #2678ff;
+	z-index: 1;
+	border-radius: 4px;
+	width: 124px;
+}
+#wrtc_inlineAvatars > .avatar:hover .name{
+	display: block;
+}
+
+#wrtc_inlineAvatars > .avatar .name{
+	display: none;
+	float: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	width: 100;
+	margin-left:5px
 }
 

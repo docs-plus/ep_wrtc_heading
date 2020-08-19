@@ -60,7 +60,7 @@ var videoChat = (function () {
 		$('#werc_toolbar .nd_title .nd_count').text(userCount);
 
 		if (userCount === 0) {
-			$videoChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="video"><b>text-chat</b></button></li>');
+			$videoChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="video"><b>video-chat</b></button></li>');
 		}
 
 		// remove the text-chat notification
@@ -106,9 +106,7 @@ var videoChat = (function () {
 
 		$(document).find("#wrtc_textChatWrapper .textChatToolbar .userCount").text(userCount);
 
-		var $vidoeChatUserList = $headingRoom.find('.wrtc_content.videoChat ul');
-
-		share.appendUserList(roomInfo, $vidoeChatUserList);
+		share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.videoChat ul'));
 
 		// notify, a user join the video-chat room
 		var msg = {

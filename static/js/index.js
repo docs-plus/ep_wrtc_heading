@@ -101,6 +101,7 @@ var hooks = {
 			});
 		}
 
+		// Bridge in ep_profiles
 		window.clientVars.ep_profile_list = {};
 		getSocket().on('message', function (obj) {
 			if (obj.type === 'COLLABROOM' & obj.data.type === 'CUSTOM') {

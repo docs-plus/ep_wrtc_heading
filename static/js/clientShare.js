@@ -1,5 +1,7 @@
 "use strict";
 
+var avatarUrl = "../static/plugins/ep_profile_modal/static/img/user.png";
+
 exports.scrollDownToLastChatText = function scrollDownToLastChatText(selector) {
 	var $element = $(selector)[0];
 	if (!selector && $element.length) return true;
@@ -103,16 +105,29 @@ exports.roomBoxIconActive = function roomBoxIconActive() {
 	});
 };
 
-exports.appendUserList = function appendUserList(roomInfo, $element) {
-	if (roomInfo.list) {
-		$element.find('li').remove();
-		roomInfo.list.forEach(function reOrderUserList(el) {
-			var userInList = share.getUserFromId(el.userId);
-			var avatarUrl = "../static/plugins/ep_profile_modal/static/img/user.png"
-			if(clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]){
-				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
-			} 
-			$element.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'><div class='avatar'><img src='" + avatarUrl + "'></div>" + userInList.name + '</li>');
-		});
-	}
+exports.appendUserList = function appendUserList(roomInfo, selector) {
+	if (!roomInfo.list) return true;
+	var $element = typeof(selector) === "string" ? $(document).find(selector) : selector;
+	$element.find('li').remove();
+	roomInfo.list.forEach(function reOrderUserList(el) {
+		var userInList = share.getUserFromId(el.userId);
+		if(clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]){
+			avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+		} 
+		$element.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'><div class='avatar'><img src='" + avatarUrl + "'></div>" + userInList.name + '</li>');
+	});
+	
+}
+
+exports.appendInlineAvatar = function appendInlineAvatar(roomInfo, selector) {
+	if (!roomInfo.list) return true;
+	var $element = typeof(selector) === "string" ? $(document).find(selector) : selector;
+	$element.find('.avatar').remove();
+	roomInfo.list.forEach(function reOrderUserList(el) {
+		var userInList = share.getUserFromId(el.userId);
+		if(clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]){
+			avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+		} 
+		$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"><div class="name">' + userInList.name + '</div></div>');
+	});
 }

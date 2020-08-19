@@ -92,15 +92,13 @@ var textChat = (function () {
 		if (!existTextChat.length) {
 			var textChatBox = $('#wrtc_textChatBox').tmpl({
 				headerId: headerId,
-				headTitle: headTitle,
-				userCount: userCount
+				headTitle: headTitle
 			});
 			$('body').append(textChatBox);
 		} else {
 			// TODO: change this to template
 			existTextChat.attr({ "data-id": headerId }).find(".btn_leave").attr({ "data-id": headerId });
 			existTextChat.find(".nd_title b").text(headTitle);
-			existTextChat.find(".userCount").text(userCount);
 		}
 
 		// for animation pop up
@@ -125,8 +123,8 @@ var textChat = (function () {
 		}
 		share.toggleRoomBtnHandler($joinBtn, "LEAVE");
 
-		var $textChatModalUserList = $(document).find("#wrtc_textChatWrapper  #textChatUserModal ul");
-		share.appendUserList(roomInfo, $textChatModalUserList);
+		share.appendUserList(roomInfo, "#wrtc_textChatWrapper  #textChatUserModal ul");
+		share.appendInlineAvatar(roomInfo, "#wrtc_inlineAvatars")l
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -138,11 +136,8 @@ var textChat = (function () {
 		$headingRoom.find('.textChatCount').text(userCount);
 		$(".textChatToolbar .textChat").text(userCount);
 
-		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
-		share.appendUserList(roomInfo, $textChatUserList);
-
-		var $textChatModalUserList = $(document).find("#wrtc_textChatWrapper  #textChatUserModal ul");
-		share.appendUserList(roomInfo, $textChatModalUserList);
+		share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.textChat ul'));
+		share.appendUserList(roomInfo,"#wrtc_textChatWrapper  #textChatUserModal ul");
 
 		var user = share.getUserFromId(data.userId);
 
@@ -186,10 +181,11 @@ var textChat = (function () {
 		$(".textChatToolbar .textChat").text(userCount);
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
-		var $textChatModalUserList = $(document).find("#wrtc_textChatWrapper #textChatUserModal ul");
 
 		share.appendUserList(roomInfo, $textChatUserList);
-		share.appendUserList(roomInfo, $textChatModalUserList);
+		share.appendUserList(roomInfo, "#wrtc_textChatWrapper #textChatUserModal ul");
+
+		share.appendInlineAvatar(roomInfo, "#wrtc_inlineAvatars");
 
 		if (userCount === 0) {
 			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text"><b>text-chat</b></button></li>');
