@@ -91,7 +91,7 @@ exports.toggleRoomBtnHandler = function toggleRoomBtnHandler($joinLeaveBtn, acti
 	// 		exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='chatRoom']").attr({"data-action": "JOIN"});
 	// 	}
 	// }
-}
+};
 
 exports.roomBoxIconActive = function roomBoxIconActive() {
 	exports.$body_ace_outer().find(".wbrtc_roomBox").each(function (index, val) {
@@ -107,27 +107,26 @@ exports.roomBoxIconActive = function roomBoxIconActive() {
 
 exports.appendUserList = function appendUserList(roomInfo, selector) {
 	if (!roomInfo.list) return true;
-	var $element = typeof(selector) === "string" ? $(document).find(selector) : selector;
+	var $element = typeof selector === "string" ? $(document).find(selector) : selector;
 	$element.find('li').remove();
 	roomInfo.list.forEach(function reOrderUserList(el) {
 		var userInList = share.getUserFromId(el.userId);
-		if(clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]){
+		if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
 			avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
-		} 
+		}
 		$element.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'><div class='avatar'><img src='" + avatarUrl + "'></div>" + userInList.name + '</li>');
 	});
-	
-}
+};
 
 exports.appendInlineAvatar = function appendInlineAvatar(roomInfo, selector) {
 	if (!roomInfo.list) return true;
-	var $element = typeof(selector) === "string" ? $(document).find(selector) : selector;
+	var $element = typeof selector === "string" ? $(document).find(selector) : selector;
 	$element.find('.avatar').remove();
 	roomInfo.list.forEach(function reOrderUserList(el) {
 		var userInList = share.getUserFromId(el.userId);
-		if(clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]){
+		if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
 			avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
-		} 
+		}
 		$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"><div class="name">' + userInList.name + '</div></div>');
 	});
-}
+};

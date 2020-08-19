@@ -60,7 +60,6 @@ var WRTC_Room = (function () {
 		actions = $(this).attr('data-action') || actions;
 		target = $(this).attr('data-join') || target;
 
-
 		if (!headerId || !target) return true;
 
 		var $joinBtn = $(this);

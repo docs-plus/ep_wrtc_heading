@@ -124,7 +124,7 @@ var textChat = (function () {
 		share.toggleRoomBtnHandler($joinBtn, "LEAVE");
 
 		share.appendUserList(roomInfo, "#wrtc_textChatWrapper  #textChatUserModal ul");
-		share.appendInlineAvatar(roomInfo, "#wrtc_inlineAvatars")l
+		share.appendInlineAvatar(roomInfo, "#wrtc_inlineAvatars");
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -137,7 +137,7 @@ var textChat = (function () {
 		$(".textChatToolbar .textChat").text(userCount);
 
 		share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.textChat ul'));
-		share.appendUserList(roomInfo,"#wrtc_textChatWrapper  #textChatUserModal ul");
+		share.appendUserList(roomInfo, "#wrtc_textChatWrapper  #textChatUserModal ul");
 
 		var user = share.getUserFromId(data.userId);
 
