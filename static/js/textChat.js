@@ -1,10 +1,15 @@
 'use strict';
+var share = require("ep_wrtc_heading/static/js/clientShare");
 
 var textChat = (function () {
 	var socket = null;
 	var padId = null;
 	var currentRoom = {};
 	var $joinBtn = null;
+
+	share.wrtcPubsub.on("Join the text chat", function() {
+
+	})
 
 	function createAndAppendMessage(msg) {
 		if (!msg) return true;
@@ -70,7 +75,7 @@ var textChat = (function () {
 		});
 	}
 
-	function deactivateModal(headerId) {
+	function deactivateModal(headerId, roomInfo) {
 		var $TextChatWrapper = $(document).find("#wrtc_textChatWrapper");
 
 		$TextChatWrapper.removeClass('active').removeAttr('style');
@@ -82,7 +87,7 @@ var textChat = (function () {
 		$btn.find('.fa_arrow-from-top').toggle();
 		$btn.find('.fa_arrow-to-top').toggle();
 
-		share.toggleRoomBtnHandler($joinBtn, "JOIN");
+		// share.toggleRoomBtnHandler($joinBtn, "JOIN", headerId);
 	}
 
 	function activateModal(headerId, headTitle, userCount, roomInfo) {
@@ -118,13 +123,14 @@ var textChat = (function () {
 			});
 		});
 
-		if ($joinBtn && $joinBtn.length && !$joinBtn.targetPlus) {
-			$joinBtn.prop('disabled', false);
-		}
-		share.toggleRoomBtnHandler($joinBtn, "LEAVE");
+		// state managment
+		// if ($joinBtn && $joinBtn.length && !$joinBtn.targetPlus) {
+		// 	$joinBtn.prop('disabled', false);
+		// }
+
+		// share.toggleRoomBtnHandler($joinBtn, "LEAVE");
 
 		share.appendUserList(roomInfo, "#wrtc_textChatWrapper  #textChatUserModal ul");
-		share.appendInlineAvatar(roomInfo, "#wrtc_inlineAvatars");
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -134,7 +140,6 @@ var textChat = (function () {
 		var headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
-		$(".textChatToolbar .textChat").text(userCount);
 
 		share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.textChat ul'));
 		share.appendUserList(roomInfo, "#wrtc_textChatWrapper  #textChatUserModal ul");
@@ -169,6 +174,12 @@ var textChat = (function () {
 			share.roomBoxIconActive();
 			activateModal(headerId, headTitle, userCount, roomInfo);
 		}
+
+
+		share.wrtcPubsub.emit("update store", data, headerId, 'JOIN', 'TEXT', roomInfo, function(data) {
+		})
+
+		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
 	}
 
 	function removeUserFromRoom(data, roomInfo, target, cb) {
@@ -178,17 +189,15 @@ var textChat = (function () {
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
-		$(".textChatToolbar .textChat").text(userCount);
 
 		var $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
 		share.appendUserList(roomInfo, $textChatUserList);
 		share.appendUserList(roomInfo, "#wrtc_textChatWrapper #textChatUserModal ul");
 
-		share.appendInlineAvatar(roomInfo, "#wrtc_inlineAvatars");
 
 		if (userCount === 0) {
-			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="text"><b>text-chat</b></button></li>');
+			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="TEXT"><b>text-chat</b></button></li>');
 		}
 
 		// remove the text-chat notification
@@ -198,8 +207,14 @@ var textChat = (function () {
 			$headingRoom.removeAttr('data-text');
 			share.roomBoxIconActive();
 			currentRoom = {};
-			deactivateModal(data.headId);
+			deactivateModal(data.headerId, roomInfo);
 		}
+
+		share.wrtcPubsub.emit("update store", data, headerId, 'LEAVE', 'TEXT', roomInfo, function(data) {
+		})
+
+		share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn)
+
 		if (cb && typeof cb === 'function') cb();
 	}
 
@@ -208,7 +223,8 @@ var textChat = (function () {
 
 		// check if user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
-			if ($joinBtn && $joinBtn.length) $joinBtn.prop('disabled', false);
+			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
+			// if ($joinBtn && $joinBtn.length) $joinBtn.prop('disabled', false);
 			return false;
 		}
 

@@ -48,7 +48,7 @@ var EPwrtcHeading = (function () {
 		// insert wbrtc containers
 		var $target = outerBody;
 		if ($target.find('#wbrtc_chatBox').length) return false;
-		$target.prepend('<div id="wbrtc_chatBox"></div>');
+		$target.prepend('<div id="wbrtc_chatBox"></div><div id="wbrtc_avatarCol"></div>');
 
 		// module settings
 		$('#options-wrtc-heading').on('change', function () {

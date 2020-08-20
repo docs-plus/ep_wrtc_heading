@@ -1,4 +1,5 @@
 'use strict';
+var share = require("ep_wrtc_heading/static/js/clientShare");
 
 var videoChat = (function () {
 	var socket = null;
@@ -57,10 +58,9 @@ var videoChat = (function () {
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.videoChatCount').text(userCount);
-		$('#werc_toolbar .nd_title .nd_count').text(userCount);
 
 		if (userCount === 0) {
-			$videoChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="video"><b>video-chat</b></button></li>');
+			$videoChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="VIDEO"><b>video-chat</b></button></li>');
 		}
 
 		// remove the text-chat notification
@@ -80,9 +80,15 @@ var videoChat = (function () {
 			}).attr({ 'data-active': false });
 
 			stopStreaming(localStream);
-			share.toggleRoomBtnHandler($joinBtn, "JOIN");
+			// share.toggleRoomBtnHandler($joinBtn, "JOIN");
 		}
+
 		if (cb && typeof cb === 'function') cb();
+
+		share.wrtcPubsub.emit("update store",data, headerId, 'LEAVE', 'VIDEO', roomInfo, function(data) {
+		})
+
+		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -101,8 +107,6 @@ var videoChat = (function () {
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.videoChatCount').text(userCount);
-
-		$('#werc_toolbar .nd_title .nd_count').text(userCount);
 
 		$(document).find("#wrtc_textChatWrapper .textChatToolbar .userCount").text(userCount);
 
@@ -150,20 +154,28 @@ var videoChat = (function () {
 				'opacity': 1
 			}).attr({ 'data-active': true });
 
-			if ($joinBtn && $joinBtn.length) {
-				$joinBtn.prop('disabled', false);
-			}
-			share.toggleRoomBtnHandler($joinBtn, "LEAVE");
+			// if ($joinBtn && $joinBtn.length) {
+			// 	$joinBtn.prop('disabled', false);
+			// }
+			// share.toggleRoomBtnHandler($joinBtn, "LEAVE");
 		}
+
+
+		share.wrtcPubsub.emit("update store",data, headerId, 'JOIN', 'VIDEO', roomInfo, function(data) {
+		})
+
+		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
+
 	}
 
 	function userJoin(headerId, data, $joinButton) {
 		$joinBtn = $joinButton;
-		$joinBtn.prop('disabled', true);
+		// $joinBtn.prop('disabled', true);
 
 		// check if has user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
-			if ($joinBtn.length) $joinBtn.prop('disabled', false);
+			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
+			// if ($joinBtn.length) $joinBtn.prop('disabled', false);
 			return false;
 		}
 

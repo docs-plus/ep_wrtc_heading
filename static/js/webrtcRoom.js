@@ -39,14 +39,14 @@ var WRTC_Room = (function () {
 		});
 	}
 
-	function joinChatRoom(headerId, userInfo, $joinBtn) {
-		textChat.userJoin(headerId, userInfo, $joinBtn);
-		videoChat.userJoin(headerId, userInfo, $joinBtn);
+	function joinChatRoom(headerId, userInfo, target) {
+		textChat.userJoin(headerId, userInfo, 'TEXTPLUS');
+		videoChat.userJoin(headerId, userInfo, 'PLUS');
 	}
 
-	function leaveChatRoom(headerId, userInfo, $joinBtn) {
-		textChat.userLeave(headerId, userInfo, $joinBtn);
-		videoChat.userLeave(headerId, userInfo, $joinBtn);
+	function leaveChatRoom(headerId, userInfo, target) {
+		textChat.userLeave(headerId, userInfo, 'TEXTPLUS');
+		videoChat.userLeave(headerId, userInfo, 'PLUS');
 	}
 
 	/**
@@ -72,32 +72,34 @@ var WRTC_Room = (function () {
 			'target': target
 		};
 
+		share.wrtcPubsub.emit("disable room buttons", headerId, actions, target)
+
 		if (actions === 'JOIN') {
-			if ($joinBtn.length) $joinBtn.prop('disabled', true);
+			// if ($joinBtn.length) $joinBtn.prop('disabled', true);
 
 			switch (target) {
-				case 'chatRoom':
+				case 'PLUS':
 					$joinBtn.targetPlus = true;
 					// share.$body_ace_outer().find(".btn_joinChat_chatRoom[data-id='" + headerId + "'] , .btn_joinChat_video[data-id='" + headerId + "'], .btn_joinChat_text[data-id='" + headerId + "']").prop('disabled', true);
-					joinChatRoom(headerId, userInfo, $joinBtn);
+					joinChatRoom(headerId, userInfo, target);
 					break;
-				case 'video':
-					videoChat.userJoin(headerId, userInfo, $joinBtn);
+				case 'VIDEO':
+					videoChat.userJoin(headerId, userInfo, target);
 					break;
-				case 'text':
-					textChat.userJoin(headerId, userInfo, $joinBtn);
+				case 'TEXT':
+					textChat.userJoin(headerId, userInfo, target);
 					break;
 			}
 		} else if (actions === 'LEAVE') {
 			switch (target) {
-				case 'chatRoom':
-					leaveChatRoom(headerId, userInfo, $joinBtn);
+				case 'PLUS':
+					leaveChatRoom(headerId, userInfo, target);
 					break;
-				case 'video':
-					videoChat.userLeave(headerId, userInfo, $joinBtn);
+				case 'VIDEO':
+					videoChat.userLeave(headerId, userInfo, target);
 					break;
-				case 'text':
-					textChat.userLeave(headerId, userInfo, $joinBtn);
+				case 'TEXT':
+					textChat.userLeave(headerId, userInfo, target);
 					break;
 			}
 		}
@@ -113,7 +115,7 @@ var WRTC_Room = (function () {
 			scroll2Header(headerId);
 		}
 		if (join === 'true') {
-			if (target === 'plus') target = 'chatRoom';
+			target = target.toUpperCase()
 			roomBtnHandler('JOIN', headerId, target);
 		}
 	}
@@ -255,7 +257,7 @@ var WRTC_Room = (function () {
 			var $padOuter = share.$body_ace_outer();
 			if (!$padOuter) return;
 
-			$padOuter.find('.wbrtc_roomBox').each(function adjustHeaderIconPosition() {
+			$padOuter.find('.wbrtc_roomBox, .wrtc_roomInlineAvatar ').each(function adjustHeaderIconPosition() {
 				var $el = $(this);
 				var $boxId = $el.attr('id');
 				var hClassId = 'headingTagId_' + $boxId;
@@ -299,12 +301,18 @@ var WRTC_Room = (function () {
 					'videoChatLimit': VIDEOCHATLIMIT
 				};
 
+				if(!share.wrtcStore[data.headingTagId]) share.wrtcStore[data.headingTagId] = {VIDEO: {list:[]}, TEXT: {list:[]}, USERS: {}};
+
 				// if the header does not exists then adde to list
 				// otherwise update textHeader
 				// TODO: performance issue
 				if (target.find('#' + data.headingTagId).length <= 0) {
 					var box = $('#wertc_roomBox').tmpl(data);
 					target.find('#wbrtc_chatBox').append(box);
+
+					var box = $('#wertc_inlineAvatar').tmpl(data);
+					target.find('#wbrtc_avatarCol').append(box);
+
 					newHTagAdded = true;
 				} else {
 					$(document).find('[data-headid=' + data.headingTagId + '].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-id=' + data.headingTagId + ']').text(data.headTitle);
@@ -315,7 +323,7 @@ var WRTC_Room = (function () {
 				hTagList.push(data);
 			});
 
-			clientVars.plugins.plugins.ep_wrtc_heading_room = hTagList;
+			// clientVars.plugins.plugins.ep_wrtc_heading_room = hTagList;
 
 			// if a new h tag addedd check all heading again!
 			if (newHTagAdded) {

@@ -71,7 +71,9 @@ exports.notifyNewUserJoined = function notifyNewUserJoined(target, msg) {
 	addTextChatMessage(msg);
 };
 
-exports.toggleRoomBtnHandler = function toggleRoomBtnHandler($joinLeaveBtn, action) {
+exports.toggleRoomBtnHandler = function toggleRoomBtnHandler($joinLeaveBtn, action, headerId) {
+	
+
 	// var join = $joinLeaveBtn.attr("data-join");
 	// var headerId = $joinLeaveBtn.attr("data-id");
 	// var $btnText = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='text']")
@@ -118,15 +120,167 @@ exports.appendUserList = function appendUserList(roomInfo, selector) {
 	});
 };
 
-exports.appendInlineAvatar = function appendInlineAvatar(roomInfo, selector) {
-	if (!roomInfo.list) return true;
-	var $element = typeof selector === "string" ? $(document).find(selector) : selector;
-	$element.find('.avatar').remove();
-	roomInfo.list.forEach(function reOrderUserList(el) {
-		var userInList = share.getUserFromId(el.userId);
-		if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
-			avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+// exports.appendInlineAvatar = function appendInlineAvatar(roomInfo, selector) {
+// 	if (!roomInfo.list) return true;
+// 	var $element = typeof selector === "string" ? $(document).find(selector) : selector;
+// 	$element.find('.avatar').remove();
+// 	roomInfo.list.forEach(function reOrderUserList(el) {
+// 		var userInList = share.getUserFromId(el.userId);
+// 		if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
+// 			avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+// 		}
+// 		$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"><div class="name">' + userInList.name + '</div></div>');
+// 	});
+// };
+
+exports.wrtcStore = {}
+
+exports.wrtcPubsub = {
+	events: {},
+	on: function (eventName, fn) {
+		this.events[eventName] = this.events[eventName] || [];
+		this.events[eventName].push(fn);
+	},
+	off: function (eventName, fn) {
+		if (this.events[eventName]) {
+			for (var i = 0; i < this.events[eventName].length; i++) {
+				if (this.events[eventName][i] === fn) {
+					this.events[eventName].splice(i, 1);
+					break;
+				}
+			};
 		}
-		$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"><div class="name">' + userInList.name + '</div></div>');
-	});
+	},
+	emit: function (eventName, ...data) {
+		if (this.events[eventName]) {
+			this.events[eventName].forEach(function (fn) {
+				fn(...data);
+			});
+		}
+	}
 };
+
+exports.wrtcPubsub.on("update store", function(requestUser, headerId, action, target, roomInfo, callback) {
+	// console.log(!requestUser || headerId, action, target, roomInfo)
+
+	if (!requestUser || !headerId || !action || !roomInfo || !target) return false
+	var users = exports.wrtcStore[headerId].USERS
+
+	if(action === "JOIN"){
+		exports.wrtcStore[headerId][target] = roomInfo
+	}
+
+	if(action === "LEAVE"){
+		exports.wrtcStore[headerId][target] = roomInfo
+	}
+
+	// remove all users
+	users = {}
+
+	exports.wrtcStore[headerId]["TEXT"].list.forEach(function(el) {
+		if(!users[el.userId]) users[el.userId] = {}
+		users[el.userId] = el
+	})
+
+	exports.wrtcStore[headerId]["VIDEO"].list.forEach(function(el) {
+		if(!users[el.userId]) users[el.userId] = {}
+		users[el.userId] = el
+	})
+
+
+	inlineAvatar[target](headerId, exports.wrtcStore[headerId][target])
+	inlineAvatar["ROOM"](headerId, users)
+
+	if(callback) callback(exports.wrtcStore[headerId])
+
+
+})
+
+exports.wrtcPubsub.on("disable room buttons", function(headerId, actions, target) {
+	console.log(headerId, actions, target, "disable room buttons")
+	var $headingRoom = exports.$body_ace_outer().find('#' + headerId);
+
+	if(target === "TEXT" || target === "VIDEO"){
+		// disable target and plus buttton
+		$headingRoom.find('.btn_icon[data-join="'+ target +'"]').prop('disabled', true);
+		$headingRoom.find('.btn_icon[data-join="PLUS"]').prop('disabled', true);
+	}
+
+	if(target === "PLUS"){
+		// disable all buttons
+		$headingRoom.find('.btn_icon[data-join="TEXT"]').prop('disabled', true);
+		$headingRoom.find('.btn_icon[data-join="VIDEO"]').prop('disabled', true);
+		$headingRoom.find('.btn_icon[data-join="PLUS"]').prop('disabled', true);
+	}
+
+
+
+	// $headingRoom.find(".btn_joinChat_chatRoom[data-id='" + headerId + "'] , .btn_joinChat_video[data-id='" + headerId + "'], .btn_joinChat_text[data-id='" + headerId + "']").prop('disabled', true);
+})
+
+exports.wrtcPubsub.on("enable room buttons", function(headerId, actions, target) {
+	console.log(headerId, actions, target, "enable room buttons")
+	var $headingRoom = exports.$body_ace_outer().find('#' + headerId);
+
+	if(target === "TEXT" || target === "VIDEO"){
+		// enable target and plus buttton
+		$headingRoom.find('.btn_icon[data-join="'+ target +'"]').prop('disabled', false);
+		$headingRoom.find('.btn_icon[data-join="PLUS"]').prop('disabled', false);
+	}
+
+	if(target === "TEXTPLUS"){
+		//enable text button
+		$headingRoom.find('.btn_icon[data-join="TEXT"]').prop('disabled', false);
+	}
+
+	if(target === "PLUS"){
+		// enable all buttons
+		$headingRoom.find('.btn_icon[data-join="TEXT"]').prop('disabled', false);
+		$headingRoom.find('.btn_icon[data-join="VIDEO"]').prop('disabled', false);
+		$headingRoom.find('.btn_icon[data-join="PLUS"]').prop('disabled', false);
+	}
+
+
+	// $headingRoom.find(".btn_joinChat_chatRoom[data-id='" + headerId + "'] , .btn_joinChat_video[data-id='" + headerId + "'], .btn_joinChat_text[data-id='" + headerId + "']").prop('disabled', false);
+})
+
+
+
+var inlineAvatar = {
+	"ROOM": function ROOM (headerId, room) {
+		var $element= exports.$body_ace_outer().find("#wbrtc_avatarCol ."+ headerId + ' .wrtc_inlineAvatars')
+		$element.find('.avatar').remove();
+		Object.keys(room).forEach(function reOrderUserList(key) {
+			var userInList = share.getUserFromId(room[key].userId);
+			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
+				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+			}
+			$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+		});
+	},
+	"TEXT": function TEXT (headerId, room) {
+		var $element = $(document).find("#wrtc_textChatWrapper .wrtc_inlineAvatars");
+		$element.find('.avatar').remove();
+		room.list.forEach(function reOrderUserList(el) {
+			var userInList = share.getUserFromId(el.userId);
+			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
+				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+			}
+			$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+		});
+	},
+	"VIDEO": function VIDEO (headerId, room) {
+		var $element = $(document).find("#werc_toolbar .wrtc_inlineAvatars");
+		$element.find('.avatar').remove();
+		room.list.forEach(function reOrderUserList(el) {
+			var userInList = share.getUserFromId(el.userId);
+			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
+				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+			}
+			$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+		});
+	}
+}
+
+
+/* Helper */

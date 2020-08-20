@@ -534,7 +534,7 @@
 }
 
 .wrtc_box .wrtc_contentBody .wrtc_content li .avatar,
-#wrtc_inlineAvatars .avatar {
+.wrtc_inlineAvatars .avatar {
 	width: 24px;
 	border: 2px solid #ddd;
 	height: 24px;
@@ -545,7 +545,7 @@
 }
 
 .wrtc_box .wrtc_contentBody .wrtc_content li .avatar img,
-#wrtc_inlineAvatars .avatar img{
+.wrtc_inlineAvatars .avatar img{
 	width: auto;
 	height: 100%;
 }
@@ -561,7 +561,7 @@
 }
 
 /* inline avater*/
-#wrtc_inlineAvatars{
+.wrtc_inlineAvatars{
 	display: flex;
 	flex-direction: row;
 	margin: 0 8px 0 0;
@@ -569,7 +569,7 @@
 	max-width: 220px;
 }
 
-#wrtc_inlineAvatars > .avatar {
+.wrtc_inlineAvatars > .avatar {
 	float:left;
 	margin: 0 0 0 -8px;
 	position: relative;
@@ -578,30 +578,22 @@
 	display: flex;
 	flex-direction: row;
 }
-#wrtc_inlineAvatars > .avatar img{
+.wrtc_inlineAvatars > .avatar img{
 	float: left;
 }
-#wrtc_inlineAvatars:first-child{
+.wrtc_inlineAvatars:first-child{
 	margin: 0;
 }
-
-#wrtc_inlineAvatars > .avatar:hover{
+.wrtc_inlineAvatars > .avatar:hover{
 	border-color: #2678ff;
 	z-index: 1;
-	border-radius: 4px;
-	width: 124px;
-}
-#wrtc_inlineAvatars > .avatar:hover .name{
-	display: block;
+	
 }
 
-#wrtc_inlineAvatars > .avatar .name{
-	display: none;
-	float: left;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	overflow: hidden;
-	width: 100;
-	margin-left:5px
+#chatbox{
+	display: none!important;
 }
 
+#editorcontainer, #editorcontainer > iframe{
+	padding: 0!important;
+}
