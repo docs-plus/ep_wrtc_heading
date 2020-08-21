@@ -1,7 +1,7 @@
 {
 	"name": "ep_wrtc_heading",
 	"description": "Video Headings Plugin for Etherpad",
-	"version": "0.21.3",
+	"version": "0.22.0",
 	"author": {
 		"name": "Hossein Marzban",
 		"email": "marzban98@gmail.com"
