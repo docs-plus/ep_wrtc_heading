@@ -80,15 +80,13 @@ var videoChat = (function () {
 			}).attr({ 'data-active': false });
 
 			stopStreaming(localStream);
-			// share.toggleRoomBtnHandler($joinBtn, "JOIN");
 		}
 
 		if (cb && typeof cb === 'function') cb();
 
-		share.wrtcPubsub.emit("update store",data, headerId, 'LEAVE', 'VIDEO', roomInfo, function(data) {
-		})
+		share.wrtcPubsub.emit("update store",data, headerId, 'LEAVE', 'VIDEO', roomInfo, function(data) {})
 
-		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
+	share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn);
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -154,10 +152,6 @@ var videoChat = (function () {
 				'opacity': 1
 			}).attr({ 'data-active': true });
 
-			// if ($joinBtn && $joinBtn.length) {
-			// 	$joinBtn.prop('disabled', false);
-			// }
-			// share.toggleRoomBtnHandler($joinBtn, "LEAVE");
 		}
 
 
@@ -165,17 +159,14 @@ var videoChat = (function () {
 		})
 
 		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
-
 	}
 
 	function userJoin(headerId, data, $joinButton) {
 		$joinBtn = $joinButton;
-		// $joinBtn.prop('disabled', true);
 
 		// check if has user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
 			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
-			// if ($joinBtn.length) $joinBtn.prop('disabled', false);
 			return false;
 		}
 

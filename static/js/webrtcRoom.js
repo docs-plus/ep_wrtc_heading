@@ -75,12 +75,9 @@ var WRTC_Room = (function () {
 		share.wrtcPubsub.emit("disable room buttons", headerId, actions, target)
 
 		if (actions === 'JOIN') {
-			// if ($joinBtn.length) $joinBtn.prop('disabled', true);
-
 			switch (target) {
 				case 'PLUS':
 					$joinBtn.targetPlus = true;
-					// share.$body_ace_outer().find(".btn_joinChat_chatRoom[data-id='" + headerId + "'] , .btn_joinChat_video[data-id='" + headerId + "'], .btn_joinChat_text[data-id='" + headerId + "']").prop('disabled', true);
 					joinChatRoom(headerId, userInfo, target);
 					break;
 				case 'VIDEO':

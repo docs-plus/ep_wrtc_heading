@@ -7,10 +7,6 @@ var textChat = (function () {
 	var currentRoom = {};
 	var $joinBtn = null;
 
-	share.wrtcPubsub.on("Join the text chat", function() {
-
-	})
-
 	function createAndAppendMessage(msg) {
 		if (!msg) return true;
 
@@ -87,7 +83,6 @@ var textChat = (function () {
 		$btn.find('.fa_arrow-from-top').toggle();
 		$btn.find('.fa_arrow-to-top').toggle();
 
-		// share.toggleRoomBtnHandler($joinBtn, "JOIN", headerId);
 	}
 
 	function activateModal(headerId, headTitle, userCount, roomInfo) {
@@ -122,13 +117,6 @@ var textChat = (function () {
 				createAndAppendMessage(el);
 			});
 		});
-
-		// state managment
-		// if ($joinBtn && $joinBtn.length && !$joinBtn.targetPlus) {
-		// 	$joinBtn.prop('disabled', false);
-		// }
-
-		// share.toggleRoomBtnHandler($joinBtn, "LEAVE");
 
 		share.appendUserList(roomInfo, "#wrtc_textChatWrapper  #textChatUserModal ul");
 	}
@@ -175,9 +163,7 @@ var textChat = (function () {
 			activateModal(headerId, headTitle, userCount, roomInfo);
 		}
 
-
-		share.wrtcPubsub.emit("update store", data, headerId, 'JOIN', 'TEXT', roomInfo, function(data) {
-		})
+		share.wrtcPubsub.emit("update store", data, headerId, 'JOIN', 'TEXT', roomInfo, function(data) {})
 
 		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
 	}
@@ -224,7 +210,6 @@ var textChat = (function () {
 		// check if user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
 			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
-			// if ($joinBtn && $joinBtn.length) $joinBtn.prop('disabled', false);
 			return false;
 		}
 

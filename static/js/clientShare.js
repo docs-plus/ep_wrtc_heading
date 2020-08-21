@@ -71,30 +71,6 @@ exports.notifyNewUserJoined = function notifyNewUserJoined(target, msg) {
 	addTextChatMessage(msg);
 };
 
-exports.toggleRoomBtnHandler = function toggleRoomBtnHandler($joinLeaveBtn, action, headerId) {
-	
-
-	// var join = $joinLeaveBtn.attr("data-join");
-	// var headerId = $joinLeaveBtn.attr("data-id");
-	// var $btnText = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='text']")
-	// var $btnVideo = exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='video']")
-
-	// $joinLeaveBtn.attr({"data-action": action});
-
-	// if(join === "chatRoom"){
-	// 	$btnVideo.prop('disabled', false)
-	// 	$btnText.prop('disabled', false)
-	// 	$btnText.attr({"data-action": action});
-	// 	$btnVideo.attr({"data-action": action});
-	// } else {
-	// 	if($btnText.attr("data-action") === "LEAVE" || $btnVideo.attr("data-action") === "LEAVE") {
-	// 		exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='chatRoom']").attr({"data-action": "LEAVE"});
-	// 	}else {
-	// 		exports.$body_ace_outer().find(".wbrtc_roomBox." + headerId + " [data-join='chatRoom']").attr({"data-action": "JOIN"});
-	// 	}
-	// }
-};
-
 exports.roomBoxIconActive = function roomBoxIconActive() {
 	exports.$body_ace_outer().find(".wbrtc_roomBox").each(function (index, val) {
 		var textActive = $(val).attr("data-text");
@@ -119,19 +95,6 @@ exports.appendUserList = function appendUserList(roomInfo, selector) {
 		$element.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'><div class='avatar'><img src='" + avatarUrl + "'></div>" + userInList.name + '</li>');
 	});
 };
-
-// exports.appendInlineAvatar = function appendInlineAvatar(roomInfo, selector) {
-// 	if (!roomInfo.list) return true;
-// 	var $element = typeof selector === "string" ? $(document).find(selector) : selector;
-// 	$element.find('.avatar').remove();
-// 	roomInfo.list.forEach(function reOrderUserList(el) {
-// 		var userInList = share.getUserFromId(el.userId);
-// 		if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
-// 			avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
-// 		}
-// 		$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"><div class="name">' + userInList.name + '</div></div>');
-// 	});
-// };
 
 exports.wrtcStore = {}
 
@@ -161,90 +124,82 @@ exports.wrtcPubsub = {
 };
 
 exports.wrtcPubsub.on("update store", function(requestUser, headerId, action, target, roomInfo, callback) {
-	// console.log(!requestUser || headerId, action, target, roomInfo)
-
-	if (!requestUser || !headerId || !action || !roomInfo || !target) return false
-	var users = exports.wrtcStore[headerId].USERS
-
-	if(action === "JOIN"){
-		exports.wrtcStore[headerId][target] = roomInfo
-	}
-
-	if(action === "LEAVE"){
-		exports.wrtcStore[headerId][target] = roomInfo
-	}
-
+	if (!requestUser || !headerId || !action || !roomInfo || !target) return false;
+	var users = exports.wrtcStore[headerId].USERS;
+	exports.wrtcStore[headerId][target] = roomInfo;
+	// if(action === "JOIN"){}
+	// if(action === "LEAVE"){}
 	// remove all users
 	users = {}
 
 	exports.wrtcStore[headerId]["TEXT"].list.forEach(function(el) {
-		if(!users[el.userId]) users[el.userId] = {}
-		users[el.userId] = el
+		if(!users[el.userId]) users[el.userId] = {};
+		users[el.userId] = el;
 	})
 
 	exports.wrtcStore[headerId]["VIDEO"].list.forEach(function(el) {
-		if(!users[el.userId]) users[el.userId] = {}
-		users[el.userId] = el
+		if(!users[el.userId]) users[el.userId] = {};
+		users[el.userId] = el;
 	})
 
 
-	inlineAvatar[target](headerId, exports.wrtcStore[headerId][target])
-	inlineAvatar["ROOM"](headerId, users)
+	inlineAvatar[target](headerId, exports.wrtcStore[headerId][target]);
+	inlineAvatar["ROOM"](headerId, users);
 
-	if(callback) callback(exports.wrtcStore[headerId])
-
-
+	if(callback) callback(exports.wrtcStore[headerId]);
 })
 
 exports.wrtcPubsub.on("disable room buttons", function(headerId, actions, target) {
-	console.log(headerId, actions, target, "disable room buttons")
 	var $headingRoom = exports.$body_ace_outer().find('#' + headerId);
+
+	var $btnVideo = $headingRoom.find('.btn_icon[data-join="VIDEO"]');
+	var $btnText = $headingRoom.find('.btn_icon[data-join="TEXT"]');
+	var $btnPlus = $headingRoom.find('.btn_icon[data-join="PLUS"]');
 
 	if(target === "TEXT" || target === "VIDEO"){
 		// disable target and plus buttton
 		$headingRoom.find('.btn_icon[data-join="'+ target +'"]').prop('disabled', true);
-		$headingRoom.find('.btn_icon[data-join="PLUS"]').prop('disabled', true);
+		$btnPlus.prop('disabled', true);
 	}
 
 	if(target === "PLUS"){
 		// disable all buttons
-		$headingRoom.find('.btn_icon[data-join="TEXT"]').prop('disabled', true);
-		$headingRoom.find('.btn_icon[data-join="VIDEO"]').prop('disabled', true);
-		$headingRoom.find('.btn_icon[data-join="PLUS"]').prop('disabled', true);
+		$btnText.prop('disabled', true);
+		$btnVideo.prop('disabled', true);
+		$btnPlus.prop('disabled', true);
 	}
-
-
-
-	// $headingRoom.find(".btn_joinChat_chatRoom[data-id='" + headerId + "'] , .btn_joinChat_video[data-id='" + headerId + "'], .btn_joinChat_text[data-id='" + headerId + "']").prop('disabled', true);
 })
 
-exports.wrtcPubsub.on("enable room buttons", function(headerId, actions, target) {
-	console.log(headerId, actions, target, "enable room buttons")
+exports.wrtcPubsub.on("enable room buttons", function(headerId, action, target) {
 	var $headingRoom = exports.$body_ace_outer().find('#' + headerId);
+	var newAction = action === "JOIN" ? "LEAVE" : "JOIN";
+
+	var $btnVideo = $headingRoom.find('.btn_icon[data-join="VIDEO"]');
+	var $btnText = $headingRoom.find('.btn_icon[data-join="TEXT"]');
+	var $btnPlus = $headingRoom.find('.btn_icon[data-join="PLUS"]');
 
 	if(target === "TEXT" || target === "VIDEO"){
 		// enable target and plus buttton
-		$headingRoom.find('.btn_icon[data-join="'+ target +'"]').prop('disabled', false);
-		$headingRoom.find('.btn_icon[data-join="PLUS"]').prop('disabled', false);
+		$headingRoom.find('.btn_icon[data-join="'+ target +'"]')
+		.attr({"data-action": newAction})
+		.prop('disabled', false);
+
+		$btnPlus.attr({"data-action": newAction}).prop('disabled', false);
 	}
 
 	if(target === "TEXTPLUS"){
 		//enable text button
-		$headingRoom.find('.btn_icon[data-join="TEXT"]').prop('disabled', false);
+		$btnText.attr({"data-action": newAction}).prop('disabled', false);
+		$btnVideo.attr({"data-action": newAction});
 	}
 
 	if(target === "PLUS"){
-		// enable all buttons
-		$headingRoom.find('.btn_icon[data-join="TEXT"]').prop('disabled', false);
-		$headingRoom.find('.btn_icon[data-join="VIDEO"]').prop('disabled', false);
-		$headingRoom.find('.btn_icon[data-join="PLUS"]').prop('disabled', false);
+		// make enable and action toggle all buttons
+		$btnText.attr({"data-action": newAction}).prop('disabled', false);
+		$btnVideo.attr({"data-action": newAction}).prop('disabled', false);
+		$btnPlus.attr({"data-action": newAction}).prop('disabled', false);
 	}
-
-
-	// $headingRoom.find(".btn_joinChat_chatRoom[data-id='" + headerId + "'] , .btn_joinChat_video[data-id='" + headerId + "'], .btn_joinChat_text[data-id='" + headerId + "']").prop('disabled', false);
 })
-
-
 
 var inlineAvatar = {
 	"ROOM": function ROOM (headerId, room) {
@@ -281,6 +236,5 @@ var inlineAvatar = {
 		});
 	}
 }
-
 
 /* Helper */
