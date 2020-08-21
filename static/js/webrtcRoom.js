@@ -159,7 +159,7 @@ var WRTC_Room = (function () {
 
 		$wbrtc_roomBox.on('click', '.wbrtc_roomBox button.btn_shareRoom', shareRoomsLink);
 
-		$(document).on('click', '#werc_toolbar .btn_leave, .wrtc_text .wrtc_roomLink', roomBtnHandler);
+		$(document).on('click', '#werc_toolbar .btn_leave, #chattext .wrtc_roomLink', roomBtnHandler);
 
 		$(document).on('click', '#wrtc_textChatWrapper .btn_leave', roomBtnHandler);
 

@@ -317,13 +317,16 @@
 	cursor: pointer;
 }
 
-.wrtc_text .videoIcon, .wrtc_text .textIcon{
+.wrtc_text .videoIcon, .wrtc_text .textIcon,
+#wrtc_textChat .textIcon{
 	width: 16px;
 	display: inline-block;
 	margin: 0 2px 0 6px;
 	height: 17px;
 }
-.wrtc_text .videoIcon svg, .wrtc_text .textIcon svg {display: inline-block;margin-bottom: -2px;}
+.wrtc_text .videoIcon svg, 
+.wrtc_text .textIcon svg,
+#wrtc_textChat .textIcon svg {display: inline-block;margin-bottom: -2px;}
 
 /*=== wrtc_settings ===*/
 
@@ -590,10 +593,10 @@
 	
 }
 
-#chatbox{
+/* #chatbox{
 	display: none!important;
 }
 
 #editorcontainer, #editorcontainer > iframe{
 	padding: 0!important;
-}
+} */

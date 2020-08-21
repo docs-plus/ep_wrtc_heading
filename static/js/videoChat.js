@@ -52,6 +52,7 @@ var videoChat = (function () {
 		if (!data || !roomInfo) return false;
 		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
+		var headerTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
 		var $videoChatUserList = $headingRoom.find('.wrtc_content.videoChat ul');
 
 		share.appendUserList(roomInfo, $videoChatUserList);
@@ -63,8 +64,18 @@ var videoChat = (function () {
 			$videoChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="VIDEO"><b>video-chat</b></button></li>');
 		}
 
-		// remove the text-chat notification
-		$(".wrtc_text[data-target='video'][data-authorid='" + data.userId + "'][data-id='" + data.headerId + "']").remove();
+		// notify, a user join the video-chat room
+		var msg = {
+			'time': new Date(),
+			'userId': user.userId,
+			'userName': user.name,
+			'headerId': data.headerId,
+			'userCount': userCount,
+			'headerTitle': headerTitle,
+			'VIDEOCHATLIMIT': VIDEOCHATLIMIT
+		};
+
+		share.notifyNewUserJoined("VIDEO", msg, "LEAVE");
 
 		if (data.userId === clientVars.userId) {
 			$headingRoom.removeAttr('data-video');
@@ -86,7 +97,7 @@ var videoChat = (function () {
 
 		share.wrtcPubsub.emit("update store",data, headerId, 'LEAVE', 'VIDEO', roomInfo, function(data) {})
 
-	share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn);
+		share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn);
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -121,7 +132,7 @@ var videoChat = (function () {
 			'VIDEOCHATLIMIT': VIDEOCHATLIMIT
 		};
 
-		share.notifyNewUserJoined("video", msg);
+		share.notifyNewUserJoined("VIDEO", msg, "JOIN");
 
 		if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
 			$.gritter.add({

@@ -8,7 +8,7 @@ var textChat = (function () {
 	var $joinBtn = null;
 
 	function createAndAppendMessage(msg) {
-		if (!msg) return true;
+		if (!msg || !currentRoom.userId) return true;
 
 		//correct the time
 		// msg.time += window.clientTimeOffset;
@@ -29,6 +29,21 @@ var textChat = (function () {
 		$("#wrtc_textChat").append(message);
 		share.scrollDownToLastChatText("#wrtc_textChat");
 	}
+
+	function privateNotifyNewUserJoined(target, msg, action) {
+
+		var textIcon = '<span class="textIcon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M416 224V64c0-35.3-28.7-64-64-64H64C28.7 0 0 28.7 0 64v160c0 35.3 28.7 64 64 64v54.2c0 8 9.1 12.6 15.5 7.8l82.8-62.1H352c35.3.1 64-28.6 64-63.9zm96-64h-64v64c0 52.9-43.1 96-96 96H192v64c0 35.3 28.7 64 64 64h125.7l82.8 62.1c6.4 4.8 15.5.2 15.5-7.8V448h32c35.3 0 64-28.7 64-64V224c0-35.3-28.7-64-64-64z"></path></svg></span>';
+		var btnJoin = "<span class='wrtc_roomLink' data-join='" + target + "' data-action='JOIN' data-id='" + msg.headerId + "' title='Join'>" + msg.headerTitle + '</span>';
+	
+		var text = action === "JOIN" ? "joins" : "leave";
+	
+		msg.text = '<span>' + text + '</span>' + textIcon + btnJoin;
+	
+		msg.target = target;
+	
+		createAndAppendMessage(msg);
+	};
+
 
 	function eventTextChatInput(e) {
 		var keycode = event.keyCode || event.which;
@@ -143,8 +158,16 @@ var textChat = (function () {
 			'userCount': userCount,
 			'headerTitle': headTitle
 		};
-
-		share.notifyNewUserJoined("text", msg);
+		share.notifyNewUserJoined("TEXT", msg, "JOIN");
+		
+		var privateMsg = { 
+			userName: user.name,
+			author: user.userId,
+			headerTitle: headTitle,
+			time: new Date().getTime()
+		};
+		privateNotifyNewUserJoined("TEXT", privateMsg, "JOIN");
+		
 
 		if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
 			$.gritter.add({
@@ -172,6 +195,8 @@ var textChat = (function () {
 		if (!data) return true;
 		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
+		var headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
+		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
@@ -186,9 +211,27 @@ var textChat = (function () {
 			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="TEXT"><b>text-chat</b></button></li>');
 		}
 
-		// remove the text-chat notification
-		$(".wrtc_text[data-target='text'][data-authorid='" + data.userId + "'][data-id='" + headerId + "']").remove();
+		var user = share.getUserFromId(data.userId);
 
+		// notify, a user join the video-chat room
+		var msg = {
+			'time': new Date(),
+			'userId': user.userId,
+			'userName': user.name,
+			'headerId': data.headerId,
+			'userCount': userCount,
+			'headerTitle': headTitle
+		};
+		share.notifyNewUserJoined("TEXT", msg, "LEAVE");
+
+		var privateMsg = { 
+			userName: user.name,
+			author: user.userId,
+			headerTitle: headTitle,
+			time: new Date().getTime()
+		}
+		privateNotifyNewUserJoined("TEXT", privateMsg, "LEAVE");
+	
 		if (data.userId === clientVars.userId) {
 			$headingRoom.removeAttr('data-text');
 			share.roomBoxIconActive();
