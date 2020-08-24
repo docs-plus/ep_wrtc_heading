@@ -45,7 +45,7 @@
 }
 
 
-.wbrtc_roomBox:hover .wrtc_wrapper{
+.wbrtc_roomBox.active .wrtc_wrapper{
 	display: flex!important;
 }
 
@@ -292,10 +292,14 @@
 	height: 100%;
 }
 
+.wrtc_inlineAvatars .avatarMore{
+	display: none;
+}
+
 .wrtc_inlineAvatars > .avatar:hover, .wrtc_inlineAvatars .avatarMore:hover{
 	border-color: #2678ff;
 	z-index: 1;
-	transform: scale(1.3);
+	transform: scale(1.2);
 }
 
 .wrtc_inlineAvatars .avatarMore:active {

@@ -72,7 +72,7 @@ var WRTC_Room = (function () {
 			'target': target
 		};
 
-		share.wrtcPubsub.emit("disable room buttons", headerId, actions, target)
+		share.wrtcPubsub.emit("disable room buttons", headerId, actions, target);
 
 		if (actions === 'JOIN') {
 			switch (target) {
@@ -112,7 +112,7 @@ var WRTC_Room = (function () {
 			scroll2Header(headerId);
 		}
 		if (join === 'true') {
-			target = target.toUpperCase()
+			target = target.toUpperCase();
 			roomBtnHandler('JOIN', headerId, target);
 		}
 	}
@@ -164,14 +164,24 @@ var WRTC_Room = (function () {
 		$(document).on('click', '#wrtc_textChatWrapper .btn_leave', roomBtnHandler);
 
 		share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function () {
+			$(this).parent().css({ 'overflow': 'initial' });
 			$(this).addClass('active').find('.wrtc_contentBody').css({ 'display': 'block' });
 		}).on('mouseleave', '.wbrtc_roomBox', function () {
+			$(this).parent().css({ 'overflow': 'hidden' });
 			$(this).removeClass('active').find('.wrtc_contentBody').css({ 'display': 'none' });
 		});
 
 		share.$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_share', function () {
 			var headerURI = $(this).find('input').val();
 			link2Clipboard(headerURI);
+		});
+
+		share.$body_ace_outer().on('mouseenter', '.wrtc_roomInlineAvatar .avatar', function () {
+			var id = $(this).parent().parent().attr("id");
+			share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseenter');
+		}).on('mouseleave', '.wrtc_roomInlineAvatar .avatar', function () {
+			var id = $(this).parent().parent().attr("id");
+			share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseleave');
 		});
 
 		$(document).on('click', '#werc_toolbar p, .textChatToolbar b', function () {
@@ -205,7 +215,6 @@ var WRTC_Room = (function () {
 				var user = share.getUserFromId(context.author);
 				if (user) {
 					// sync user info
-					// socket.emit('sync user info', window.pad.getPadId(), user, function(){})
 					share.$body_ace_outer().find(".wrtc_content.textChat ul li[data-id='" + user.userId + "']").css({ 'border-color': user.colorId }).text(user.name);
 					share.$body_ace_outer().find(".wrtc_content.videoChat ul li[data-id='" + user.userId + "']").css({ 'border-color': user.colorId }).text(user.name);
 				}
@@ -298,7 +307,7 @@ var WRTC_Room = (function () {
 					'videoChatLimit': VIDEOCHATLIMIT
 				};
 
-				if(!share.wrtcStore[data.headingTagId]) share.wrtcStore[data.headingTagId] = {VIDEO: {list:[]}, TEXT: {list:[]}, USERS: {}};
+				if (!share.wrtcStore[data.headingTagId]) share.wrtcStore[data.headingTagId] = { VIDEO: { list: [] }, TEXT: { list: [] }, USERS: {} };
 
 				// if the header does not exists then adde to list
 				// otherwise update textHeader

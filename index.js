@@ -38,11 +38,9 @@ exports.socketio = function (hookName, args, cb) {
 
 			if(target === "video"){
 				room = videoChat.socketUserJoin(userData)
-	
 				_.set(socket, 'ndHolder.video', room.data)
 			}else{
 				room = textChat.socketUserJoin(userData)
-
 				_.set(socket, 'ndHolder.text', room.data)
 			}
 
@@ -178,6 +176,7 @@ exports.clientVars = function (hook, context, callback) {
 		webrtc: {
 			version: packageJson.version,
 			videoChatLimit: Config.get("VIDEO_CHAT_LIMIT"),
+			inlineAvatarLimit: Config.get("INLINE_AVATAR_LIMIT"),
 			iceServers: iceServers,
 			enabled: enabled,
 			video: video,

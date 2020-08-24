@@ -64,6 +64,8 @@ var videoChat = (function () {
 			$videoChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="VIDEO"><b>video-chat</b></button></li>');
 		}
 
+		var user = share.getUserFromId(data.userId);
+
 		// notify, a user join the video-chat room
 		var msg = {
 			'time': new Date(),
@@ -95,7 +97,7 @@ var videoChat = (function () {
 
 		if (cb && typeof cb === 'function') cb();
 
-		share.wrtcPubsub.emit("update store",data, headerId, 'LEAVE', 'VIDEO', roomInfo, function(data) {})
+		share.wrtcPubsub.emit("update store", data, headerId, 'LEAVE', 'VIDEO', roomInfo, function (data) {});
 
 		share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn);
 	}
@@ -162,14 +164,11 @@ var videoChat = (function () {
 				'transform': 'translate(-50%, 0)',
 				'opacity': 1
 			}).attr({ 'data-active': true });
-
 		}
 
+		share.wrtcPubsub.emit("update store", data, headerId, 'JOIN', 'VIDEO', roomInfo, function (data) {});
 
-		share.wrtcPubsub.emit("update store",data, headerId, 'JOIN', 'VIDEO', roomInfo, function(data) {
-		})
-
-		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
+		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn);
 	}
 
 	function userJoin(headerId, data, $joinButton) {
@@ -177,7 +176,7 @@ var videoChat = (function () {
 
 		// check if has user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
-			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
+			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn);
 			return false;
 		}
 

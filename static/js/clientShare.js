@@ -98,15 +98,15 @@ exports.appendUserList = function appendUserList(roomInfo, selector) {
 	});
 };
 
-exports.wrtcStore = {}
+exports.wrtcStore = {};
 
 exports.wrtcPubsub = {
 	events: {},
-	on: function (eventName, fn) {
+	on: function on(eventName, fn) {
 		this.events[eventName] = this.events[eventName] || [];
 		this.events[eventName].push(fn);
 	},
-	off: function (eventName, fn) {
+	off: function off(eventName, fn) {
 		if (this.events[eventName]) {
 			for (var i = 0; i < this.events[eventName].length; i++) {
 				if (this.events[eventName][i] === fn) {
@@ -116,63 +116,66 @@ exports.wrtcPubsub = {
 			};
 		}
 	},
-	emit: function (eventName, ...data) {
+	emit: function emit(eventName) {
+		for (var _len = arguments.length, data = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+			data[_key - 1] = arguments[_key];
+		}
+
 		if (this.events[eventName]) {
 			this.events[eventName].forEach(function (fn) {
-				fn(...data);
+				fn.apply(undefined, data);
 			});
 		}
 	}
 };
 
-exports.wrtcPubsub.on("update store", function(requestUser, headerId, action, target, roomInfo, callback) {
+exports.wrtcPubsub.on("update store", function (requestUser, headerId, action, target, roomInfo, callback) {
 	if (!requestUser || !headerId || !action || !roomInfo || !target) return false;
 	var users = exports.wrtcStore[headerId].USERS;
 	exports.wrtcStore[headerId][target] = roomInfo;
 	// if(action === "JOIN"){}
 	// if(action === "LEAVE"){}
 	// remove all users
-	users = {}
+	users = {};
 
-	exports.wrtcStore[headerId]["TEXT"].list.forEach(function(el) {
-		if(!users[el.userId]) users[el.userId] = {};
+	exports.wrtcStore[headerId]["TEXT"].list.forEach(function (el) {
+		if (!users[el.userId]) users[el.userId] = {};
 		users[el.userId] = el;
-	})
+	});
 
-	exports.wrtcStore[headerId]["VIDEO"].list.forEach(function(el) {
-		if(!users[el.userId]) users[el.userId] = {};
+	exports.wrtcStore[headerId]["VIDEO"].list.forEach(function (el) {
+		if (!users[el.userId]) users[el.userId] = {};
 		users[el.userId] = el;
-	})
-
+	});
 
 	inlineAvatar[target](headerId, exports.wrtcStore[headerId][target]);
 	inlineAvatar["ROOM"](headerId, users);
 
-	if(callback) callback(exports.wrtcStore[headerId]);
-})
+	if (callback) callback(exports.wrtcStore[headerId]);
+});
 
-exports.wrtcPubsub.on("disable room buttons", function(headerId, actions, target) {
+exports.wrtcPubsub.on("disable room buttons", function (headerId, actions, target) {
 	var $headingRoom = exports.$body_ace_outer().find('#' + headerId);
 
 	var $btnVideo = $headingRoom.find('.btn_icon[data-join="VIDEO"]');
 	var $btnText = $headingRoom.find('.btn_icon[data-join="TEXT"]');
 	var $btnPlus = $headingRoom.find('.btn_icon[data-join="PLUS"]');
 
-	if(target === "TEXT" || target === "VIDEO"){
+	if (target === "TEXT" || target === "VIDEO") {
 		// disable target and plus buttton
-		$headingRoom.find('.btn_icon[data-join="'+ target +'"]').prop('disabled', true);
+		$headingRoom.find('.btn_icon[data-join="' + target + '"]').prop('disabled', true);
 		$btnPlus.prop('disabled', true);
 	}
 
-	if(target === "PLUS"){
+	if (target === "PLUS") {
 		// disable all buttons
 		$btnText.prop('disabled', true);
 		$btnVideo.prop('disabled', true);
 		$btnPlus.prop('disabled', true);
 	}
-})
+});
 
-exports.wrtcPubsub.on("enable room buttons", function(headerId, action, target) {
+exports.wrtcPubsub.on("enable room buttons", function (headerId, action, target) {
 	var $headingRoom = exports.$body_ace_outer().find('#' + headerId);
 	var newAction = action === "JOIN" ? "LEAVE" : "JOIN";
 
@@ -180,63 +183,71 @@ exports.wrtcPubsub.on("enable room buttons", function(headerId, action, target) 
 	var $btnText = $headingRoom.find('.btn_icon[data-join="TEXT"]');
 	var $btnPlus = $headingRoom.find('.btn_icon[data-join="PLUS"]');
 
-	if(target === "TEXT" || target === "VIDEO"){
+	if (target === "TEXT" || target === "VIDEO") {
 		// enable target and plus buttton
-		$headingRoom.find('.btn_icon[data-join="'+ target +'"]')
-		.attr({"data-action": newAction})
-		.prop('disabled', false);
+		$headingRoom.find('.btn_icon[data-join="' + target + '"]').attr({ "data-action": newAction }).prop('disabled', false);
 
-		$btnPlus.attr({"data-action": newAction}).prop('disabled', false);
+		$btnPlus.attr({ "data-action": newAction }).prop('disabled', false);
 	}
 
-	if(target === "TEXTPLUS"){
+	if (target === "TEXTPLUS") {
 		//enable text button
-		$btnText.attr({"data-action": newAction}).prop('disabled', false);
-		$btnVideo.attr({"data-action": newAction});
+		$btnText.attr({ "data-action": newAction }).prop('disabled', false);
+		$btnVideo.attr({ "data-action": newAction });
 	}
 
-	if(target === "PLUS"){
+	if (target === "PLUS") {
 		// make enable and action toggle all buttons
-		$btnText.attr({"data-action": newAction}).prop('disabled', false);
-		$btnVideo.attr({"data-action": newAction}).prop('disabled', false);
-		$btnPlus.attr({"data-action": newAction}).prop('disabled', false);
+		$btnText.attr({ "data-action": newAction }).prop('disabled', false);
+		$btnVideo.attr({ "data-action": newAction }).prop('disabled', false);
+		$btnPlus.attr({ "data-action": newAction }).prop('disabled', false);
 	}
-})
+});
 
 var inlineAvatar = {
-	"ROOM": function ROOM (headerId, room) {
-		var $element= exports.$body_ace_outer().find("#wbrtc_avatarCol ."+ headerId + ' .wrtc_inlineAvatars')
+	"ROOM": function ROOM(headerId, room) {
+		var inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
+		var $element = exports.$body_ace_outer().find("#wbrtc_avatarCol ." + headerId + ' .wrtc_inlineAvatars');
 		$element.find('.avatar').remove();
-		Object.keys(room).forEach(function reOrderUserList(key) {
+		Object.keys(room).forEach(function reOrderUserList(key, index) {
 			var userInList = share.getUserFromId(room[key].userId);
 			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
 				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
 			}
-			$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+			if (index < inlineAvatarLimit) {
+				$element.find('.avatarMore').hide();
+				$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+			} else {
+				$element.find('.avatarMore').show().text("+" + (index + 1 - inlineAvatarLimit));
+			}
 		});
 	},
-	"TEXT": function TEXT (headerId, room) {
+	"TEXT": function TEXT(headerId, room) {
+		var inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
 		var $element = $(document).find("#wrtc_textChatWrapper .wrtc_inlineAvatars");
 		$element.find('.avatar').remove();
-		room.list.forEach(function reOrderUserList(el) {
-			var userInList = share.getUserFromId(el.userId);
-			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
-				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
-			}
-			$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
-		});
+		this.append(room.list, $element);
 	},
-	"VIDEO": function VIDEO (headerId, room) {
+	"VIDEO": function VIDEO(headerId, room) {
 		var $element = $(document).find("#werc_toolbar .wrtc_inlineAvatars");
 		$element.find('.avatar').remove();
-		room.list.forEach(function reOrderUserList(el) {
+		this.append(room.list, $element);
+	},
+	append: function appendAvatart(list, $element) {
+		var inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
+		list.forEach(function reOrderUserList(el, index) {
 			var userInList = share.getUserFromId(el.userId);
 			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
 				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
 			}
-			$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
-		});
-	}
-}
+			if (index < inlineAvatarLimit) {
+				$element.find('.avatarMore').hide();
+				$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+			} else {
+				$element.find('.avatarMore').show().text("+" + (index + 1 - inlineAvatarLimit));
+			}
+		})
+	},
+};
 
 /* Helper */

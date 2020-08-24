@@ -52,7 +52,7 @@
 	overflow: hidden;
 	width: 95%;
 	float: left;
-	margin-left: 6px;
+	/* margin-left: 6px; */
 	cursor: pointer;
 }
 
@@ -537,7 +537,7 @@
 }
 
 .wrtc_box .wrtc_contentBody .wrtc_content li .avatar,
-.wrtc_inlineAvatars .avatar {
+.wrtc_inlineAvatars .avatar, .wrtc_inlineAvatars > .avatarMore {
 	width: 24px;
 	border: 2px solid #ddd;
 	height: 24px;
@@ -572,7 +572,7 @@
 	max-width: 220px;
 }
 
-.wrtc_inlineAvatars > .avatar {
+.wrtc_inlineAvatars > .avatar, .wrtc_inlineAvatars > .avatarMore {
 	float:left;
 	margin: 0 0 0 -8px;
 	position: relative;
@@ -587,10 +587,23 @@
 .wrtc_inlineAvatars:first-child{
 	margin: 0;
 }
-.wrtc_inlineAvatars > .avatar:hover{
+.wrtc_inlineAvatars > .avatar:hover, .wrtc_inlineAvatars .avatarMore:hover{
 	border-color: #2678ff;
 	z-index: 1;
-	
+	transform: scale(1.2);
+}
+
+.wrtc_inlineAvatars .avatarMore {
+	border-style: dashed;
+	text-align: center;
+	order: -1;
+	margin-right: 12px;
+	font-family: Quicksand;
+	font-weight: bold;
+	background: transparent;
+	justify-content: center;
+	padding-right: 2px;
+	border-color: #333;
 }
 
 /* #chatbox{
