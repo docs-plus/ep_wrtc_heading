@@ -70,7 +70,7 @@ var videoChat = (function () {
 		var msg = {
 			'time': new Date(),
 			'userId': data.userId,
-			'userName': user.name,
+			'userName': user.name || data.name || "anonymous",
 			'headerId': data.headerId,
 			'userCount': userCount,
 			'headerTitle': headerTitle,
@@ -126,8 +126,8 @@ var videoChat = (function () {
 		// notify, a user join the video-chat room
 		var msg = {
 			'time': new Date(),
-			'userId': user.userId,
-			'userName': user.name,
+			'userId': data.userId,
+			'userName': user.name || data.name || "anonymous",
 			'headerId': data.headerId,
 			'userCount': userCount,
 			'headerTitle': headerTitle,
@@ -164,11 +164,11 @@ var videoChat = (function () {
 				'transform': 'translate(-50%, 0)',
 				'opacity': 1
 			}).attr({ 'data-active': true });
+			
+			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn);
 		}
 
 		share.wrtcPubsub.emit("update store", data, headerId, 'JOIN', 'VIDEO', roomInfo, function (data) {});
-
-		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn);
 	}
 
 	function userJoin(headerId, data, $joinButton) {

@@ -88,7 +88,7 @@ exports.roomBoxIconActive = function roomBoxIconActive() {
 exports.appendUserList = function appendUserList(roomInfo, selector) {
 	if (!roomInfo.list) return true;
 	var $element = typeof selector === "string" ? $(document).find(selector) : selector;
-	$element.find('li').remove();
+	$element.empty();
 	roomInfo.list.forEach(function reOrderUserList(el) {
 		var userInList = share.getUserFromId(el.userId) || {colorId: "", name: "anonymous"};
 		if (clientVars.ep_profile_list && clientVars.ep_profile_list[el.userId]) {

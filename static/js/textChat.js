@@ -153,8 +153,8 @@ var textChat = (function () {
 		// notify, a user join the video-chat room
 		var msg = {
 			'time': new Date(),
-			'userId': user.userId,
-			'userName': user.name,
+			'userId': data.userId,
+			'userName': user.name || data.name || "anonymous",
 			'headerId': data.headerId,
 			'userCount': userCount,
 			'headerTitle': headTitle
@@ -187,11 +187,10 @@ var textChat = (function () {
 			$headingRoom.attr({ 'data-text': true });
 			share.roomBoxIconActive();
 			activateModal(headerId, headTitle, userCount, roomInfo);
+			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
 		}
 
 		share.wrtcPubsub.emit("update store", data, headerId, 'JOIN', 'TEXT', roomInfo, function(data) {})
-
-		share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
 	}
 
 	function removeUserFromRoom(data, roomInfo, target, cb) {
@@ -209,7 +208,6 @@ var textChat = (function () {
 		share.appendUserList(roomInfo, $textChatUserList);
 		share.appendUserList(roomInfo, "#wrtc_textChatWrapper #textChatUserModal ul");
 
-
 		if (userCount === 0) {
 			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="TEXT"><b>text-chat</b></button></li>');
 		}
@@ -219,8 +217,8 @@ var textChat = (function () {
 		// notify, a user join the video-chat room
 		var msg = {
 			'time': new Date(),
-			'userId': user.userId,
-			'userName': user.name,
+			'userId': data.userId,
+			'userName': user.name || data.name || "anonymous",
 			'headerId': data.headerId,
 			'userCount': userCount,
 			'headerTitle': headTitle
@@ -243,11 +241,10 @@ var textChat = (function () {
 			share.roomBoxIconActive();
 			currentRoom = {};
 			deactivateModal(data.headerId, roomInfo);
+			share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn);
 		}
 
 		share.wrtcPubsub.emit("update store", data, headerId, 'LEAVE', 'TEXT', roomInfo, function(data) {});
-
-		share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn);
 
 		if (cb && typeof cb === 'function') cb();
 	}
