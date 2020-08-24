@@ -149,6 +149,14 @@ var WRTC_Room = (function () {
 		return offsetTop + height / 2 - 20;
 	}
 
+	function getHeaderRoomX($element) {
+		var width = $element.outerWidth();
+		var paddingLeft = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-left');
+		var aceOuterPadding = parseInt(paddingLeft, 10);
+		var offsetLeft = Math.ceil(share.$body_ace_outer().find('iframe[name="ace_inner"]').offset().left - aceOuterPadding);
+		return offsetLeft - width 
+	}
+
 	function activeEventListener() {
 
 		var $wbrtc_roomBox = share.$body_ace_outer();
@@ -210,6 +218,7 @@ var WRTC_Room = (function () {
 	}
 
 	self = {
+		'getHeaderRoomX': getHeaderRoomX,
 		'aceSetAuthorStyle': function aceSetAuthorStyle(context) {
 			if (context.author) {
 				var user = share.getUserFromId(context.author);
@@ -268,15 +277,20 @@ var WRTC_Room = (function () {
 				var $boxId = $el.attr('id');
 				var hClassId = 'headingTagId_' + $boxId;
 				var $headingEl = $padOuter.find('iframe').contents().find('#innerdocbody').find('.' + hClassId);
+				// var $headingInlineAvatar = 
 
 				// if the H tags does not find, remove chatBox
 				// TODO: and kick out the user form the chatBox
 				if ($headingEl.length <= 0) {
 					$el.remove();
+					// $headingInlineAvatar.remove()
 					return false;
 				}
-
-				$el.css({ 'top': getHeaderRoomY($headingEl) + 'px' });
+				if($el.attr("data-box") === "avatar"){
+					$el.css({'left': getHeaderRoomX($el) + 'px'})
+				}else {
+					$el.css({ 'top': getHeaderRoomY($headingEl) + 'px' });
+				}
 			});
 		},
 		'findTags': function findTags() {

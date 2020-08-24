@@ -209,6 +209,7 @@ var inlineAvatar = {
 		var inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
 		var $element = exports.$body_ace_outer().find("#wbrtc_avatarCol ." + headerId + ' .wrtc_inlineAvatars');
 		$element.find('.avatar').remove();
+		$element.parent().css({'left': WRTC_Room.getHeaderRoomX($element.parent()) + 'px'})
 		Object.keys(room).forEach(function reOrderUserList(key, index) {
 			var userInList = share.getUserFromId(room[key].userId);
 			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
@@ -218,12 +219,12 @@ var inlineAvatar = {
 				$element.find('.avatarMore').hide();
 				$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
 			} else {
+				
 				$element.find('.avatarMore').show().text("+" + (index + 1 - inlineAvatarLimit));
 			}
 		});
 	},
 	"TEXT": function TEXT(headerId, room) {
-		var inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
 		var $element = $(document).find("#wrtc_textChatWrapper .wrtc_inlineAvatars");
 		$element.find('.avatar').remove();
 		this.append(room.list, $element);
