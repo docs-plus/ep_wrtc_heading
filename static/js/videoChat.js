@@ -69,7 +69,7 @@ var videoChat = (function () {
 		// notify, a user join the video-chat room
 		var msg = {
 			'time': new Date(),
-			'userId': user.userId,
+			'userId': data.userId,
 			'userName': user.name,
 			'headerId': data.headerId,
 			'userCount': userCount,

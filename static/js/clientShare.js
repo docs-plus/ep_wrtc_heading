@@ -90,11 +90,11 @@ exports.appendUserList = function appendUserList(roomInfo, selector) {
 	var $element = typeof selector === "string" ? $(document).find(selector) : selector;
 	$element.find('li').remove();
 	roomInfo.list.forEach(function reOrderUserList(el) {
-		var userInList = share.getUserFromId(el.userId);
-		if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
-			avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+		var userInList = share.getUserFromId(el.userId) || {colorId: "", name: "anonymous"};
+		if (clientVars.ep_profile_list && clientVars.ep_profile_list[el.userId]) {
+			avatarUrl = clientVars.ep_profile_list[el.userId].imageUrl || clientVars.ep_profile_list[el.userId].img;
 		}
-		$element.append('<li data-id=' + userInList.userId + " style='border-color: " + userInList.colorId + "'><div class='avatar'><img src='" + avatarUrl + "'></div>" + userInList.name + '</li>');
+		$element.append('<li data-id=' + el.userId + " style='border-color: " + userInList.colorId + "'><div class='avatar'><img src='" + avatarUrl + "'></div>" + userInList.name + '</li>');
 	});
 };
 

@@ -160,14 +160,16 @@ var textChat = (function () {
 		};
 		share.notifyNewUserJoined("TEXT", msg, "JOIN");
 		
-		var privateMsg = { 
-			userName: user.name,
-			author: user.userId,
-			headerTitle: headTitle,
-			time: new Date().getTime()
-		};
-		privateNotifyNewUserJoined("TEXT", privateMsg, "JOIN");
-		
+		if(data.headerId === currentRoom.headerId){
+			var privateMsg = { 
+				userName: user.name,
+				author: user.userId,
+				headerTitle: headTitle,
+				time: new Date().getTime()
+			};
+			privateNotifyNewUserJoined("TEXT", privateMsg, "JOIN");
+		}
+
 
 		if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
 			$.gritter.add({
@@ -224,13 +226,16 @@ var textChat = (function () {
 		};
 		share.notifyNewUserJoined("TEXT", msg, "LEAVE");
 
-		var privateMsg = { 
-			userName: user.name,
-			author: user.userId,
-			headerTitle: headTitle,
-			time: new Date().getTime()
+		if(data.headerId === currentRoom.headerId){
+			var privateMsg = { 
+				userName: user.name,
+				author: user.userId,
+				headerTitle: headTitle,
+				time: new Date().getTime()
+			}
+			privateNotifyNewUserJoined("TEXT", privateMsg, "LEAVE");
 		}
-		privateNotifyNewUserJoined("TEXT", privateMsg, "LEAVE");
+
 	
 		if (data.userId === clientVars.userId) {
 			$headingRoom.removeAttr('data-text');
@@ -239,10 +244,9 @@ var textChat = (function () {
 			deactivateModal(data.headerId, roomInfo);
 		}
 
-		share.wrtcPubsub.emit("update store", data, headerId, 'LEAVE', 'TEXT', roomInfo, function(data) {
-		})
+		share.wrtcPubsub.emit("update store", data, headerId, 'LEAVE', 'TEXT', roomInfo, function(data) {});
 
-		share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn)
+		share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn);
 
 		if (cb && typeof cb === 'function') cb();
 	}

@@ -277,20 +277,16 @@ var WRTC_Room = (function () {
 				var $boxId = $el.attr('id');
 				var hClassId = 'headingTagId_' + $boxId;
 				var $headingEl = $padOuter.find('iframe').contents().find('#innerdocbody').find('.' + hClassId);
-				// var $headingInlineAvatar = 
 
 				// if the H tags does not find, remove chatBox
 				// TODO: and kick out the user form the chatBox
 				if ($headingEl.length <= 0) {
 					$el.remove();
-					// $headingInlineAvatar.remove()
 					return false;
 				}
-				if($el.attr("data-box") === "avatar"){
-					$el.css({'left': getHeaderRoomX($el) + 'px'})
-				}else {
-					$el.css({ 'top': getHeaderRoomY($headingEl) + 'px' });
-				}
+
+				if($el.attr("data-box") === "avatar") $el.css({'left': getHeaderRoomX($el) + 'px'});
+				$el.css({ 'top': getHeaderRoomY($headingEl) + 'px' });
 			});
 		},
 		'findTags': function findTags() {
