@@ -104,7 +104,7 @@ var hooks = {
 		// Bridge in ep_profiles
 		window.clientVars.ep_profile_list = {};
 		getSocket().on('message', function (obj) {
-			if (obj.type === 'COLLABROOM' & obj.data.type === 'CUSTOM') {
+			if (obj.type === 'COLLABROOM' && obj.data && obj.data.type === 'CUSTOM') {
 				var data = obj.data.payload;
 				if (data.action === "EP_PROFILE_USERS_LIST") {
 					data.list.forEach(function (el) {
