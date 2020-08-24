@@ -176,7 +176,7 @@ var videoChat = (function () {
 
 		// check if has user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
-			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn);
+			share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn);
 			return false;
 		}
 

@@ -103,7 +103,6 @@ var textChat = (function () {
 	function activateModal(headerId, headTitle, userCount, roomInfo) {
 		if (!headerId) return false;
 		var existTextChat = $(document).find("#wrtc_textChatWrapper");
-
 		if (!existTextChat.length) {
 			var textChatBox = $('#wrtc_textChatBox').tmpl({
 				headerId: headerId,
@@ -112,7 +111,9 @@ var textChat = (function () {
 			$('body').append(textChatBox);
 		} else {
 			// TODO: change this to template
-			existTextChat.attr({ "data-id": headerId }).find(".btn_leave").attr({ "data-id": headerId });
+			existTextChat.attr({ "data-id": headerId })
+			.find(".textChatToolbar b, .btn_leave")
+			.attr({ "data-id": headerId });
 			existTextChat.find(".nd_title b").text(headTitle);
 		}
 
@@ -256,7 +257,7 @@ var textChat = (function () {
 
 		// check if user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
-			share.wrtcPubsub.emit("enable room buttons", headerId, 'JOIN', $joinBtn)
+			share.wrtcPubsub.emit("enable room buttons", headerId, 'LEAVE', $joinBtn)
 			return false;
 		}
 
