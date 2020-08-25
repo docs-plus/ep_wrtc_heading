@@ -19,11 +19,11 @@ exports.getUserFromId = function getUserFromId(userId) {
 
 exports.slugify = function slugify(text) {
 	return text.toString().toLowerCase().trim().replace(/\s+/g, '-') // Replace spaces with -
-		.replace(/&/g, '-and-') // Replace & with 'and'
-		.replace(/[^\w\-]+/g, '') // Remove all non-word chars
-		.replace(/\--+/g, '-') // Replace multiple - with single -
-		.replace(/^-+/, '') // Trim - from start of text
-		.replace(/-+$/, ''); // Trim - from end of text
+	.replace(/&/g, '-and-') // Replace & with 'and'
+	.replace(/[^\w\-]+/g, '') // Remove all non-word chars
+	.replace(/\--+/g, '-') // Replace multiple - with single -
+	.replace(/^-+/, '') // Trim - from start of text
+	.replace(/-+$/, ''); // Trim - from end of text
 };
 
 exports.$body_ace_outer = function $body_ace_outer() {
@@ -73,7 +73,7 @@ exports.notifyNewUserJoined = function notifyNewUserJoined(target, msg, action) 
 };
 
 exports.roomBoxIconActive = function roomBoxIconActive() {
-	exports.$body_ace_outer().find('.wbrtc_roomBox').each(function(index, val) {
+	exports.$body_ace_outer().find('.wbrtc_roomBox').each(function (index, val) {
 		var textActive = $(val).attr('data-text');
 		var videoActive = $(val).attr('data-video');
 		if (textActive || videoActive) {
@@ -89,7 +89,7 @@ exports.appendUserList = function appendUserList(roomInfo, selector) {
 	var $element = typeof selector === 'string' ? $(document).find(selector) : selector;
 	$element.empty();
 	roomInfo.list.forEach(function reOrderUserList(el) {
-		var userInList = exports.getUserFromId(el.userId) || {colorId: '', name: 'anonymous'};
+		var userInList = exports.getUserFromId(el.userId) || { colorId: '', name: 'anonymous' };
 		if (clientVars.ep_profile_list && clientVars.ep_profile_list[el.userId]) {
 			avatarUrl = clientVars.ep_profile_list[el.userId].imageUrl || clientVars.ep_profile_list[el.userId].img;
 		}
@@ -121,7 +121,7 @@ exports.wrtcPubsub = {
 		}
 
 		if (this.events[eventName]) {
-			this.events[eventName].forEach(function(fn) {
+			this.events[eventName].forEach(function (fn) {
 				fn.apply(undefined, data);
 			});
 		}
@@ -133,7 +133,7 @@ var inlineAvatar = {
 		var inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
 		var $element = exports.$body_ace_outer().find('#wbrtc_avatarCol .' + headerId + ' .wrtc_inlineAvatars');
 		$element.find('.avatar').remove();
-		$element.parent().css({left: WRTC_Room.getHeaderRoomX($element.parent()) + 'px'});
+		$element.parent().css({ left: WRTC_Room.getHeaderRoomX($element.parent()) + 'px' });
 		Object.keys(room).forEach(function reOrderUserList(key, index) {
 			var userInList = exports.getUserFromId(room[key].userId);
 			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
@@ -174,8 +174,7 @@ var inlineAvatar = {
 	}
 };
 
-
-exports.wrtcPubsub.on('update store', function(requestUser, headerId, action, target, roomInfo, callback) {
+exports.wrtcPubsub.on('update store', function (requestUser, headerId, action, target, roomInfo, callback) {
 	if (!requestUser || !headerId || !action || !roomInfo || !target) return false;
 	var users = exports.wrtcStore[headerId].USERS;
 	exports.wrtcStore[headerId][target] = roomInfo;
@@ -184,12 +183,12 @@ exports.wrtcPubsub.on('update store', function(requestUser, headerId, action, ta
 	// remove all users
 	users = {};
 
-	exports.wrtcStore[headerId].TEXT.list.forEach(function(el) {
+	exports.wrtcStore[headerId].TEXT.list.forEach(function (el) {
 		if (!users[el.userId]) users[el.userId] = {};
 		users[el.userId] = el;
 	});
 
-	exports.wrtcStore[headerId].VIDEO.list.forEach(function(el) {
+	exports.wrtcStore[headerId].VIDEO.list.forEach(function (el) {
 		if (!users[el.userId]) users[el.userId] = {};
 		users[el.userId] = el;
 	});
@@ -249,6 +248,5 @@ exports.wrtcPubsub.on('enable room buttons', function enableRoomButtons(headerId
 		$btnPlus.attr({ 'data-action': newAction }).prop('disabled', false);
 	}
 });
-
 
 /* Helper */

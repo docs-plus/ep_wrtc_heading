@@ -20,7 +20,7 @@ var textChat = (function textChat() {
 		var timeStr = hours + ':' + minutes;
 
 		var userName = $('<b>').text(msg.userName + ': ');
-		var tim = $('<span>').attr({ class: 'time' }).text(timeStr);
+		var tim = $('<span>').attr({ 'class': 'time' }).text(timeStr);
 
 		var message = $('<p>').attr({
 			'data-authorid': msg.author
@@ -42,7 +42,6 @@ var textChat = (function textChat() {
 
 		createAndAppendMessage(msg);
 	}
-
 
 	function eventTextChatInput() {
 		var keycode = event.keyCode || event.which;
@@ -108,9 +107,7 @@ var textChat = (function textChat() {
 			$('body').append(textChatBox);
 		} else {
 			// TODO: change this to template
-			existTextChat.attr({ 'data-id': headerId })
-				.find('.textChatToolbar b, .btn_leave')
-				.attr({ 'data-id': headerId });
+			existTextChat.attr({ 'data-id': headerId }).find('.textChatToolbar b, .btn_leave').attr({ 'data-id': headerId });
 			existTextChat.find('.nd_title b').text(headTitle);
 		}
 
@@ -126,7 +123,7 @@ var textChat = (function textChat() {
 		});
 
 		socket.emit('getTextMessages', padId, headerId, {}, function getTextMessages(data) {
-			data.forEach(function(el) {
+			data.forEach(function (el) {
 				createAndAppendMessage(el);
 			});
 		});
@@ -167,7 +164,6 @@ var textChat = (function textChat() {
 			};
 			privateNotifyNewUserJoined('TEXT', privateMsg, 'JOIN');
 		}
-
 
 		if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
 			$.gritter.add({
@@ -231,7 +227,6 @@ var textChat = (function textChat() {
 			privateNotifyNewUserJoined('TEXT', privateMsg, 'LEAVE');
 		}
 
-
 		if (data.userId === clientVars.userId) {
 			$headingRoom.removeAttr('data-text');
 			share.roomBoxIconActive();
@@ -240,7 +235,7 @@ var textChat = (function textChat() {
 			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
 		}
 
-		share.wrtcPubsub.emit('update store', data, headerId, 'LEAVE', 'TEXT', roomInfo, function() {});
+		share.wrtcPubsub.emit('update store', data, headerId, 'LEAVE', 'TEXT', roomInfo, function () {});
 
 		if (cb && typeof cb === 'function') cb();
 	}
@@ -275,7 +270,7 @@ var textChat = (function textChat() {
 	function socketBulkUpdateRooms(rooms, info, target) {
 		var roomsInfo = {};
 		// create a roomInfo for each individual room
-		Object.keys(rooms).forEach(function(headerId) {
+		Object.keys(rooms).forEach(function (headerId) {
 			var roomInfo = {
 				present: rooms[headerId].length,
 				list: rooms[headerId]
@@ -284,9 +279,9 @@ var textChat = (function textChat() {
 		});
 
 		// bind roomInfo and send user to gateway_userJoin
-		Object.keys(rooms).forEach(function(headerId) {
-			rooms[headerId].forEach(function(user) {
-				textChat.addUserToRoom(user, roomsInfo[headerId], 'text');
+		Object.keys(rooms).forEach(function (headerId) {
+			rooms[headerId].forEach(function (user) {
+				addUserToRoom(user, roomsInfo[headerId], 'text');
 			});
 		});
 	}

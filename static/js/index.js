@@ -127,7 +127,7 @@ var hooks = {
 
 		$('#editorcontainer iframe').ready(function readyObj() {
 			WRTC.appendInterfaceLayout();
-			setTimeout(function() {
+			setTimeout(function () {
 				WRTC_Room.findTags();
 			}, 250);
 		});

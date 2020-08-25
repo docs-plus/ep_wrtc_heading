@@ -63,7 +63,7 @@ var WRTC = (function WRTC() {
 			var $wrtc_modal = $('<div id="wrtc_modal"><div class="videoWrapper" class="thin-scrollbar"></div></div');
 			$wrtc_modal.append(werc_toolbar);
 			$('body').prepend($wrtc_modal);
-			$(document).on('click', '#wrtc_modal .btn_toggle_modal', function() {
+			$(document).on('click', '#wrtc_modal .btn_toggle_modal', function () {
 				var $parent = $(this).parent().parent();
 				var action = $(this).attr('data-action');
 				var videoBox = $('#wrtc_modal .videoWrapper').innerHeight();
@@ -117,44 +117,44 @@ var WRTC = (function WRTC() {
 			// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 			// However keep in mind that we add our own errors in getUserMediaPolyfill
 			switch (err.name) {
-			case 'CustomNotSupportedError':
-				reason = 'Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>' + 'To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera.' + '<a href="http://www.webrtc.org/" target="_new">Find out more</a>';
-				self.sendErrorStat('NotSupported');
-				break;
-			case 'CustomSecureConnectionError':
-				reason = 'Sorry, you need to install SSL certificates for your Etherpad instance to use WebRTC';
-				self.sendErrorStat('SecureConnection');
-				break;
-			case 'NotAllowedError':
-				// For certain (I suspect older) browsers, `NotAllowedError` indicates either an insecure connection or the user rejecting camera permissions.
-				// The error for both cases appears to be identical, so our best guess at telling them apart is to guess whether we are in a secure context.
-				// (webrtc is considered secure for https connections or on localhost)
-				if (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-					reason = 'Sorry, you need to give us permission to use your camera and microphone';
-					self.sendErrorStat('Permission');
-				} else {
+				case 'CustomNotSupportedError':
+					reason = 'Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>' + 'To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera.' + '<a href="http://www.webrtc.org/" target="_new">Find out more</a>';
+					self.sendErrorStat('NotSupported');
+					break;
+				case 'CustomSecureConnectionError':
 					reason = 'Sorry, you need to install SSL certificates for your Etherpad instance to use WebRTC';
 					self.sendErrorStat('SecureConnection');
-				}
-				break;
-			case 'NotFoundError':
-				reason = "Sorry, we couldn't find a suitable camera on your device. If you have a camera, make sure it set up correctly and refresh this website to retry.";
-				self.sendErrorStat('NotFound');
-				break;
-			case 'NotReadableError':
-				// `err.message` might give useful info to the user (not necessarily useful for other error messages)
-				reason = 'Sorry, a hardware error occurred that prevented access to your camera and/or microphone:<br><br>' + err.message;
-				self.sendErrorStat('Hardware');
-				break;
-			case 'AbortError':
-				// `err.message` might give useful info to the user (not necessarily useful for other error messages)
-				reason = 'Sorry, an error occurred (probably not hardware related) that prevented access to your camera and/or microphone:<br><br>' + err.message;
-				self.sendErrorStat('Abort');
-				break;
-			default:
-				// `err` as a string might give useful info to the user (not necessarily useful for other error messages)
-				reason = 'Sorry, there was an unknown Error:<br><br>' + err;
-				self.sendErrorStat('Unknown');
+					break;
+				case 'NotAllowedError':
+					// For certain (I suspect older) browsers, `NotAllowedError` indicates either an insecure connection or the user rejecting camera permissions.
+					// The error for both cases appears to be identical, so our best guess at telling them apart is to guess whether we are in a secure context.
+					// (webrtc is considered secure for https connections or on localhost)
+					if (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+						reason = 'Sorry, you need to give us permission to use your camera and microphone';
+						self.sendErrorStat('Permission');
+					} else {
+						reason = 'Sorry, you need to install SSL certificates for your Etherpad instance to use WebRTC';
+						self.sendErrorStat('SecureConnection');
+					}
+					break;
+				case 'NotFoundError':
+					reason = "Sorry, we couldn't find a suitable camera on your device. If you have a camera, make sure it set up correctly and refresh this website to retry.";
+					self.sendErrorStat('NotFound');
+					break;
+				case 'NotReadableError':
+					// `err.message` might give useful info to the user (not necessarily useful for other error messages)
+					reason = 'Sorry, a hardware error occurred that prevented access to your camera and/or microphone:<br><br>' + err.message;
+					self.sendErrorStat('Hardware');
+					break;
+				case 'AbortError':
+					// `err.message` might give useful info to the user (not necessarily useful for other error messages)
+					reason = 'Sorry, an error occurred (probably not hardware related) that prevented access to your camera and/or microphone:<br><br>' + err.message;
+					self.sendErrorStat('Abort');
+					break;
+				default:
+					// `err` as a string might give useful info to the user (not necessarily useful for other error messages)
+					reason = 'Sorry, there was an unknown Error:<br><br>' + err;
+					self.sendErrorStat('Unknown');
 			}
 			$.gritter.add({
 				title: 'Error',
@@ -179,7 +179,7 @@ var WRTC = (function WRTC() {
 			self.hangupAll(headerId);
 			self.hangup(userId, true, headerId);
 			if (localStream) {
-				localStream.getTracks().forEach(function(track) {
+				localStream.getTracks().forEach(function (track) {
 					track.stop();
 				});
 				localStream = null;
@@ -201,7 +201,7 @@ var WRTC = (function WRTC() {
 		},
 		getUserFromId: function getUserFromId(userId) {
 			if (!self._pad || !self._pad.collabClient) return null;
-			var result = self._pad.collabClient.getConnectedUsers().filter(function(user) {
+			var result = self._pad.collabClient.getConnectedUsers().filter(function (user) {
 				return user.userId === userId;
 			});
 			var user = result.length > 0 ? result[0] : null;
@@ -281,7 +281,7 @@ var WRTC = (function WRTC() {
 					if (videoEnlarged) {
 						enlargedVideos.add(userId);
 					} else {
-						enlargedVideos.delete(userId);
+						enlargedVideos['delete'](userId);
 					}
 
 					$largeVideo.attr('title', videoEnlarged ? 'Make video smaller' : 'Make video larger').toggleClass('large', videoEnlarged);
@@ -342,10 +342,10 @@ var WRTC = (function WRTC() {
 					}
 				}
 				var offer = new RTCSessionDescription(data.offer);
-				pc[peer].setRemoteDescription(offer, function() {
-					pc[peer].createAnswer(function(desc) {
+				pc[peer].setRemoteDescription(offer, function () {
+					pc[peer].createAnswer(function (desc) {
 						desc.sdp = cleanupSdp(desc.sdp);
-						pc[peer].setLocalDescription(desc, function() {
+						pc[peer].setLocalDescription(desc, function () {
 							self.sendMessage(peer, { type: 'answer', answer: desc, headerId: data.headerId });
 						}, logError);
 					}, logError, sdpConstraints);
@@ -353,16 +353,16 @@ var WRTC = (function WRTC() {
 			} else if (type === 'answer') {
 				if (pc[peer]) {
 					var answer = new RTCSessionDescription(data.answer);
-					pc[peer].setRemoteDescription(answer, function() {}, logError);
+					pc[peer].setRemoteDescription(answer, function () {}, logError);
 				}
 			} else if (type === 'icecandidate') {
 				if (pc[peer]) {
 					var candidate = new RTCIceCandidate(data.candidate);
 					var p = pc[peer].addIceCandidate(candidate);
 					if (p) {
-						p.then(function() {
+						p.then(function () {
 							// Do stuff when the candidate is successfully passed to the ICE agent
-						}).catch(function() {
+						})['catch'](function () {
 							console.error('Error: Failure during addIceCandidate()', data);
 						});
 					}
@@ -372,7 +372,7 @@ var WRTC = (function WRTC() {
 			}
 		},
 		hangupAll: function hangupAll(_headerId) {
-			Object.keys(pc).forEach(function(userId) {
+			Object.keys(pc).forEach(function (userId) {
 				self.hangup(userId, true, _headerId);
 			});
 		},
@@ -408,9 +408,9 @@ var WRTC = (function WRTC() {
 				self.createPeerConnection(userId, headerId);
 			}
 			pc[userId].addStream(localStream);
-			pc[userId].createOffer(function(desc) {
+			pc[userId].createOffer(function (desc) {
 				desc.sdp = cleanupSdp(desc.sdp);
-				pc[userId].setLocalDescription(desc, function() {
+				pc[userId].setLocalDescription(desc, function () {
 					self.sendMessage(userId, { type: 'offer', offer: desc, headerId: headerId });
 				}, logError);
 			}, logError, constraints);
@@ -420,7 +420,7 @@ var WRTC = (function WRTC() {
 				console.warn('WARNING creating PC connection even though one exists', userId);
 			}
 			pc[userId] = new RTCPeerConnection(pcConfig, pcConstraints);
-			pc[userId].onicecandidate = function(event) {
+			pc[userId].onicecandidate = function (event) {
 				if (event.candidate) {
 					self.sendMessage(userId, {
 						type: 'icecandidate',
@@ -429,16 +429,16 @@ var WRTC = (function WRTC() {
 					});
 				}
 			};
-			pc[userId].onaddstream = function(event) {
+			pc[userId].onaddstream = function (event) {
 				remoteStream[userId] = event.stream;
 				self.setStream(userId, event.stream);
 			};
-			pc[userId].onremovestream = function() {
+			pc[userId].onremovestream = function () {
 				self.setStream(userId, '');
 			};
 		},
 		audioVideoInputChange: function audioVideoInputChange() {
-			localStream.getTracks().forEach(function(track) {
+			localStream.getTracks().forEach(function (track) {
 				track.stop();
 			});
 
@@ -471,10 +471,10 @@ var WRTC = (function WRTC() {
 
 			localStorage.setItem('videoSettings', JSON.stringify({ video: videoSource, audio: audioSource }));
 
-			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function(stream) {
+			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
 				localStream = stream;
 				self.setStream(self._pad.getUserId(), stream);
-				self._pad.collabClient.getConnectedUsers().forEach(function(user) {
+				self._pad.collabClient.getConnectedUsers().forEach(function (user) {
 					if (user.userId !== self.getUserId()) {
 						if (pc[user.userId]) {
 							self.hangup(user.userId, false, headerId);
@@ -482,7 +482,7 @@ var WRTC = (function WRTC() {
 						self.call(user.userId, headerId);
 					}
 				});
-			}).catch(function(err) {
+			})['catch'](function (err) {
 				self.showUserMediaError(err);
 			});
 		},
@@ -492,7 +492,7 @@ var WRTC = (function WRTC() {
 			$(document).on('change', 'select#audioSource', self.audioVideoInputChange);
 			$(document).on('change', 'select#videoSource', self.audioVideoInputChange);
 
-			$(window).on('unload', function() {
+			$(window).on('unload', function () {
 				self.hangupAll();
 			});
 		}

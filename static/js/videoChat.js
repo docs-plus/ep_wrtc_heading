@@ -47,7 +47,7 @@ var videoChat = (function videoChat() {
 	}
 
 	function isUserMediaAvailable() {
-		return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true }).catch(function getUserMedia(err) {
+		return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true })['catch'](function getUserMedia(err) {
 			WRTC.showUserMediaError(err);
 			console.error(err);
 		});
@@ -239,8 +239,8 @@ var videoChat = (function videoChat() {
 		});
 
 		// bind roomInfo and send user to gateway_userJoin
-		Object.keys(rooms).forEach(function(headerId) {
-			rooms[headerId].forEach(function(user) {
+		Object.keys(rooms).forEach(function (headerId) {
+			rooms[headerId].forEach(function (user) {
 				videoChat.gateway_userJoin(user, roomsInfo[headerId], true);
 			});
 		});

@@ -76,32 +76,32 @@ var WRTC_Room = (function WRTC_Room() {
 
 		if (actions === 'JOIN') {
 			switch (target) {
-			case 'PLUS':
-				$joinBtn.targetPlus = true;
-				joinChatRoom(headerId, userInfo, target);
-				break;
-			case 'VIDEO':
-				videoChat.userJoin(headerId, userInfo, target);
-				break;
-			case 'TEXT':
-				textChat.userJoin(headerId, userInfo, target);
-				break;
-			default:
-				return false;
+				case 'PLUS':
+					$joinBtn.targetPlus = true;
+					joinChatRoom(headerId, userInfo, target);
+					break;
+				case 'VIDEO':
+					videoChat.userJoin(headerId, userInfo, target);
+					break;
+				case 'TEXT':
+					textChat.userJoin(headerId, userInfo, target);
+					break;
+				default:
+					return false;
 			}
 		} else if (actions === 'LEAVE') {
 			switch (target) {
-			case 'PLUS':
-				leaveChatRoom(headerId, userInfo, target);
-				break;
-			case 'VIDEO':
-				videoChat.userLeave(headerId, userInfo, target);
-				break;
-			case 'TEXT':
-				textChat.userLeave(headerId, userInfo, target);
-				break;
-			default:
-				return false;
+				case 'PLUS':
+					leaveChatRoom(headerId, userInfo, target);
+					break;
+				case 'VIDEO':
+					videoChat.userLeave(headerId, userInfo, target);
+					break;
+				case 'TEXT':
+					textChat.userLeave(headerId, userInfo, target);
+					break;
+				default:
+					return false;
 			}
 		}
 	}
@@ -247,7 +247,7 @@ var WRTC_Room = (function WRTC_Room() {
 
 			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
 
-			socket.on('userJoin', function(data, roomInfo, target) {
+			socket.on('userJoin', function (data, roomInfo, target) {
 				if (target === 'video') {
 					videoChat.gateway_userJoin(data, roomInfo, false);
 				} else {
@@ -255,7 +255,7 @@ var WRTC_Room = (function WRTC_Room() {
 				}
 			});
 
-			socket.on('userLeave', function(data, roomInfo, target) {
+			socket.on('userLeave', function (data, roomInfo, target) {
 				if (target === 'video') {
 					videoChat.gateway_userLeave(data, roomInfo, target);
 				} else {
@@ -266,7 +266,7 @@ var WRTC_Room = (function WRTC_Room() {
 			activeEventListener();
 
 			// check if there is a join request in URI queryString
-			setTimeout(function() {
+			setTimeout(function () {
 				joinByQueryString();
 			}, 500);
 		},
@@ -288,7 +288,7 @@ var WRTC_Room = (function WRTC_Room() {
 					return false;
 				}
 
-				if ($el.attr('data-box') === 'avatar') $el.css({left: getHeaderRoomX($el) + 'px'});
+				if ($el.attr('data-box') === 'avatar') $el.css({ left: getHeaderRoomX($el) + 'px' });
 				$el.css({ top: getHeaderRoomY($headingEl) + 'px' });
 			});
 		},
