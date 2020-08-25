@@ -57,7 +57,7 @@
 }
 
 .btn_controllers{
-	width: 25%;
+	width: 20%;
 	float: right;
 	display: flex;
 	flex-direction: row-reverse;
@@ -414,7 +414,7 @@
 	display: flex;
 	align-items: center;
 	display: flex;
-  align-items: center;
+	align-items: center;
 }
 .textChatToolbar .chatIcon {
 	width: 19px;

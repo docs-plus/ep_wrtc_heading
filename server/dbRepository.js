@@ -31,7 +31,7 @@ exports.getLastMessages = async (key, lastMessageId, {limit, offset}) => {
 
 	for(let id = startPoint; id >= endPoint; id--) rowOfIds.push(id)
 
-	rowOfIds.reverse().map(id => results.push(db.get(key+":"+id)) ) 
+	rowOfIds.reverse().map(id => results.push(db.get(`${key}:${id}`)) ) 
 	
 	return Promise.all(results)
 }

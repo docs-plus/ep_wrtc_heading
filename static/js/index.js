@@ -4,18 +4,17 @@ var $ = require('ep_etherpad-lite/static/js/rjquery').$;
 var _ = require('ep_etherpad-lite/static/js/underscore');
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 var events = require('ep_wrtc_heading/static/js/copyPasteEvents');
-var textChat = require("ep_wrtc_heading/static/js/textChat");
+var textChat = require('ep_wrtc_heading/static/js/textChat');
 var videoChat = require('ep_wrtc_heading/static/js/videoChat');
 
-var _require = require('ep_etherpad-lite/static/js/pad');
-
-var pad = _require.pad;
+// var _require = require('ep_etherpad-lite/static/js/pad');
+// var pad = _require.pad;
 
 /** **********************************************************************/
 /*                              Plugin                                  */
 /** **********************************************************************/
 
-var EPwrtcHeading = (function () {
+var EPwrtcHeading = (function EPwrtcHeading() {
 	var padOuter = null;
 	var padInner = null;
 	var outerBody = null;
@@ -32,13 +31,12 @@ var EPwrtcHeading = (function () {
 	}
 
 	function init(ace, padId, userId) {
-
 		var loc = document.location;
 		var port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
 		var url = loc.protocol + '//' + loc.hostname + ':' + port + '/' + 'heading_chat_room';
 		var socket = io.connect(url);
 
-		socket.emit('join pad', padId, userId, function () {});
+		// socket.emit('join pad', padId, userId, function joinPad() {});
 
 		// find containers
 		padOuter = $('iframe[name="ace_outer"]').contents();
@@ -51,23 +49,23 @@ var EPwrtcHeading = (function () {
 		$target.prepend('<div id="wbrtc_chatBox"></div><div id="wbrtc_avatarCol"></div>');
 
 		// module settings
-		$('#options-wrtc-heading').on('change', function () {
+		$('#options-wrtc-heading').on('change', function change() {
 			$('#options-wrtc-heading').is(':checked') ? enableWrtcHeading() : disableWrtcHeading();
 		});
 
 		$('#options-wrtc-heading').trigger('change');
 
 		if (browser.chrome || browser.firefox) {
-			padInner.contents().on('copy', function (e) {
+			padInner.contents().on('copy', function copy(e) {
 				events.addTextOnClipboard(e, ace, padInner, false);
 			});
 
-			padInner.contents().on('cut', function (e) {
+			padInner.contents().on('cut', function cut(e) {
 				events.addTextOnClipboard(e, ace, padInner, true);
 			});
 
-			padInner.contents().on('paste', function (e) {
-				setTimeout(function () {
+			padInner.contents().on('paste', function paste() {
+				setTimeout(function setTimeout() {
 					WRTC_Room.adoptHeaderYRoom();
 				}, 250);
 			});
@@ -77,7 +75,7 @@ var EPwrtcHeading = (function () {
 	}
 
 	return Object.freeze({
-		'init': init
+		init: init
 	});
 })();
 
@@ -91,28 +89,27 @@ function getSocket() {
 
 var hooks = {
 	postAceInit: function postAceInit(hook, context) {
-
-		if (!$("#editorcontainerbox").hasClass("flex-layout")) {
+		if (!$('#editorcontainerbox').hasClass('flex-layout')) {
 			$.gritter.add({
-				'title': 'Error',
-				'text': 'ep_wrtc_heading: Please upgrade to etherpad 1.8.3 for this plugin to work correctly',
-				'sticky': true,
-				'class_name': 'error'
+				title: 'Error',
+				text: 'ep_wrtc_heading: Please upgrade to etherpad 1.8.3 for this plugin to work correctly',
+				sticky: true,
+				class_name: 'error'
 			});
 		}
 
-		// Bridge in ep_profiles
+		// Bridge into the ep_profiles
 		window.clientVars.ep_profile_list = {};
-		getSocket().on('message', function (obj) {
+		getSocket().on('message', function message(obj) {
 			if (obj.type === 'COLLABROOM' && obj.data && obj.data.type === 'CUSTOM') {
 				var data = obj.data.payload;
-				if (data.action === "EP_PROFILE_USERS_LIST") {
-					data.list.forEach(function (el) {
+				if (data.action === 'EP_PROFILE_USERS_LIST') {
+					data.list.forEach(function updateList(el) {
 						if (!window.clientVars.ep_profile_list[el.userId]) window.clientVars.ep_profile_list[el.userId] = {};
 						window.clientVars.ep_profile_list[el.userId] = el;
 					});
 				}
-				if (data.action === "EP_PROFILE_USER_LOGIN_UPDATE") {
+				if (data.action === 'EP_PROFILE_USER_LOGIN_UPDATE') {
 					window.clientVars.ep_profile_list[data.userId] = data;
 				}
 			}
@@ -128,14 +125,14 @@ var hooks = {
 		textChat.postAceInit(hook, context, socket, padId);
 		videoChat.postAceInit(hook, context, socket, padId);
 
-		$('#editorcontainer iframe').ready(function () {
+		$('#editorcontainer iframe').ready(function readyObj() {
 			WRTC.appendInterfaceLayout();
-			setTimeout(function () {
+			setTimeout(function() {
 				WRTC_Room.findTags();
 			}, 250);
 		});
 
-		$(window).resize(_.debounce(function () {
+		$(window).resize(_.debounce(function resize() {
 			WRTC_Room.adoptHeaderYRoom();
 		}, 100));
 	},
@@ -150,7 +147,7 @@ var hooks = {
 
 		// apply changes to the other user
 		if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
-			setTimeout(function () {
+			setTimeout(function setTimeout() {
 				WRTC_Room.findTags();
 			}, 250);
 		}
@@ -160,14 +157,14 @@ var hooks = {
 			// unfortunately "setAttributesRange" takes a little time to set attribute
 			// also ep_headings2 plugin has setTimeout about 250 ms to set and update H tag
 			// more info: https://github.com/ether/ep_headings2/blob/6827f1f0b64d99c3f3082bc0477d87187073a74f/static/js/index.js#L71
-			setTimeout(function () {
+			setTimeout(function setTimeout() {
 				WRTC_Room.findTags();
 			}, 250);
 		}
 	},
 	aceAttribsToClasses: function aceAttribsToClasses(hook, context) {
-		if (context.key === "headingTagId") {
-			return ["headingTagId_" + context.value];
+		if (context.key === 'headingTagId') {
+			return ['headingTagId_' + context.value];
 		}
 	},
 	aceEditorCSS: function aceEditorCSS() {
@@ -186,9 +183,9 @@ var hooks = {
 		WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
 	},
 	aceSelectionChanged: function aceSelectionChanged(rep, context) {
-		if (context.callstack.type === "insertheading") {
+		if (context.callstack.type === 'insertheading') {
 			rep = context.rep;
-			var headingTagId = ["headingTagId", randomString(16)];
+			var headingTagId = ['headingTagId', randomString(16)];
 			context.documentAttributeManager.setAttributesOnRange(rep.selStart, rep.selEnd, [headingTagId]);
 		}
 	},

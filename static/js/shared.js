@@ -23,7 +23,7 @@ var collectContentPre = function collectContentPre(hook, context) {
 			context.cc.doAttrib(context.state, 'headingTagId::' + randomString(16));
 		}
 
-		setTimeout(function () {
+		setTimeout(function setTimeout() {
 			WRTC_Room.findTags(context);
 		}, 250);
 	}

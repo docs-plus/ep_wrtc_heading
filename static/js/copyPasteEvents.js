@@ -1,10 +1,10 @@
 
 // inspired by ep_comments_page plugin, used and modified copyPasteEvents.js
 
-"use strict";
+'use strict';
 
-var _ = require("ep_etherpad-lite/static/js/underscore");
-var randomString = require("ep_etherpad-lite/static/js/pad_utils").randomString;
+var _ = require('ep_etherpad-lite/static/js/underscore');
+var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 var padInner = null;
 
 var getFirstColumnOfSelection = function getFirstColumnOfSelection(line, rep, firstLineOfSelection) {
@@ -27,9 +27,22 @@ var getLastColumnOfSelection = function getLastColumnOfSelection(line, rep, last
 	if (line !== lastLineOfSelection) {
 		lastColumnOfSelection = getLength(line, rep); // length of line
 	} else {
-			lastColumnOfSelection = rep.selEnd[1] - 1; // position of last character selected
-		}
+		lastColumnOfSelection = rep.selEnd[1] - 1; // position of last character selected
+	}
 	return lastColumnOfSelection;
+};
+
+
+var hasCommentOnLine = function hasCommentOnLine(lineNumber, firstColumn, lastColumn, attributeManager) {
+	var foundHeadOnLine = false;
+	var headId = null;
+	for (var column = firstColumn; column <= lastColumn && !foundHeadOnLine; column++) {
+		headId = _.object(attributeManager.getAttributesOnPosition(lineNumber, column)).headingTagId;
+		if (!headId) {
+			foundHeadOnLine = true;
+		}
+	}
+	return { foundHeadOnLine: foundHeadOnLine, headId: headId };
 };
 
 var hasCommentOnMultipleLineSelection = function hasCommentOnMultipleLineSelection(firstLineOfSelection, lastLineOfSelection, rep, attributeManager) {
@@ -45,23 +58,11 @@ var hasCommentOnMultipleLineSelection = function hasCommentOnMultipleLineSelecti
 	return foundLineWithComment;
 };
 
-var hasCommentOnLine = function hasCommentOnLine(lineNumber, firstColumn, lastColumn, attributeManager) {
-	var foundHeadOnLine = false;
-	var headId = null;
-	for (var column = firstColumn; column <= lastColumn && !foundHeadOnLine; column++) {
-		headId = _.object(attributeManager.getAttributesOnPosition(lineNumber, column)).headingTagId;
-		if (headId !== undefined) {
-			foundHeadOnLine = true;
-		}
-	}
-	return { "foundHeadOnLine": foundHeadOnLine, "headId": headId };
-};
-
 var hasMultipleLineSelected = function hasMultipleLineSelected(firstLineOfSelection, lastLineOfSelection) {
 	return firstLineOfSelection !== lastLineOfSelection;
 };
 
-exports.hasHeaderOnSelection = function () {
+exports.hasHeaderOnSelection = function hasHeaderOnSelection() {
 	var hasVideoHeader;
 	var attributeManager = this.documentAttributeManager;
 	var rep = this.rep;
@@ -76,12 +77,12 @@ exports.hasHeaderOnSelection = function () {
 	} else {
 		hasVideoHeader = hasCommentOnLine(firstLineOfSelection, firstColumn, lastColumn, attributeManager);
 	}
-	return { "hasVideoHeader": hasVideoHeader.foundHeadOnLine, "headId": hasVideoHeader.headId, "hasMultipleLine": selectionOfMultipleLine };
+	return { hasVideoHeader: hasVideoHeader.foundHeadOnLine, headId: hasVideoHeader.headId, hasMultipleLine: selectionOfMultipleLine };
 };
 
 function getSelectionHtml() {
-	var html = "";
-	if (typeof window.getSelection != "undefined") {
+	var html = '';
+	if (typeof window.getSelection !== 'undefined') {
 		var sel = padInner.contents()[0].getSelection();
 		if (sel.rangeCount) {
 			var container = document.createElement('div');
@@ -101,28 +102,28 @@ function getSelectionHtml() {
 function selectionMultipleLine() {
 	var rawHtml = getSelectionHtml();
 	rawHtml = $('<div></div>').append(rawHtml);
-	rawHtml.find(':header span').removeClass(function (index, css) {
+	rawHtml.find(':header span').removeClass(function removeClass(index, css) {
 		return (css.match(/\headingTagId_\S+/g) || []).join(' ');
-	}).addClass(function (index, css) {
+	}).addClass(function addClass(index, css) {
 		return 'headingTagId_' + randomString(16) + ' ' + css;
 	});
 	return rawHtml.html();
 }
 
 function selectionOneLine(headerId) {
-	var hTag = padInner.contents().find(".headingTagId_" + headerId).closest(":header")[0].tagName;
-	var content = padInner.contents().find(".headingTagId_" + headerId).closest(":header span").removeClass(function (index, css) {
-		return (css.match(/\headingTagId_\S+/g) || []).join(" ");
+	var hTag = padInner.contents().find('.headingTagId_' + headerId).closest(':header')[0].tagName;
+	var content = padInner.contents().find('.headingTagId_' + headerId).closest(':header span').removeClass(function(index, css) {
+		return (css.match(/\headingTagId_\S+/g) || []).join(' ');
 	}).html();
-	var rawHtml = $("<div></div>").append("<" + hTag + "><span class='headingTagId_" + randomString(16) + "'>" + content + "</span></" + hTag + ">");
+	var rawHtml = $('<div></div>').append('<' + hTag + "><span class='headingTagId_" + randomString(16) + "'>" + content + '</span></' + hTag + '>');
 	return rawHtml.html();
 }
 
-exports.addTextOnClipboard = function (e, aces, inner, removeSelection) {
+exports.addTextOnClipboard = function addTextOnClipboard(e, aces, inner, removeSelection) {
 	padInner = inner;
 
 	var selection;
-	aces.callWithAce(function (ace) {
+	aces.callWithAce(function callWithAce(ace) {
 		selection = ace.ace_hasHeaderOnSelection();
 	});
 
@@ -137,13 +138,13 @@ exports.addTextOnClipboard = function (e, aces, inner, removeSelection) {
 		}
 
 		if (rawHtml) {
-			e.originalEvent.clipboardData.setData("text/html", rawHtml);
+			e.originalEvent.clipboardData.setData('text/html', rawHtml);
 			e.preventDefault();
 		}
 
 		// if it is a cut event we have to remove the selection
 		if (removeSelection) {
-			padInner.contents()[0].execCommand("delete");
+			padInner.contents()[0].execCommand('delete');
 		}
 	}
 };

@@ -18,20 +18,20 @@
 require('ep_wrtc_heading/static/js/adapter');
 require('ep_wrtc_heading/static/js/getUserMediaPolyfill');
 
-var WRTC = (function () {
-	var videoSizes = { 'large': '260px', 'small': '160px' };
+var WRTC = (function WRTC() {
+	var videoSizes = { large: '260px', small: '160px' };
 	var pcConfig = {};
 	var audioInputSelect = null;
 	var videoSelect = null;
 	var pcConstraints = {
-		'optional': [{
-			'DtlsSrtpKeyAgreement': true
+		optional: [{
+			DtlsSrtpKeyAgreement: true
 		}]
 	};
 	var sdpConstraints = {
-		'mandatory': {
-			'OfferToReceiveAudio': true,
-			'OfferToReceiveVideo': true
+		mandatory: {
+			OfferToReceiveAudio: true,
+			OfferToReceiveVideo: true
 		}
 	};
 	var localStream;
@@ -42,9 +42,9 @@ var WRTC = (function () {
 
 	var self = {
 		// API HOOKS
-		'postAceInit': function postAceInit(hook, context) {
+		postAceInit: function postAceInit(hook, context) {
 			pcConfig.iceServers = clientVars.webrtc && clientVars.webrtc.iceServers ? clientVars.webrtc.iceServers : [{
-				'url': 'stun:stun.l.google.com:19302'
+				url: 'stun:stun.l.google.com:19302'
 			}];
 			if (clientVars.webrtc.video.sizes.large) {
 				videoSizes.large = clientVars.webrtc.video.sizes.large + 'px';
@@ -54,16 +54,16 @@ var WRTC = (function () {
 			}
 			self.init(context.pad);
 		},
-		'appendInterfaceLayout': function appendInterfaceLayout() {
+		appendInterfaceLayout: function appendInterfaceLayout() {
 			// TODO: legacy code, move it to template
 			var werc_toolbar = $('#wertc_modal_toolbar').tmpl({
-				'videoChatLimit': clientVars.webrtc.videoChatLimit,
-				headerId: ""
+				videoChatLimit: clientVars.webrtc.videoChatLimit,
+				headerId: ''
 			});
 			var $wrtc_modal = $('<div id="wrtc_modal"><div class="videoWrapper" class="thin-scrollbar"></div></div');
 			$wrtc_modal.append(werc_toolbar);
 			$('body').prepend($wrtc_modal);
-			$(document).on('click', '#wrtc_modal .btn_toggle_modal', function () {
+			$(document).on('click', '#wrtc_modal .btn_toggle_modal', function() {
 				var $parent = $(this).parent().parent();
 				var action = $(this).attr('data-action');
 				var videoBox = $('#wrtc_modal .videoWrapper').innerHeight();
@@ -72,21 +72,21 @@ var WRTC = (function () {
 				$(this).find('.fa_arrow-to-top').toggle();
 
 				if (action === 'collapse') {
-					$(this).attr({ 'data-action': "expand" });
+					$(this).attr({ 'data-action': 'expand' });
 					$parent.find('.btn_enlarge').removeAttr('active');
 					$('#wrtc_modal').css({
-						'transform': 'translate(-50%, -' + videoBox + 'px)'
+						transform: 'translate(-50%, -' + videoBox + 'px)'
 					});
 				} else {
-					$(this).attr({ 'data-action': "collapse" });
-					$parent.find('.btn_enlarge').attr({ 'active': true });
+					$(this).attr({ 'data-action': 'collapse' });
+					$parent.find('.btn_enlarge').attr({ active: true });
 					$('#wrtc_modal').css({
-						'transform': 'translate(-50%, 0)'
+						transform: 'translate(-50%, 0)'
 					});
 				}
 			});
 		},
-		'aceSetAuthorStyle': function aceSetAuthorStyle(context) {
+		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
 			if (context.author) {
 				var user = self.getUserFromId(context.author);
 				if (user) {
@@ -96,118 +96,118 @@ var WRTC = (function () {
 				}
 			}
 		},
-		'userLeave': function userLeave(hook, context, callback) {
+		userLeave: function userLeave(hook, context, callback) {
 			var userId = context.userInfo.userId;
 			if (userId && pc[userId]) {
 				self.hangup(userId, true);
 			}
 			callback();
 		},
-		'handleClientMessage_RTC_MESSAGE': function handleClientMessage_RTC_MESSAGE(hook, context) {
+		handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
 			if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
 		},
 		// END OF API HOOKS
-		'show': function show() {
+		show: function show() {
 			$('#pad_title').addClass('f_wrtcActive');
 		},
-		'showUserMediaError': function showUserMediaError(err) {
+		showUserMediaError: function showUserMediaError(err) {
 			// show an error returned from getUserMedia
 			var reason;
 			// For reference on standard errors returned by getUserMedia:
 			// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 			// However keep in mind that we add our own errors in getUserMediaPolyfill
 			switch (err.name) {
-				case 'CustomNotSupportedError':
-					reason = 'Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>' + 'To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera.' + '<a href="http://www.webrtc.org/" target="_new">Find out more</a>';
-					self.sendErrorStat('NotSupported');
-					break;
-				case 'CustomSecureConnectionError':
+			case 'CustomNotSupportedError':
+				reason = 'Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>' + 'To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera.' + '<a href="http://www.webrtc.org/" target="_new">Find out more</a>';
+				self.sendErrorStat('NotSupported');
+				break;
+			case 'CustomSecureConnectionError':
+				reason = 'Sorry, you need to install SSL certificates for your Etherpad instance to use WebRTC';
+				self.sendErrorStat('SecureConnection');
+				break;
+			case 'NotAllowedError':
+				// For certain (I suspect older) browsers, `NotAllowedError` indicates either an insecure connection or the user rejecting camera permissions.
+				// The error for both cases appears to be identical, so our best guess at telling them apart is to guess whether we are in a secure context.
+				// (webrtc is considered secure for https connections or on localhost)
+				if (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+					reason = 'Sorry, you need to give us permission to use your camera and microphone';
+					self.sendErrorStat('Permission');
+				} else {
 					reason = 'Sorry, you need to install SSL certificates for your Etherpad instance to use WebRTC';
 					self.sendErrorStat('SecureConnection');
-					break;
-				case 'NotAllowedError':
-					// For certain (I suspect older) browsers, `NotAllowedError` indicates either an insecure connection or the user rejecting camera permissions.
-					// The error for both cases appears to be identical, so our best guess at telling them apart is to guess whether we are in a secure context.
-					// (webrtc is considered secure for https connections or on localhost)
-					if (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-						reason = 'Sorry, you need to give us permission to use your camera and microphone';
-						self.sendErrorStat('Permission');
-					} else {
-						reason = 'Sorry, you need to install SSL certificates for your Etherpad instance to use WebRTC';
-						self.sendErrorStat('SecureConnection');
-					}
-					break;
-				case 'NotFoundError':
-					reason = "Sorry, we couldn't find a suitable camera on your device. If you have a camera, make sure it set up correctly and refresh this website to retry.";
-					self.sendErrorStat('NotFound');
-					break;
-				case 'NotReadableError':
-					// `err.message` might give useful info to the user (not necessarily useful for other error messages)
-					reason = 'Sorry, a hardware error occurred that prevented access to your camera and/or microphone:<br><br>' + err.message;
-					self.sendErrorStat('Hardware');
-					break;
-				case 'AbortError':
-					// `err.message` might give useful info to the user (not necessarily useful for other error messages)
-					reason = 'Sorry, an error occurred (probably not hardware related) that prevented access to your camera and/or microphone:<br><br>' + err.message;
-					self.sendErrorStat('Abort');
-					break;
-				default:
-					// `err` as a string might give useful info to the user (not necessarily useful for other error messages)
-					reason = 'Sorry, there was an unknown Error:<br><br>' + err;
-					self.sendErrorStat('Unknown');
+				}
+				break;
+			case 'NotFoundError':
+				reason = "Sorry, we couldn't find a suitable camera on your device. If you have a camera, make sure it set up correctly and refresh this website to retry.";
+				self.sendErrorStat('NotFound');
+				break;
+			case 'NotReadableError':
+				// `err.message` might give useful info to the user (not necessarily useful for other error messages)
+				reason = 'Sorry, a hardware error occurred that prevented access to your camera and/or microphone:<br><br>' + err.message;
+				self.sendErrorStat('Hardware');
+				break;
+			case 'AbortError':
+				// `err.message` might give useful info to the user (not necessarily useful for other error messages)
+				reason = 'Sorry, an error occurred (probably not hardware related) that prevented access to your camera and/or microphone:<br><br>' + err.message;
+				self.sendErrorStat('Abort');
+				break;
+			default:
+				// `err` as a string might give useful info to the user (not necessarily useful for other error messages)
+				reason = 'Sorry, there was an unknown Error:<br><br>' + err;
+				self.sendErrorStat('Unknown');
 			}
 			$.gritter.add({
-				'title': 'Error',
-				'text': reason,
-				'sticky': true,
-				'class_name': 'error'
+				title: 'Error',
+				text: reason,
+				sticky: true,
+				class_name: 'error'
 			});
 			self.hide();
 		},
-		'hide': function hide(userId) {
+		hide: function hide(userId) {
 			if (!userId) return false;
 			userId = userId.split('.')[1];
 			$('#rtcbox').find('#video_a_' + userId).parent().remove();
 		},
-		'activate': function activate(headerId) {
+		activate: function activate(headerId) {
 			self.show();
 			self.hangupAll();
 			self.getUserMedia(headerId);
 		},
-		'deactivate': function deactivate(userId, headerId) {
+		deactivate: function deactivate(userId, headerId) {
 			self.hide(userId);
 			self.hangupAll(headerId);
 			self.hangup(userId, true, headerId);
 			if (localStream) {
-				localStream.getTracks().forEach(function (track) {
+				localStream.getTracks().forEach(function(track) {
 					track.stop();
 				});
 				localStream = null;
 			}
 		},
-		'toggleMuted': function toggleMuted() {
+		toggleMuted: function toggleMuted() {
 			var audioTrack = localStream.getAudioTracks()[0];
 			if (audioTrack) {
 				audioTrack.enabled = !audioTrack.enabled;
 				return !audioTrack.enabled;
 			}
 		},
-		'toggleVideo': function toggleVideo() {
+		toggleVideo: function toggleVideo() {
 			var videoTrack = localStream.getVideoTracks()[0];
 			if (videoTrack) {
 				videoTrack.enabled = !videoTrack.enabled;
 				return !videoTrack.enabled;
 			}
 		},
-		'getUserFromId': function getUserFromId(userId) {
+		getUserFromId: function getUserFromId(userId) {
 			if (!self._pad || !self._pad.collabClient) return null;
-			var result = self._pad.collabClient.getConnectedUsers().filter(function (user) {
+			var result = self._pad.collabClient.getConnectedUsers().filter(function(user) {
 				return user.userId === userId;
 			});
 			var user = result.length > 0 ? result[0] : null;
 			return user;
 		},
-		'setStream': function setStream(userId, stream) {
+		setStream: function setStream(userId, stream) {
 			if (!userId) return false;
 			var isLocal = userId === self.getUserId();
 			var videoId = 'video_' + userId.replace(/\./g, '_');
@@ -217,7 +217,7 @@ var WRTC = (function () {
 
 			if (!video && stream) {
 				var videoContainer = $("<div class='video-container'>").css({
-					'width': videoSizes.small,
+					width: videoSizes.small,
 					'max-height': videoSizes.small
 				}).appendTo($('#wrtc_modal .videoWrapper'));
 
@@ -225,10 +225,10 @@ var WRTC = (function () {
 
 				video = $('<video playsinline>').attr('id', videoId).css({
 					'border-color': user.colorId,
-					'width': videoSizes.small,
+					width: videoSizes.small,
 					'max-height': videoSizes.small
 				}).on({
-					'loadedmetadata': function loadedmetadata() {
+					loadedmetadata: function loadedmetadata() {
 						self.addInterface(userId);
 					}
 				}).appendTo(videoContainer)[0];
@@ -246,14 +246,14 @@ var WRTC = (function () {
 				$(video).parent().remove();
 			}
 		},
-		'addInterface': function addInterface(userId) {
+		addInterface: function addInterface(userId) {
 			if (!userId) return false;
 			var isLocal = userId === self.getUserId();
 			var videoId = 'video_' + userId.replace(/\./g, '_');
 			var $video = $('#' + videoId);
 
 			var $mute = $("<span class='interface-btn audio-btn buttonicon'>").attr('title', 'Mute').on({
-				'click': function click() {
+				click: function click() {
 					var muted;
 					if (isLocal) {
 						muted = self.toggleMuted();
@@ -266,7 +266,7 @@ var WRTC = (function () {
 			});
 			var videoEnabled = true;
 			var $disableVideo = isLocal ? $("<span class='interface-btn video-btn buttonicon'>").attr('title', 'Disable video').on({
-				'click': function click() {
+				click: function click() {
 					self.toggleVideo();
 					videoEnabled = !videoEnabled;
 					$disableVideo.attr('title', videoEnabled ? 'Disable video' : 'Enable video').toggleClass('off', !videoEnabled);
@@ -275,20 +275,20 @@ var WRTC = (function () {
 
 			var videoEnlarged = false;
 			var $largeVideo = $("<span class='interface-btn enlarge-btn buttonicon'>").attr('title', 'Make video larger').on({
-				'click': function click() {
+				click: function click() {
 					videoEnlarged = !videoEnlarged;
 
 					if (videoEnlarged) {
 						enlargedVideos.add(userId);
 					} else {
-						enlargedVideos['delete'](userId);
+						enlargedVideos.delete(userId);
 					}
 
 					$largeVideo.attr('title', videoEnlarged ? 'Make video smaller' : 'Make video larger').toggleClass('large', videoEnlarged);
 
 					var videoSize = videoEnlarged ? videoSizes.large : videoSizes.small;
-					$video.parent().css({ 'width': videoSize, 'max-height': videoSize });
-					$video.css({ 'width': videoSize, 'max-height': videoSize });
+					$video.parent().css({ width: videoSize, 'max-height': videoSize });
+					$video.css({ width: videoSize, 'max-height': videoSize });
 				}
 			});
 
@@ -299,17 +299,17 @@ var WRTC = (function () {
 		},
 		// Sends a stat to the back end. `statName` must be in the
 		// approved list on the server side.
-		'sendErrorStat': function sendErrorStat(statName) {
-			var msg = { 'component': 'pad', 'type': 'STATS', 'data': { 'statName': statName, 'type': 'RTC_MESSAGE' } };
+		sendErrorStat: function sendErrorStat(statName) {
+			var msg = { component: 'pad', type: 'STATS', data: { statName: statName, type: 'RTC_MESSAGE' } };
 			self._pad.socket.json.send(msg);
 		},
-		'sendMessage': function sendMessage(to, data) {
+		sendMessage: function sendMessage(to, data) {
 			self._pad.collabClient.sendMessage({
-				'type': 'RTC_MESSAGE',
-				'payload': { 'data': data, 'to': to }
+				type: 'RTC_MESSAGE',
+				payload: { data: data, to: to }
 			});
 		},
-		'receiveMessage': function receiveMessage(msg) {
+		receiveMessage: function receiveMessage(msg) {
 			var peer = msg.from;
 			var data = msg.data;
 			var type = data.type;
@@ -342,27 +342,27 @@ var WRTC = (function () {
 					}
 				}
 				var offer = new RTCSessionDescription(data.offer);
-				pc[peer].setRemoteDescription(offer, function () {
-					pc[peer].createAnswer(function (desc) {
+				pc[peer].setRemoteDescription(offer, function() {
+					pc[peer].createAnswer(function(desc) {
 						desc.sdp = cleanupSdp(desc.sdp);
-						pc[peer].setLocalDescription(desc, function () {
-							self.sendMessage(peer, { 'type': 'answer', 'answer': desc, 'headerId': data.headerId });
+						pc[peer].setLocalDescription(desc, function() {
+							self.sendMessage(peer, { type: 'answer', answer: desc, headerId: data.headerId });
 						}, logError);
 					}, logError, sdpConstraints);
 				}, logError);
 			} else if (type === 'answer') {
 				if (pc[peer]) {
 					var answer = new RTCSessionDescription(data.answer);
-					pc[peer].setRemoteDescription(answer, function () {}, logError);
+					pc[peer].setRemoteDescription(answer, function() {}, logError);
 				}
 			} else if (type === 'icecandidate') {
 				if (pc[peer]) {
 					var candidate = new RTCIceCandidate(data.candidate);
 					var p = pc[peer].addIceCandidate(candidate);
 					if (p) {
-						p.then(function () {
+						p.then(function() {
 							// Do stuff when the candidate is successfully passed to the ICE agent
-						})['catch'](function () {
+						}).catch(function() {
 							console.error('Error: Failure during addIceCandidate()', data);
 						});
 					}
@@ -371,29 +371,29 @@ var WRTC = (function () {
 				console.error('unknown message', data);
 			}
 		},
-		'hangupAll': function hangupAll(_headerId) {
-			Object.keys(pc).forEach(function (userId) {
+		hangupAll: function hangupAll(_headerId) {
+			Object.keys(pc).forEach(function(userId) {
 				self.hangup(userId, true, _headerId);
 			});
 		},
-		'getUserId': function getUserId() {
+		getUserId: function getUserId() {
 			return self._pad && self._pad.getUserId();
 		},
-		'hangup': function hangup(userId, notify, headerId) {
+		hangup: function hangup(userId, notify, headerId) {
 			notify = arguments.length === 1 ? true : notify;
 			if (pc[userId] && userId !== self.getUserId()) {
 				self.setStream(userId, '');
 				pc[userId].close();
 				delete pc[userId];
-				if (notify) self.sendMessage(userId, { 'type': 'hangup', 'headerId': headerId });
+				if (notify) self.sendMessage(userId, { type: 'hangup', headerId: headerId });
 			}
 		},
-		'call': function call(userId, headerId) {
+		call: function call(userId, headerId) {
 			if (!localStream) {
 				callQueue.push(userId);
 				return;
 			}
-			var constraints = { 'optional': [], 'mandatory': {} };
+			var constraints = { optional: [], mandatory: {} };
 			// temporary measure to remove Moz* constraints in Chrome
 			if (webrtcDetectedBrowser === 'chrome') {
 				for (var prop in constraints.mandatory) {
@@ -408,43 +408,43 @@ var WRTC = (function () {
 				self.createPeerConnection(userId, headerId);
 			}
 			pc[userId].addStream(localStream);
-			pc[userId].createOffer(function (desc) {
+			pc[userId].createOffer(function(desc) {
 				desc.sdp = cleanupSdp(desc.sdp);
-				pc[userId].setLocalDescription(desc, function () {
-					self.sendMessage(userId, { 'type': 'offer', 'offer': desc, 'headerId': headerId });
+				pc[userId].setLocalDescription(desc, function() {
+					self.sendMessage(userId, { type: 'offer', offer: desc, headerId: headerId });
 				}, logError);
 			}, logError, constraints);
 		},
-		'createPeerConnection': function createPeerConnection(userId, headerId) {
+		createPeerConnection: function createPeerConnection(userId, headerId) {
 			if (pc[userId]) {
 				console.warn('WARNING creating PC connection even though one exists', userId);
 			}
 			pc[userId] = new RTCPeerConnection(pcConfig, pcConstraints);
-			pc[userId].onicecandidate = function (event) {
+			pc[userId].onicecandidate = function(event) {
 				if (event.candidate) {
 					self.sendMessage(userId, {
-						'type': 'icecandidate',
-						'headerId': headerId,
-						'candidate': event.candidate
+						type: 'icecandidate',
+						headerId: headerId,
+						candidate: event.candidate
 					});
 				}
 			};
-			pc[userId].onaddstream = function (event) {
+			pc[userId].onaddstream = function(event) {
 				remoteStream[userId] = event.stream;
 				self.setStream(userId, event.stream);
 			};
-			pc[userId].onremovestream = function () {
+			pc[userId].onremovestream = function() {
 				self.setStream(userId, '');
 			};
 		},
-		'audioVideoInputChange': function audioVideoInputChange() {
-			localStream.getTracks().forEach(function (track) {
+		audioVideoInputChange: function audioVideoInputChange() {
+			localStream.getTracks().forEach(function(track) {
 				track.stop();
 			});
 
 			self.getUserMedia(window.headerId);
 		},
-		'getUserMedia': function getUserMedia(headerId) {
+		getUserMedia: function getUserMedia(headerId) {
 			audioInputSelect = document.querySelector('select#audioSource');
 			videoSelect = document.querySelector('select#videoSource');
 
@@ -452,29 +452,29 @@ var WRTC = (function () {
 			var videoSource = videoSelect.value;
 
 			var mediaConstraints = {
-				'audio': true,
-				'video': {
-					'optional': [],
-					'mandatory': {
-						'maxWidth': 320,
-						'maxHeight': 240
+				audio: true,
+				video: {
+					optional: [],
+					mandatory: {
+						maxWidth: 320,
+						maxHeight: 240
 					}
 				}
 			};
 
 			if (audioSource) {
-				mediaConstraints.audio = { 'deviceId': { 'exact': audioSource } };
+				mediaConstraints.audio = { deviceId: { exact: audioSource } };
 			}
 			if (videoSource) {
-				mediaConstraints.video = { 'deviceId': { 'exact': videoSource } };
+				mediaConstraints.video = { deviceId: { exact: videoSource } };
 			}
 
 			localStorage.setItem('videoSettings', JSON.stringify({ video: videoSource, audio: audioSource }));
 
-			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
+			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function(stream) {
 				localStream = stream;
 				self.setStream(self._pad.getUserId(), stream);
-				self._pad.collabClient.getConnectedUsers().forEach(function (user) {
+				self._pad.collabClient.getConnectedUsers().forEach(function(user) {
 					if (user.userId !== self.getUserId()) {
 						if (pc[user.userId]) {
 							self.hangup(user.userId, false, headerId);
@@ -482,17 +482,17 @@ var WRTC = (function () {
 						self.call(user.userId, headerId);
 					}
 				});
-			})['catch'](function (err) {
+			}).catch(function(err) {
 				self.showUserMediaError(err);
 			});
 		},
-		'init': function init(pad) {
+		init: function init(pad) {
 			self._pad = pad || window.pad;
 
 			$(document).on('change', 'select#audioSource', self.audioVideoInputChange);
 			$(document).on('change', 'select#videoSource', self.audioVideoInputChange);
 
-			$(window).on('unload', function () {
+			$(window).on('unload', function() {
 				self.hangupAll();
 			});
 		}

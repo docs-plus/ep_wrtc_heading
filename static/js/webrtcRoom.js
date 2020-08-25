@@ -1,10 +1,10 @@
 'use strict';
 
-var share = require("ep_wrtc_heading/static/js/clientShare");
-var textChat = require("ep_wrtc_heading/static/js/textChat");
-var videoChat = require("ep_wrtc_heading/static/js/videoChat");
+var share = require('ep_wrtc_heading/static/js/clientShare');
+var textChat = require('ep_wrtc_heading/static/js/textChat');
+var videoChat = require('ep_wrtc_heading/static/js/videoChat');
 
-var WRTC_Room = (function () {
+var WRTC_Room = (function WRTC_Room() {
 	var self = null;
 	var socket = null;
 	var padId = null;
@@ -22,19 +22,19 @@ var WRTC_Room = (function () {
 		document.execCommand('copy');
 		$temp.remove();
 		$.gritter.add({
-			'title': 'Copied',
-			'text': 'Join link copied to clip board',
-			'sticky': false,
-			'class_name': 'copyLinkToClipboard',
-			'time': '3000'
+			title: 'Copied',
+			text: 'Join link copied to clip board',
+			sticky: false,
+			class_name: 'copyLinkToClipboard',
+			time: '3000'
 		});
 	}
 
 	function scroll2Header(headerId) {
 		var padContainer = share.$body_ace_outer().find('iframe').contents().find('#innerdocbody');
-		padContainer.find('.' + prefixHeaderId + headerId).each(function () {
+		padContainer.find('.' + prefixHeaderId + headerId).each(function scrolling() {
 			this.scrollIntoView({
-				'behavior': 'smooth'
+				behavior: 'smooth'
 			});
 		});
 	}
@@ -50,9 +50,9 @@ var WRTC_Room = (function () {
 	}
 
 	/**
-  * 
+  *
   * @param {string} actions @enum (JOIN|LEAVE)
-  * @param {string} headerId 
+  * @param {string} headerId
   * @param {string} target @enum (chatRoom|video|text)
   */
 	function roomBtnHandler(actions, headerId, target) {
@@ -65,39 +65,43 @@ var WRTC_Room = (function () {
 		var $joinBtn = $(this);
 
 		var userInfo = {
-			'padId': clientVars.padId,
-			'userId': clientVars.userId,
-			'userName': clientVars.userName || 'anonymous',
-			'headerId': headerId,
-			'target': target
+			padId: clientVars.padId,
+			userId: clientVars.userId,
+			userName: clientVars.userName || 'anonymous',
+			headerId: headerId,
+			target: target
 		};
 
-		share.wrtcPubsub.emit("disable room buttons", headerId, actions, target);
+		share.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
 
 		if (actions === 'JOIN') {
 			switch (target) {
-				case 'PLUS':
-					$joinBtn.targetPlus = true;
-					joinChatRoom(headerId, userInfo, target);
-					break;
-				case 'VIDEO':
-					videoChat.userJoin(headerId, userInfo, target);
-					break;
-				case 'TEXT':
-					textChat.userJoin(headerId, userInfo, target);
-					break;
+			case 'PLUS':
+				$joinBtn.targetPlus = true;
+				joinChatRoom(headerId, userInfo, target);
+				break;
+			case 'VIDEO':
+				videoChat.userJoin(headerId, userInfo, target);
+				break;
+			case 'TEXT':
+				textChat.userJoin(headerId, userInfo, target);
+				break;
+			default:
+				return false;
 			}
 		} else if (actions === 'LEAVE') {
 			switch (target) {
-				case 'PLUS':
-					leaveChatRoom(headerId, userInfo, target);
-					break;
-				case 'VIDEO':
-					videoChat.userLeave(headerId, userInfo, target);
-					break;
-				case 'TEXT':
-					textChat.userLeave(headerId, userInfo, target);
-					break;
+			case 'PLUS':
+				leaveChatRoom(headerId, userInfo, target);
+				break;
+			case 'VIDEO':
+				videoChat.userLeave(headerId, userInfo, target);
+				break;
+			case 'TEXT':
+				textChat.userLeave(headerId, userInfo, target);
+				break;
+			default:
+				return false;
 			}
 		}
 	}
@@ -118,9 +122,9 @@ var WRTC_Room = (function () {
 	}
 
 	function shareRoomsLink() {
-		var headId = $(this).attr("data-id");
-		var target = $(this).attr("data-join");
-		var title = share.$body_ace_outer().find(".wbrtc_roomBox." + headId + " .titleRoom").text();
+		var headId = $(this).attr('data-id');
+		var target = $(this).attr('data-join');
+		var title = share.$body_ace_outer().find('.wbrtc_roomBox.' + headId + ' .titleRoom').text();
 
 		var origin = window.location.origin;
 		var pathName = window.location.pathname;
@@ -133,11 +137,11 @@ var WRTC_Room = (function () {
 		$temp.remove();
 
 		$.gritter.add({
-			'title': 'Copied',
-			'text': 'Join link copied to clip board',
-			'sticky': false,
-			'class_name': 'copyLinkToClipboard',
-			'time': '3000'
+			title: 'Copied',
+			text: 'Join link copied to clip board',
+			sticky: false,
+			class_name: 'copyLinkToClipboard',
+			time: '3000'
 		});
 	}
 
@@ -154,11 +158,10 @@ var WRTC_Room = (function () {
 		var paddingLeft = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-left');
 		var aceOuterPadding = parseInt(paddingLeft, 10);
 		var offsetLeft = Math.ceil(share.$body_ace_outer().find('iframe[name="ace_inner"]').offset().left - aceOuterPadding);
-		return offsetLeft - width 
+		return offsetLeft - width;
 	}
 
 	function activeEventListener() {
-
 		var $wbrtc_roomBox = share.$body_ace_outer();
 
 		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_text', roomBtnHandler);
@@ -171,55 +174,55 @@ var WRTC_Room = (function () {
 
 		$(document).on('click', '#wrtc_textChatWrapper .btn_leave', roomBtnHandler);
 
-		share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function () {
-			$(this).parent().css({ 'overflow': 'initial' });
-			$(this).addClass('active').find('.wrtc_contentBody').css({ 'display': 'block' });
-		}).on('mouseleave', '.wbrtc_roomBox', function () {
-			$(this).parent().css({ 'overflow': 'hidden' });
-			$(this).removeClass('active').find('.wrtc_contentBody').css({ 'display': 'none' });
+		share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function mouseenter() {
+			$(this).parent().css({ overflow: 'initial' });
+			$(this).addClass('active').find('.wrtc_contentBody').css({ display: 'block' });
+		}).on('mouseleave', '.wbrtc_roomBox', function mouseleave() {
+			$(this).parent().css({ overflow: 'hidden' });
+			$(this).removeClass('active').find('.wrtc_contentBody').css({ display: 'none' });
 		});
 
-		share.$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_share', function () {
+		share.$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_share', function click() {
 			var headerURI = $(this).find('input').val();
 			link2Clipboard(headerURI);
 		});
 
-		share.$body_ace_outer().on('mouseenter', '.wrtc_roomInlineAvatar .avatar', function () {
-			var id = $(this).parent().parent().attr("id");
+		share.$body_ace_outer().on('mouseenter', '.wrtc_roomInlineAvatar .avatar', function mouseenter() {
+			var id = $(this).parent().parent().attr('id');
 			share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseenter');
-		}).on('mouseleave', '.wrtc_roomInlineAvatar .avatar', function () {
-			var id = $(this).parent().parent().attr("id");
+		}).on('mouseleave', '.wrtc_roomInlineAvatar .avatar', function mouseleave() {
+			var id = $(this).parent().parent().attr('id');
 			share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseleave');
 		});
 
-		$(document).on('click', '#werc_toolbar p, .textChatToolbar b', function () {
+		$(document).on('click', '#werc_toolbar p, .textChatToolbar b', function click() {
 			var headerId = $(this).attr('data-id');
 			scroll2Header(headerId);
 		});
 
-		$(document).on('click', '#werc_toolbar .btn_enlarge', function () {
+		$(document).on('click', '#werc_toolbar .btn_enlarge', function click() {
 			if (!$(this).attr('active')) return true;
 
 			$(this).toggleClass('large');
 
-			$('#wrtc_modal .video-container .enlarge-btn').each(function () {
+			$('#wrtc_modal .video-container .enlarge-btn').each(function trigger() {
 				$(this).trigger('click');
 			});
 		});
 
 		// video interface settings
-		$(document).on('click', '.settings-btn', function () {
+		$(document).on('click', '.settings-btn', function click() {
 			$(document).find('#wrtc_settings').toggleClass('active');
 		});
 
-		$(document).on('click', '#wrtc_settings .btn_close', function () {
+		$(document).on('click', '#wrtc_settings .btn_close', function click() {
 			$('#wrtc_settings').toggleClass('active');
 		});
 	}
 
 	self = {
-		'getHeaderRoomX': getHeaderRoomX,
-		'aceSetAuthorStyle': function aceSetAuthorStyle(context) {
+		getHeaderRoomX: getHeaderRoomX,
+		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
 			if (context.author) {
 				var user = share.getUserFromId(context.author);
 				if (user) {
@@ -229,31 +232,31 @@ var WRTC_Room = (function () {
 				}
 			}
 		},
-		'userLeave': function userLeave(context, callback) {
+		userLeave: function userLeave(context, callback) {
 			// Deprecated, we use socket disconnect
 
 			callback();
 		},
-		'bulkUpdateRooms': function bulkUpdateRooms(hTagList) {
+		bulkUpdateRooms: function bulkUpdateRooms(hTagList) {
 			videoChat.bulkUpdateRooms(hTagList);
 			textChat.bulkUpdateRooms(hTagList);
 		},
-		'postAceInit': function postAceInit(hook, context, webSocket, docId) {
+		postAceInit: function postAceInit(hook, context, webSocket, docId) {
 			socket = webSocket;
 			padId = docId || window.pad.getPadId();
 
 			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
 
-			socket.on('userJoin', function (data, roomInfo, target) {
-				if (target === "video") {
+			socket.on('userJoin', function(data, roomInfo, target) {
+				if (target === 'video') {
 					videoChat.gateway_userJoin(data, roomInfo, false);
 				} else {
 					textChat.addUserToRoom(data, roomInfo, target);
 				}
 			});
 
-			socket.on('userLeave', function (data, roomInfo, target) {
-				if (target === "video") {
+			socket.on('userLeave', function(data, roomInfo, target) {
+				if (target === 'video') {
 					videoChat.gateway_userLeave(data, roomInfo, target);
 				} else {
 					textChat.removeUserFromRoom(data, roomInfo, target);
@@ -263,11 +266,11 @@ var WRTC_Room = (function () {
 			activeEventListener();
 
 			// check if there is a join request in URI queryString
-			setTimeout(function () {
+			setTimeout(function() {
 				joinByQueryString();
 			}, 500);
 		},
-		'adoptHeaderYRoom': function adoptHeaderYRoom() {
+		adoptHeaderYRoom: function adoptHeaderYRoom() {
 			// Set all video_heading to be inline with their target REP
 			var $padOuter = share.$body_ace_outer();
 			if (!$padOuter) return;
@@ -285,11 +288,11 @@ var WRTC_Room = (function () {
 					return false;
 				}
 
-				if($el.attr("data-box") === "avatar") $el.css({'left': getHeaderRoomX($el) + 'px'});
-				$el.css({ 'top': getHeaderRoomY($headingEl) + 'px' });
+				if ($el.attr('data-box') === 'avatar') $el.css({left: getHeaderRoomX($el) + 'px'});
+				$el.css({ top: getHeaderRoomY($headingEl) + 'px' });
 			});
 		},
-		'findTags': function findTags() {
+		findTags: function findTags() {
 			var hTagList = [];
 			var hTagElements = hElements.join(',');
 			var hTags = share.$body_ace_outer().find('iframe').contents().find('#innerdocbody').children('div').children(hTagElements);
@@ -308,13 +311,13 @@ var WRTC_Room = (function () {
 				if (!headingTagId) return true;
 
 				var data = {
-					'headingTagId': headingTagId[1],
-					'tag': tag,
-					'positionTop': newY,
-					'positionLeft': newX,
-					'headTitle': linkText,
-					'lineNumber': lineNumber,
-					'videoChatLimit': VIDEOCHATLIMIT
+					headingTagId: headingTagId[1],
+					tag: tag,
+					positionTop: newY,
+					positionLeft: newX,
+					headTitle: linkText,
+					lineNumber: lineNumber,
+					videoChatLimit: VIDEOCHATLIMIT
 				};
 
 				if (!share.wrtcStore[data.headingTagId]) share.wrtcStore[data.headingTagId] = { VIDEO: { list: [] }, TEXT: { list: [] }, USERS: {} };
@@ -326,8 +329,8 @@ var WRTC_Room = (function () {
 					var box = $('#wertc_roomBox').tmpl(data);
 					target.find('#wbrtc_chatBox').append(box);
 
-					var box = $('#wertc_inlineAvatar').tmpl(data);
-					target.find('#wbrtc_avatarCol').append(box);
+					var avatarBox = $('#wertc_inlineAvatar').tmpl(data);
+					target.find('#wbrtc_avatarCol').append(avatarBox);
 
 					newHTagAdded = true;
 				} else {
