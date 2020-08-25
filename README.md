@@ -26,7 +26,7 @@ Video Headings Plugin for Etherpad.
 
 WebRTC video/audio, a dedicated chat room for each headlines (h tags).  
 
-> Note: for better expriance use [ep_heading2](https://github.com/ether/ep_headings2)
+> Note: for better expriance use [ep_heading2](https://github.com/ether/ep_headings2), [ep_profile_modal](https://github.com/samirsayyad/ep_profile_modal)
 
 ## Installing
 
