@@ -241,7 +241,7 @@ var videoChat = (function videoChat() {
 		// bind roomInfo and send user to gateway_userJoin
 		Object.keys(rooms).forEach(function (headerId) {
 			rooms[headerId].forEach(function (user) {
-				videoChat.gateway_userJoin(user, roomsInfo[headerId], true);
+				gateway_userJoin(user, roomsInfo[headerId], true);
 			});
 		});
 	}
