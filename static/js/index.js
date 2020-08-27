@@ -36,7 +36,7 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 		var url = loc.protocol + '//' + loc.hostname + ':' + port + '/' + 'heading_chat_room';
 		var socket = io.connect(url);
 
-		// socket.emit('join pad', padId, userId, function joinPad() {});
+		socket.emit('join pad', padId, userId, function joinPad() {});
 
 		// find containers
 		padOuter = $('iframe[name="ace_outer"]').contents();
@@ -120,10 +120,9 @@ var hooks = {
 		var padId = window.pad.getPadId();
 
 		var socket = EPwrtcHeading.init(ace, padId, userId);
+
 		WRTC.postAceInit(hook, context);
 		WRTC_Room.postAceInit(hook, context, socket, padId);
-		textChat.postAceInit(hook, context, socket, padId);
-		videoChat.postAceInit(hook, context, socket, padId);
 
 		$('#editorcontainer iframe').ready(function readyObj() {
 			WRTC.appendInterfaceLayout();
