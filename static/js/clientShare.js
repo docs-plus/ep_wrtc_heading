@@ -3,9 +3,9 @@
 var avatarUrl = '../static/plugins/ep_profile_modal/static/img/user.png';
 
 exports.scrollDownToLastChatText = function scrollDownToLastChatText(selector) {
-	var $element = $(selector)[0];
-	if (!selector && $element.length) return true;
-	$element.animate({ scrollTop: $element.scrollHeight }, { duration: 400, queue: false });
+	var $element = $(selector);
+	if ($element.length <= 0 || !$element[0]) return true;
+	$element.animate({ scrollTop: $element[0].scrollHeight }, { duration: 400, queue: false });
 };
 
 exports.getUserFromId = function getUserFromId(userId) {
