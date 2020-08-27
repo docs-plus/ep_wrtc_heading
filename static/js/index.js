@@ -123,7 +123,9 @@ var hooks = {
 
 		WRTC.postAceInit(hook, context);
 		WRTC_Room.postAceInit(hook, context, socket, padId);
-
+		videoChat.postAceInit(hook, context, socket, padId);
+		textChat.postAceInit(hook, context, socket, padId);
+		
 		$('#editorcontainer iframe').ready(function readyObj() {
 			WRTC.appendInterfaceLayout();
 			setTimeout(function () {
