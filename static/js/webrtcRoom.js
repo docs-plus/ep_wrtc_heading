@@ -69,7 +69,8 @@ var WRTC_Room = (function WRTC_Room() {
 			userId: clientVars.userId || window.pad.getUserId(),
 			userName: clientVars.userName || 'anonymous',
 			headerId: headerId,
-			target: target
+			target: target,
+			action: actions
 		};
 
 		share.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
@@ -104,7 +105,7 @@ var WRTC_Room = (function WRTC_Room() {
 					return false;
 			}
 		} else if(actions === 'RELOAD') {
-			videoChat.reloadSession(headerId, userInfo, target);
+			videoChat.reloadSession(headerId, userInfo, target, actions);
 		}
 	}
 
