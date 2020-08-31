@@ -159,6 +159,7 @@ var videoChat = (function videoChat() {
 
 			$('#werc_toolbar p').attr({ 'data-id': data.headerId }).text(headerTitle);
 			$('#werc_toolbar .btn_leave').attr({ 'data-id': data.headerId });
+			$('#werc_toolbar .btn_reload').attr({ 'data-id': data.headerId });
 
 			window.headerId = data.headerId;
 			WRTC.activate(data.headerId, user.userId);
@@ -176,22 +177,11 @@ var videoChat = (function videoChat() {
 
 		share.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'VIDEO', roomInfo, function updateStore() {});
 	}
-
-	function userJoin(headerId, userInfo, $joinButton) {
-		if (!userInfo || !userInfo.userId) {
-			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
-			return false;
-		}
-
-		// check if has user already in that room
-		if (currentRoom && currentRoom.headerId === headerId) {
-			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
-			return false;
-		}
-
-		$joinBtn = $joinButton;
-
+	
+	function createSession(headerId, userInfo, $joinButton) {
+		
 		share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
+		$joinBtn = $joinButton;
 
 		isUserMediaAvailable().then(function joining(stream) {
 			localStream = stream;
@@ -213,6 +203,31 @@ var videoChat = (function videoChat() {
 			});
 			WRTC.showUserMediaError(err);
 		});
+
+	}
+
+	function userJoin(headerId, userInfo, $joinButton) {
+		if (!userInfo || !userInfo.userId) {
+			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+			return false;
+		}
+
+		// check if has user already in that room
+		if (currentRoom && currentRoom.headerId === headerId) {
+			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+			return false;
+		}
+
+		createSession(headerId, userInfo, $joinButton);
+	}
+
+	function reloadSession(headerId, userInfo, $joinButton){
+		if (!userInfo || !userInfo.userId) {
+			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+			return false;
+		}
+
+		createSession(headerId, userInfo, $joinButton);
 	}
 
 	function userLeave(headerId, data, $joinButton) {
@@ -305,7 +320,8 @@ var videoChat = (function videoChat() {
 		userLeave: userLeave,
 		gateway_userJoin: gateway_userJoin,
 		gateway_userLeave: gateway_userLeave,
-		bulkUpdateRooms: bulkUpdateRooms
+		bulkUpdateRooms: bulkUpdateRooms,
+		reloadSession: reloadSession
 	};
 })();
 

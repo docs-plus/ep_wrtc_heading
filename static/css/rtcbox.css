@@ -82,7 +82,7 @@
 	flex-direction: column;
 }
 
-.btn_toggle_modal i{
+.btn_toggle_modal i, .btn_reload i{
 	margin: 0;
 	display: block;
 	position: absolute;
@@ -91,7 +91,7 @@
 	width: 12px;
 	transform: translate(-50%, -50%);
 } 
-.btn_toggle_modal i svg{
+.btn_toggle_modal i svg, .btn_reload svg{
 	width: 100%;
 	height: auto;
 	display: block;

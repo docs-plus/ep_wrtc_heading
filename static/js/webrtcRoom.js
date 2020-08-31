@@ -103,6 +103,8 @@ var WRTC_Room = (function WRTC_Room() {
 				default:
 					return false;
 			}
+		} else if(actions === 'RELOAD') {
+			videoChat.reloadSession(headerId, userInfo, target)
 		}
 	}
 
@@ -172,7 +174,8 @@ var WRTC_Room = (function WRTC_Room() {
 
 		$(document).on('click', '#werc_toolbar .btn_leave, #chattext .wrtc_roomLink', roomBtnHandler);
 
-		$(document).on('click', '#wrtc_textChatWrapper .btn_leave', roomBtnHandler);
+
+		$(document).on('click', '#wrtc_textChatWrapper .btn_leave, #werc_toolbar .btn_reload', roomBtnHandler);
 
 		share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function mouseenter() {
 			$(this).parent().css({ overflow: 'initial' });
