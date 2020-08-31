@@ -47,10 +47,7 @@ var videoChat = (function videoChat() {
 	}
 
 	function isUserMediaAvailable() {
-		return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true })['catch'](function getUserMedia(err) {
-			WRTC.showUserMediaError(err);
-			console.error(err);
-		});
+		return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true });
 	}
 
 	function activateModal() {}
@@ -78,7 +75,7 @@ var videoChat = (function videoChat() {
 		// notify, a user join the video-chat room
 		var msg = {
 			time: new Date(),
-			userId: data.userId,
+			userId: user.userId || data.userId,
 			userName: user.name || data.name || 'anonymous',
 			headerId: data.headerId,
 			userCount: userCount,
@@ -121,6 +118,7 @@ var videoChat = (function videoChat() {
 		// some user may session does exist but the user info does not available in all over the current pad
 		if (!user) return true;
 
+		// TODO: this is not good idea, use global state
 		// if incoming user has already in the room don't persuade the request
 		var IsUserInRooms = $headingRoom.find(".wrtc_content.videoChat ul li[data-id='" + user.userId + "']").text();
 		if (IsUserInRooms) return false;
@@ -179,8 +177,11 @@ var videoChat = (function videoChat() {
 		share.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'VIDEO', roomInfo, function updateStore() {});
 	}
 
-	function userJoin(headerId, data, $joinButton) {
-		$joinBtn = $joinButton;
+	function userJoin(headerId, userInfo, $joinButton) {
+		if (!userInfo || !userInfo.userId) {
+			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+			return false;
+		}
 
 		// check if has user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
@@ -188,20 +189,29 @@ var videoChat = (function videoChat() {
 			return false;
 		}
 
+		$joinBtn = $joinButton;
+
 		share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
 
 		isUserMediaAvailable().then(function joining(stream) {
 			localStream = stream;
 
 			if (!currentRoom.userId) {
-				return socket.emit('userJoin', padId, data, 'video', gateway_userJoin);
+				return socket.emit('userJoin', padId, userInfo, 'video', gateway_userJoin);
 			}
 			// If the user has already joined the video chat, make suer leave that room then join to the new chat room
-			socket.emit('userLeave', padId, currentRoom, 'video', function userLeave(_data, roomInfo) {
-				gateway_userLeave(_data, roomInfo, function join2newOne() {
-					socket.emit('userJoin', padId, data, 'video', gateway_userJoin);
+			socket.emit('userLeave', padId, currentRoom, 'video', function userLeave(_userData, roomInfo) {
+				gateway_userLeave(_userData, roomInfo, function join2newOne() {
+					socket.emit('userJoin', padId, userInfo, 'video', gateway_userJoin);
 				});
 			});
+		})['catch'](function (err) {
+			console.error(err);
+			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+			socket.emit('userLeave', padId, currentRoom, 'video', function userLeave(_userData, roomInfo) {
+				gateway_userLeave(_userData, roomInfo);
+			});
+			WRTC.showUserMediaError(err);
 		});
 	}
 

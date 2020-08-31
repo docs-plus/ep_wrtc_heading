@@ -65,8 +65,8 @@ var WRTC_Room = (function WRTC_Room() {
 		var $joinBtn = $(this);
 
 		var userInfo = {
-			padId: clientVars.padId,
-			userId: clientVars.userId,
+			padId: clientVars.padId || window.pad.getPadId(),
+			userId: clientVars.userId || window.pad.getUserId(),
 			userName: clientVars.userName || 'anonymous',
 			headerId: headerId,
 			target: target

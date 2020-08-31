@@ -139,10 +139,17 @@ var textChat = (function textChat() {
 		var userCount = roomInfo.present;
 		$headingRoom.find('.textChatCount').text(userCount);
 
+		var user = share.getUserFromId(data.userId);
+		// some user may session does exist but the user info does not available in all over the current pad
+		if (!user) return true;
+
+		// TODO: this is not good idea, use global state
+		// if incoming user has already in the room don't persuade the request
+		var IsUserInRooms = $headingRoom.find(".wrtc_content.textChat ul li[data-id='" + user.userId + "']").text();
+		if (IsUserInRooms) return false;
+
 		share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.textChat ul'));
 		share.appendUserList(roomInfo, '#wrtc_textChatWrapper  #textChatUserModal ul');
-
-		var user = share.getUserFromId(data.userId);
 
 		// notify, a user join the video-chat room
 		var msg = {
@@ -209,7 +216,7 @@ var textChat = (function textChat() {
 		// notify, a user join the video-chat room
 		var msg = {
 			time: new Date(),
-			userId: data.userId,
+			userId: user.userId || data.userId,
 			userName: user.name || data.name || 'anonymous',
 			headerId: data.headerId,
 			userCount: userCount,
@@ -241,13 +248,18 @@ var textChat = (function textChat() {
 	}
 
 	function userJoin(headerId, userData, $joinButton) {
-		$joinBtn = $joinButton;
+		if (!userData || !userData.userId) {
+			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+			return false;
+		}
 
 		// check if user already in that room
 		if (currentRoom && currentRoom.headerId === headerId) {
 			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
 			return false;
 		}
+
+		$joinBtn = $joinButton;
 
 		share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
 
