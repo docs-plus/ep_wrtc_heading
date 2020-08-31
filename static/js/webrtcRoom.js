@@ -104,7 +104,7 @@ var WRTC_Room = (function WRTC_Room() {
 					return false;
 			}
 		} else if(actions === 'RELOAD') {
-			videoChat.reloadSession(headerId, userInfo, target)
+			videoChat.reloadSession(headerId, userInfo, target);
 		}
 	}
 
