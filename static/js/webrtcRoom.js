@@ -39,14 +39,20 @@ var WRTC_Room = (function WRTC_Room() {
 		});
 	}
 
-	function joinChatRoom(headerId, userInfo, target) {
-		textChat.userJoin(headerId, userInfo, 'TEXTPLUS');
-		videoChat.userJoin(headerId, userInfo, 'PLUS');
+	function closeTextChat () {
+		$('#wrtc_textChatWrapper .btn_leave').trigger('click');
 	}
 
+	function joinChatRoom(headerId, userInfo, target) {
+		// textChat.userJoin(headerId, userInfo, 'TEXTPLUS');
+		videoChat.userJoin(headerId, userInfo, 'PLUS');
+		closeTextChat();
+	}
+	
 	function leaveChatRoom(headerId, userInfo, target) {
-		textChat.userLeave(headerId, userInfo, 'TEXTPLUS');
+		// textChat.userLeave(headerId, userInfo, 'TEXTPLUS');
 		videoChat.userLeave(headerId, userInfo, 'PLUS');
+		closeTextChat();
 	}
 
 	/**
@@ -78,7 +84,6 @@ var WRTC_Room = (function WRTC_Room() {
 		if (actions === 'JOIN') {
 			switch (target) {
 				case 'PLUS':
-					$joinBtn.targetPlus = true;
 					joinChatRoom(headerId, userInfo, target);
 					break;
 				case 'VIDEO':
@@ -106,6 +111,8 @@ var WRTC_Room = (function WRTC_Room() {
 			}
 		} else if(actions === 'RELOAD') {
 			videoChat.reloadSession(headerId, userInfo, target, actions);
+		} else if(actions === 'SHARELINK') {
+			shareRoomsLink(headerId, target);
 		}
 	}
 
@@ -124,9 +131,9 @@ var WRTC_Room = (function WRTC_Room() {
 		}
 	}
 
-	function shareRoomsLink() {
-		var headId = $(this).attr('data-id');
-		var target = $(this).attr('data-join');
+	function shareRoomsLink(headId, target) {
+		headId = $(this).attr('data-id') || headId;
+		target = $(this).attr('data-join') || target;
 		var title = share.$body_ace_outer().find('.wbrtc_roomBox.' + headId + ' .titleRoom').text();
 
 		var origin = window.location.origin;
@@ -161,7 +168,7 @@ var WRTC_Room = (function WRTC_Room() {
 		var paddingLeft = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-left');
 		var aceOuterPadding = parseInt(paddingLeft, 10);
 		var offsetLeft = Math.ceil(share.$body_ace_outer().find('iframe[name="ace_inner"]').offset().left - aceOuterPadding);
-		return offsetLeft - width;
+		return offsetLeft - width - 6;
 	}
 
 	function activeEventListener() {
@@ -171,33 +178,30 @@ var WRTC_Room = (function WRTC_Room() {
 		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_video', roomBtnHandler);
 		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_chatRoom', roomBtnHandler);
 
-		$wbrtc_roomBox.on('click', '.wbrtc_roomBox button.btn_shareRoom', shareRoomsLink);
-
 		$(document).on('click', '#werc_toolbar .btn_leave, #chattext .wrtc_roomLink', roomBtnHandler);
 
+		$(document).on('click', '#werc_toolbar .btn_roomHandler, .btn_controllers .btn_roomHandler', roomBtnHandler);
 
-		$(document).on('click', '#wrtc_textChatWrapper .btn_leave, #werc_toolbar .btn_reload', roomBtnHandler);
-
-		share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function mouseenter() {
-			$(this).parent().css({ overflow: 'initial' });
-			$(this).addClass('active').find('.wrtc_contentBody').css({ display: 'block' });
-		}).on('mouseleave', '.wbrtc_roomBox', function mouseleave() {
-			$(this).parent().css({ overflow: 'hidden' });
-			$(this).removeClass('active').find('.wrtc_contentBody').css({ display: 'none' });
-		});
+		// share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function mouseenter() {
+		// 	$(this).parent().css({ overflow: 'initial' });
+		// 	$(this).addClass('active').find('.wrtc_contentBody').css({ display: 'block' });
+		// }).on('mouseleave', '.wbrtc_roomBox', function mouseleave() {
+		// 	$(this).parent().css({ overflow: 'hidden' });
+		// 	$(this).removeClass('active').find('.wrtc_contentBody').css({ display: 'none' });
+		// });
 
 		share.$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_share', function click() {
 			var headerURI = $(this).find('input').val();
 			link2Clipboard(headerURI);
 		});
 
-		share.$body_ace_outer().on('mouseenter', '.wrtc_roomInlineAvatar .avatar', function mouseenter() {
-			var id = $(this).parent().parent().attr('id');
-			share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseenter');
-		}).on('mouseleave', '.wrtc_roomInlineAvatar .avatar', function mouseleave() {
-			var id = $(this).parent().parent().attr('id');
-			share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseleave');
-		});
+		// share.$body_ace_outer().on('mouseenter', '.wrtc_roomInlineAvatar .avatar', function mouseenter() {
+		// 	var id = $(this).parent().parent().attr('id');
+		// 	share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseenter');
+		// }).on('mouseleave', '.wrtc_roomInlineAvatar .avatar', function mouseleave() {
+		// 	var id = $(this).parent().parent().attr('id');
+		// 	share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseleave');
+		// });
 
 		$(document).on('click', '#werc_toolbar p, .textChatToolbar b', function click() {
 			var headerId = $(this).attr('data-id');

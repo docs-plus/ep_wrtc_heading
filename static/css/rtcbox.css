@@ -36,7 +36,8 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	flex-grow: 8;
+	width: 88%;
+	/* flex-grow: 8; */
 }
 #werc_toolbar .nd_title .fa_video{
 	width: 18px;
@@ -57,7 +58,7 @@
 }
 
 .btn_controllers{
-	width: 20%;
+	width: 26%;
 	float: right;
 	display: flex;
 	flex-direction: row-reverse;
@@ -81,8 +82,13 @@
 	justify-content: center;
 	flex-direction: column;
 }
-
-.btn_toggle_modal i, .btn_reload i{
+.buttonicon{
+	display: flex;
+	justify-content: center;
+  align-items: baseline;
+}
+.buttonicon > i, .btn_toggle_modal i, .btn_reload i{
+ 
 	margin: 0;
 	display: block;
 	position: absolute;
@@ -90,8 +96,9 @@
 	left: 50%;
 	width: 12px;
 	transform: translate(-50%, -50%);
-} 
-.btn_toggle_modal i svg, .btn_reload svg{
+}
+
+.buttonicon  svg, .btn_toggle_modal i svg {
 	width: 100%;
 	height: auto;
 	display: block;

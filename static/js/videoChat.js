@@ -164,8 +164,8 @@ var videoChat = (function videoChat() {
 			share.roomBoxIconActive();
 
 			$('#werc_toolbar p').attr({ 'data-id': data.headerId }).text(headerTitle);
-			$('#werc_toolbar .btn_leave').attr({ 'data-id': data.headerId });
-			$('#werc_toolbar .btn_reload').attr({ 'data-id': data.headerId });
+			$("#werc_toolbar .btn_roomHandler").attr({ 'data-id': data.headerId });
+
 
 			window.headerId = data.headerId;
 			WRTC.activate(data.headerId, user.userId);
