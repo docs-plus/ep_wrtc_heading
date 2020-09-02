@@ -36,12 +36,12 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	width: 88%;
+	width: 66%;
 	/* flex-grow: 8; */
 }
 #werc_toolbar .nd_title .fa_video{
-	width: 18px;
-	margin-bottom: -5px;
+	width: 20px;
+	margin-bottom: -6px;
 }
 #werc_toolbar .nd_title .nd_count {
 	margin: 0 0 0 0;
@@ -58,7 +58,7 @@
 }
 
 .btn_controllers{
-	width: 26%;
+	width: 30%;
 	float: right;
 	display: flex;
 	flex-direction: row-reverse;
@@ -81,7 +81,19 @@
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
+	/* border-radius: 50%; */
+	transition: all cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+.ndbtn:hover{
+
+	background-color: #eee;
+}
+.ndbtn:active {
+	color: #2678ff;
+}
+
+
 .buttonicon{
 	display: flex;
 	justify-content: center;
@@ -252,7 +264,7 @@
 	background-color: white !important;
 }
 .interface-btn:before{
-	font-size: 14px;
+	font-size: 16px;
 }
 .interface-btn.audio-btn:before {
 	content: "\e83d";
