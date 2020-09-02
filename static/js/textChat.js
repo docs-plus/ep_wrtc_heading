@@ -51,8 +51,8 @@ var textChat = (function textChat() {
 			if (!textMessage) return true;
 			$(this).val('');
 			var user = share.getUserFromId(clientVars.userId);
+			if(!user) return true;
 			var msg = { text: textMessage, userName: user.name, author: user.userId, time: new Date().getTime() };
-
 			socket.emit('sendTextMessage', padId, currentRoom.headerId, msg, function sendTextMessage(incomMsg) {
 				createAndAppendMessage(incomMsg);
 			});
@@ -154,7 +154,7 @@ var textChat = (function textChat() {
 		// notify, a user join the video-chat room
 		var msg = {
 			time: new Date(),
-			userId: data.userId,
+			userId: data.userId || user.userId,
 			userName: user.name || data.name || 'anonymous',
 			headerId: data.headerId,
 			userCount: userCount,

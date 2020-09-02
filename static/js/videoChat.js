@@ -72,12 +72,12 @@ var videoChat = (function videoChat() {
 
 		var user = share.getUserFromId(data.userId);
 
-		if(data.action !== 'JOIN' && data.action !== 'RELOAD' ){
+		if(user && data.action !== 'JOIN' && data.action !== 'RELOAD' ){
 			// notify, a user join the video-chat room
 			var msg = {
 				time: new Date(),
-				userId: user.userId || data.userId,
-				userName: user.name || data.name || 'anonymous',
+				userId: data.userId || user.userId,
+				userName: data.name || user.name || 'anonymous',
 				headerId: data.headerId,
 				userCount: userCount,
 				headerTitle: headerTitle,

@@ -2,7 +2,7 @@
 
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 
-var tags = ['h1', 'h2', 'h3', 'h4'];
+var tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 
 var collectContentPre = function collectContentPre(hook, context) {
 	var tname = context.tname;

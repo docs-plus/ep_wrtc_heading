@@ -176,6 +176,8 @@ var inlineAvatar = {
 
 exports.wrtcPubsub.on('update store', function (requestUser, headerId, action, target, roomInfo, callback) {
 	if (!requestUser || !headerId || !action || !roomInfo || !target) return false;
+	if(!exports.wrtcStore[headerId].USERS) exports.wrtcStore[headerId].USERS = {};
+
 	var users = exports.wrtcStore[headerId].USERS;
 	exports.wrtcStore[headerId][target] = roomInfo;
 	// if(action === "JOIN"){}

@@ -38,7 +38,7 @@ var hasCommentOnLine = function hasCommentOnLine(lineNumber, firstColumn, lastCo
 	var headId = null;
 	for (var column = firstColumn; column <= lastColumn && !foundHeadOnLine; column++) {
 		headId = _.object(attributeManager.getAttributesOnPosition(lineNumber, column)).headingTagId;
-		if (!headId) {
+		if (headId) {
 			foundHeadOnLine = true;
 		}
 	}
@@ -71,7 +71,6 @@ exports.hasHeaderOnSelection = function hasHeaderOnSelection() {
 	var lastColumn = rep.selEnd[1];
 	var lastLineOfSelection = rep.selEnd[0];
 	var selectionOfMultipleLine = hasMultipleLineSelected(firstLineOfSelection, lastLineOfSelection);
-
 	if (selectionOfMultipleLine) {
 		hasVideoHeader = hasCommentOnMultipleLineSelection(firstLineOfSelection, lastLineOfSelection, rep, attributeManager);
 	} else {
@@ -111,10 +110,11 @@ function selectionMultipleLine() {
 }
 
 function selectionOneLine(headerId) {
-	var hTag = padInner.contents().find('.headingTagId_' + headerId).closest(':header')[0].tagName;
+	var hTag = padInner.contents().find('.headingTagId_' + headerId).closest(':header').eq(0).prop("tagName").toLowerCase();
 	var content = padInner.contents().find('.headingTagId_' + headerId).closest(':header span').removeClass(function(index, css) {
 		return (css.match(/\headingTagId_\S+/g) || []).join(' ');
 	}).html();
+	if(!hTag && !content) return false;
 	var rawHtml = $('<div></div>').append('<' + hTag + "><span class='headingTagId_" + randomString(16) + "'>" + content + '</span></' + hTag + '>');
 	return rawHtml.html();
 }
@@ -129,17 +129,18 @@ exports.addTextOnClipboard = function addTextOnClipboard(e, aces, inner, removeS
 
 	if (selection.hasVideoHeader || selection.hasMultipleLine) {
 		var rawHtml;
-
 		if (selection.hasMultipleLine) {
 			var htmlSelection = getSelectionHtml();
 			rawHtml = selectionMultipleLine(htmlSelection);
 		} else {
+			if(!selection.headId) return false;
 			rawHtml = selectionOneLine(selection.headId);
 		}
 
 		if (rawHtml) {
 			e.originalEvent.clipboardData.setData('text/html', rawHtml);
 			e.preventDefault();
+			return false;
 		}
 
 		// if it is a cut event we have to remove the selection
