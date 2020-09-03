@@ -23,6 +23,7 @@ var WRTC = (function WRTC() {
 	var pcConfig = {};
 	var audioInputSelect = null;
 	var videoSelect = null;
+	var audioOutputSelect = null;
 	var pcConstraints = {
 		optional: [{
 			DtlsSrtpKeyAgreement: true
@@ -39,6 +40,7 @@ var WRTC = (function WRTC() {
 	var pc = {};
 	var callQueue = [];
 	var enlargedVideos = new Set();
+	var localVideoElement = null;
 
 	var self = {
 		// API HOOKS
@@ -294,6 +296,8 @@ var WRTC = (function WRTC() {
 
 			var $videoSettings = isLocal ? $("<span class='interface-btn settings-btn buttonicon'>") : null;
 
+			if(isLocal) localVideoElement = $video;
+
 			$('#interface_' + videoId).remove();
 			$("<div class='interface-container'>").attr('id', 'interface_' + videoId).append($mute).append($disableVideo).append($largeVideo).append($videoSettings).insertAfter($video);
 		},
@@ -444,10 +448,35 @@ var WRTC = (function WRTC() {
 
 			self.getUserMedia(window.headerId);
 		},
+		attachSinkId: function attachSinkId(element, sinkId) {
+			// Attach audio output device to video element using device/sink ID.
+			if (typeof element[0].sinkId !== 'undefined') {
+				element[0].setSinkId(sinkId)
+						.then(() => {
+							console.info(`Success, audio output device attached: ${sinkId}`);
+						})['catch'](error => {
+							var errorMessage = error;
+							if (error.name === 'SecurityError') {
+								errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+							}
+							console.error(errorMessage);
+							// Jump back to first output device in the list as it's the default.
+							audioOutputSelect.selectedIndex = 0;
+						});
+			} else {
+				console.warn('Browser does not support output device selection.');
+			}
+		},
+		changeAudioDestination: function changeAudioDestination() {
+			var audioOutputSelect = document.querySelector('select#audioOutput');
+			var audioDestination = audioOutputSelect.value;
+			var videoElement = localVideoElement
+			self.attachSinkId(videoElement, audioDestination);
+		},
 		getUserMedia: function getUserMedia(headerId) {
 			audioInputSelect = document.querySelector('select#audioSource');
 			videoSelect = document.querySelector('select#videoSource');
-
+			
 			var audioSource = audioInputSelect.value;
 			var videoSource = videoSelect.value;
 
@@ -491,6 +520,7 @@ var WRTC = (function WRTC() {
 
 			$(document).on('change', 'select#audioSource', self.audioVideoInputChange);
 			$(document).on('change', 'select#videoSource', self.audioVideoInputChange);
+			$(document).on('change', 'select#audioOutput', self.changeAudioDestination);
 
 			$(window).on('unload', function () {
 				self.hangupAll();
@@ -604,6 +634,7 @@ var WRTC = (function WRTC() {
 		merged.optional.concat(cons2.optional);
 		return merged;
 	}
+
 	function logError(error) {
 		console.error('WebRTC ERROR:', error);
 	}

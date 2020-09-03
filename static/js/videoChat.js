@@ -11,13 +11,14 @@ var videoChat = (function videoChat() {
 
 	function mediaDevices() {
 		navigator.mediaDevices.enumerateDevices().then(function enumerateDevices(data) {
-			var videoSettings = localStorage.getItem('videoSettings') || { video: null, audio: null };
+			var videoSettings = localStorage.getItem('videoSettings') || { microphone: null, speaker: null, camera: null };
 
 			if (typeof videoSettings === 'string') {
 				videoSettings = JSON.parse(videoSettings);
 			}
 
 			var audioInputSelect = document.querySelector('select#audioSource');
+			var audioOutputSelect = document.querySelector('select#audioOutput');
 			var videoSelect = document.querySelector('select#videoSource');
 
 			for (var i = 0; i !== data.length; ++i) {
@@ -26,11 +27,15 @@ var videoChat = (function videoChat() {
 				option.value = deviceInfo.deviceId;
 				if (deviceInfo.kind === 'audioinput') {
 					option.text = deviceInfo.label || 'microphone ' + (audioInputSelect.length + 1);
-					if (videoSettings.audio === deviceInfo.deviceId) option.selected = true;
+					if (videoSettings.microphone === deviceInfo.deviceId) option.selected = true;
 					audioInputSelect.appendChild(option);
+				} else if (deviceInfo.kind === 'audiooutput') {
+					option.text = deviceInfo.label || 'speaker ' + (audioOutputSelect.length + 1);
+					if (videoSettings.speaker === deviceInfo.deviceId) option.selected = true;
+					audioOutputSelect.appendChild(option);
 				} else if (deviceInfo.kind === 'videoinput') {
 					option.text = deviceInfo.label || 'camera ' + (videoSelect.length + 1);
-					if (videoSettings.video === deviceInfo.deviceId) option.selected = true;
+					if (videoSettings.camera === deviceInfo.deviceId) option.selected = true;
 					videoSelect.appendChild(option);
 				}
 			}
