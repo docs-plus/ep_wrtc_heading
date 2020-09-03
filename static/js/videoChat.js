@@ -107,6 +107,7 @@ var videoChat = (function videoChat() {
 			}).attr({ 'data-active': false });
 
 			stopStreaming(localStream);
+			socket.removeListener('receiveTextMessage:' + data.headerId);
 		}
 
 		if (cb && typeof cb === 'function') cb();
@@ -182,6 +183,14 @@ var videoChat = (function videoChat() {
 			}).attr({ 'data-active': true });
 
 			share.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
+
+			socket.on('receiveTextMessage:' + headerId, function receiveTextMessage(headingId, msg) {
+				var active = $(document).find('#wrtc_textChatWrapper').hasClass('active');
+				if (headingId === headerId && !active) {
+					textChat.userJoin(headerId, data, 'TEXT');
+				}
+			});
+
 		}
 
 		share.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'VIDEO', roomInfo, function updateStore() {});

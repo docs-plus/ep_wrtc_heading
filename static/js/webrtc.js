@@ -299,12 +299,10 @@ var WRTC = (function WRTC() {
 				$video.css({ width: videoSizes.large, 'max-height': videoSizes.large });
 			}
 
-			var $videoSettings = isLocal ? $("<span class='interface-btn settings-btn buttonicon'>") : null;
-
 			if(isLocal) localVideoElement = $video;
 
 			$('#interface_' + videoId).remove();
-			$("<div class='interface-container'>").attr('id', 'interface_' + videoId).append($mute).append($disableVideo).append($largeVideo).append($videoSettings).insertAfter($video);
+			$("<div class='interface-container'>").attr('id', 'interface_' + videoId).append($mute).append($disableVideo).append($largeVideo).insertAfter($video);
 			self.changeAudioDestination();
 		},
 		// Sends a stat to the back end. `statName` must be in the
@@ -456,7 +454,7 @@ var WRTC = (function WRTC() {
 		},
 		attachSinkId: function attachSinkId(element, sinkId) {
 			// Attach audio output device to video element using device/sink ID.
-			if (element[0] && typeof element[0].sinkId !== 'undefined') {
+			if (element && element[0] && typeof element[0].sinkId !== 'undefined') {
 				element[0].setSinkId(sinkId)
 						.then(() => {
 							console.info(`Success, audio output device attached: ${sinkId}`);
@@ -491,11 +489,10 @@ var WRTC = (function WRTC() {
 			var mediaConstraints = {
 				audio: true,
 				video: {
+					facingMode: "user",
 					optional: [],
-					mandatory: {
-						maxWidth: 320,
-						maxHeight: 240
-					}
+					width: {exact: 640}, 
+					height: {exact: 480}
 				}
 			};
 

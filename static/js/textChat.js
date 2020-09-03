@@ -30,18 +30,18 @@ var textChat = (function textChat() {
 		share.scrollDownToLastChatText('#wrtc_textChat');
 	}
 
-	function privateNotifyNewUserJoined(target, msg, action) {
-		var textIcon = '<span class="textIcon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M416 224V64c0-35.3-28.7-64-64-64H64C28.7 0 0 28.7 0 64v160c0 35.3 28.7 64 64 64v54.2c0 8 9.1 12.6 15.5 7.8l82.8-62.1H352c35.3.1 64-28.6 64-63.9zm96-64h-64v64c0 52.9-43.1 96-96 96H192v64c0 35.3 28.7 64 64 64h125.7l82.8 62.1c6.4 4.8 15.5.2 15.5-7.8V448h32c35.3 0 64-28.7 64-64V224c0-35.3-28.7-64-64-64z"></path></svg></span>';
-		var btnJoin = "<span class='wrtc_roomLink' data-join='" + target + "' data-action='JOIN' data-id='" + msg.headerId + "' title='Join'>" + msg.headerTitle + '</span>';
+	// function privateNotifyNewUserJoined(target, msg, action) {
+	// 	var textIcon = '<span class="textIcon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M416 224V64c0-35.3-28.7-64-64-64H64C28.7 0 0 28.7 0 64v160c0 35.3 28.7 64 64 64v54.2c0 8 9.1 12.6 15.5 7.8l82.8-62.1H352c35.3.1 64-28.6 64-63.9zm96-64h-64v64c0 52.9-43.1 96-96 96H192v64c0 35.3 28.7 64 64 64h125.7l82.8 62.1c6.4 4.8 15.5.2 15.5-7.8V448h32c35.3 0 64-28.7 64-64V224c0-35.3-28.7-64-64-64z"></path></svg></span>';
+	// 	var btnJoin = "<span class='wrtc_roomLink' data-join='" + target + "' data-action='JOIN' data-id='" + msg.headerId + "' title='Join'>" + msg.headerTitle + '</span>';
 
-		var text = action === 'JOIN' ? 'joins' : 'leaves';
+	// 	var text = action === 'JOIN' ? 'joins' : 'leaves';
 
-		msg.text = '<span>' + text + '</span>' + textIcon + btnJoin;
+	// 	msg.text = '<span>' + text + '</span>' + textIcon + btnJoin;
 
-		msg.target = target;
+	// 	msg.target = target;
 
-		createAndAppendMessage(msg);
-	}
+	// 	createAndAppendMessage(msg);
+	// }
 
 	function eventTextChatInput() {
 		var keycode = event.keyCode || event.which;
@@ -88,7 +88,7 @@ var textChat = (function textChat() {
 
 		$TextChatWrapper.removeClass('active').removeAttr('style');
 		$TextChatWrapper.find('#wrtc_textChat p').remove();
-		socket.removeListener('receiveTextMessage:' + headerId);
+		// socket.removeListener('receiveTextMessage:' + headerId);
 
 		var $btn = $(document).find('#wrtc_textChatWrapper .btn_toggle_modal');
 		$btn.attr({ 'data-action': 'collapse' });
@@ -162,15 +162,15 @@ var textChat = (function textChat() {
 		};
 		share.notifyNewUserJoined('TEXT', msg, 'JOIN');
 
-		if (data.headerId === currentRoom.headerId) {
-			var privateMsg = {
-				userName: user.name,
-				author: user.userId,
-				headerTitle: headTitle,
-				time: new Date().getTime()
-			};
-			privateNotifyNewUserJoined('TEXT', privateMsg, 'JOIN');
-		}
+		// if (data.headerId === currentRoom.headerId) {
+		// 	var privateMsg = {
+		// 		userName: user.name,
+		// 		author: user.userId,
+		// 		headerTitle: headTitle,
+		// 		time: new Date().getTime()
+		// 	};
+		// 	privateNotifyNewUserJoined('TEXT', privateMsg, 'JOIN');
+		// }
 
 		if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
 			$.gritter.add({
@@ -213,7 +213,7 @@ var textChat = (function textChat() {
 
 		var user = share.getUserFromId(data.userId);
 
-		// notify, a user join the video-chat room
+		// notify, a user join the text-chat room
 		var msg = {
 			time: new Date(),
 			userId: user.userId || data.userId,
@@ -224,15 +224,15 @@ var textChat = (function textChat() {
 		};
 		share.notifyNewUserJoined('TEXT', msg, 'LEAVE');
 
-		if (data.headerId === currentRoom.headerId) {
-			var privateMsg = {
-				userName: user.name,
-				author: user.userId,
-				headerTitle: headTitle,
-				time: new Date().getTime()
-			};
-			privateNotifyNewUserJoined('TEXT', privateMsg, 'LEAVE');
-		}
+		// if (data.headerId === currentRoom.headerId) {
+		// 	var privateMsg = {
+		// 		userName: user.name,
+		// 		author: user.userId,
+		// 		headerTitle: headTitle,
+		// 		time: new Date().getTime()
+		// 	};
+		// 	privateNotifyNewUserJoined('TEXT', privateMsg, 'LEAVE');
+		// }
 
 		if (data.userId === clientVars.userId) {
 			$headingRoom.removeAttr('data-text');

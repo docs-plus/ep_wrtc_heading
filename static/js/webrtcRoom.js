@@ -219,8 +219,11 @@ var WRTC_Room = (function WRTC_Room() {
 		});
 
 		// video interface settings
-		$(document).on('click', '.settings-btn', function click() {
-			$(document).find('#wrtc_settings').toggleClass('active');
+		$(document).on('click', '#werc_toolbar .btn_videoSetting', function click() {
+			var offset = $(this).position();
+			var $box = $(document).find('#wrtc_settings');
+			var width = $box.outerWidth();
+			$box.css({left: offset.left - width  + 'px',top: offset.top + 4 + 'px'}).toggleClass('active');
 		});
 
 		$(document).on('click', '#wrtc_settings .btn_close', function click() {
