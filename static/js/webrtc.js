@@ -288,11 +288,16 @@ var WRTC = (function WRTC() {
 
 					$largeVideo.attr('title', videoEnlarged ? 'Make video smaller' : 'Make video larger').toggleClass('large', videoEnlarged);
 
-					var videoSize = videoEnlarged ? videoSizes.large : videoSizes.small;
+					var videoSize = $(document).find('#wrtc_modal .ndbtn.btn_enlarge').hasClass('large') ? videoSizes.large : videoSizes.small;
 					$video.parent().css({ width: videoSize, 'max-height': videoSize });
 					$video.css({ width: videoSize, 'max-height': videoSize });
 				}
 			});
+
+			if($(document).find('#wrtc_modal .ndbtn.btn_enlarge').hasClass('large')){
+				$video.parent().css({ width: videoSizes.large, 'max-height': videoSizes.large });
+				$video.css({ width: videoSizes.large, 'max-height': videoSizes.large });
+			}
 
 			var $videoSettings = isLocal ? $("<span class='interface-btn settings-btn buttonicon'>") : null;
 
@@ -300,6 +305,7 @@ var WRTC = (function WRTC() {
 
 			$('#interface_' + videoId).remove();
 			$("<div class='interface-container'>").attr('id', 'interface_' + videoId).append($mute).append($disableVideo).append($largeVideo).append($videoSettings).insertAfter($video);
+			self.changeAudioDestination();
 		},
 		// Sends a stat to the back end. `statName` must be in the
 		// approved list on the server side.
@@ -450,7 +456,7 @@ var WRTC = (function WRTC() {
 		},
 		attachSinkId: function attachSinkId(element, sinkId) {
 			// Attach audio output device to video element using device/sink ID.
-			if (typeof element[0].sinkId !== 'undefined') {
+			if (element[0] && typeof element[0].sinkId !== 'undefined') {
 				element[0].setSinkId(sinkId)
 						.then(() => {
 							console.info(`Success, audio output device attached: ${sinkId}`);
@@ -476,9 +482,11 @@ var WRTC = (function WRTC() {
 		getUserMedia: function getUserMedia(headerId) {
 			audioInputSelect = document.querySelector('select#audioSource');
 			videoSelect = document.querySelector('select#videoSource');
+			audioOutputSelect = document.querySelector('select#audioOutput');
 			
 			var audioSource = audioInputSelect.value;
 			var videoSource = videoSelect.value;
+			var audioOutput = audioOutputSelect.value;
 
 			var mediaConstraints = {
 				audio: true,
@@ -497,8 +505,8 @@ var WRTC = (function WRTC() {
 			if (videoSource) {
 				mediaConstraints.video = { deviceId: { exact: videoSource } };
 			}
-
-			localStorage.setItem('videoSettings', JSON.stringify({ video: videoSource, audio: audioSource }));
+			
+			localStorage.setItem('videoSettings', JSON.stringify({ microphone: audioSource, speaker: audioOutput, camera: videoSource }));
 
 			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
 				localStream = stream;

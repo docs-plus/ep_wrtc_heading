@@ -163,14 +163,12 @@ var videoChat = (function videoChat() {
 			}
 		}
 
-
 		if (data.userId === clientVars.userId) {
 			$headingRoom.attr({ 'data-video': true });
 			share.roomBoxIconActive();
 
 			$('#werc_toolbar p').attr({ 'data-id': data.headerId }).text(headerTitle);
 			$("#werc_toolbar .btn_roomHandler").attr({ 'data-id': data.headerId });
-
 
 			window.headerId = data.headerId;
 			WRTC.activate(data.headerId, user.userId);
