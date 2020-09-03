@@ -4,9 +4,9 @@
 	position: relative;
 	z-index: 20;
 	/* left: 44px; */
-	left: 16px;
+	left: 27px;
 	overflow: hidden;
-	width: 32px;
+	width: 50px;
 }
 
 #wbrtc_chatBox:hover {
@@ -89,7 +89,8 @@
 	border: 1px solid #e6e8e9;
 	border-radius: 50%;
 	background: #fff;
-	box-shadow: 1px 1px 12px #e6e8e9;
+	box-shadow: 1px 1px 8px #e6e8e9;
+	margin:5px;
 } 
 
 .wrtc_box .wrtc_header .btn_icon{
