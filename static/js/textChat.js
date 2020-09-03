@@ -152,15 +152,15 @@ var textChat = (function textChat() {
 		share.appendUserList(roomInfo, '#wrtc_textChatWrapper  #textChatUserModal ul');
 
 		// notify, a user join the video-chat room
-		var msg = {
-			time: new Date(),
-			userId: data.userId || user.userId,
-			userName: user.name || data.name || 'anonymous',
-			headerId: data.headerId,
-			userCount: userCount,
-			headerTitle: headTitle
-		};
-		share.notifyNewUserJoined('TEXT', msg, 'JOIN');
+		// var msg = {
+		// 	time: new Date(),
+		// 	userId: data.userId || user.userId,
+		// 	userName: user.name || data.name || 'anonymous',
+		// 	headerId: data.headerId,
+		// 	userCount: userCount,
+		// 	headerTitle: headTitle
+		// };
+		// share.notifyNewUserJoined('TEXT', msg, 'JOIN');
 
 		// if (data.headerId === currentRoom.headerId) {
 		// 	var privateMsg = {
@@ -172,15 +172,15 @@ var textChat = (function textChat() {
 		// 	privateNotifyNewUserJoined('TEXT', privateMsg, 'JOIN');
 		// }
 
-		if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
-			$.gritter.add({
-				text: '<span class="author-name">' + user.name + '</span>' + 'has joined the text-chat, <b><i> "' + headTitle + '"</b></i>',
-				sticky: false,
-				time: 3000,
-				position: 'center',
-				class_name: 'chat-gritter-msg'
-			});
-		}
+		// if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
+		// 	$.gritter.add({
+		// 		text: '<span class="author-name">' + user.name + '</span>' + 'has joined the text-chat, <b><i> "' + headTitle + '"</b></i>',
+		// 		sticky: false,
+		// 		time: 3000,
+		// 		position: 'center',
+		// 		class_name: 'chat-gritter-msg'
+		// 	});
+		// }
 
 		if (data.userId === clientVars.userId) {
 			currentRoom = data;
@@ -214,15 +214,15 @@ var textChat = (function textChat() {
 		var user = share.getUserFromId(data.userId);
 
 		// notify, a user join the text-chat room
-		var msg = {
-			time: new Date(),
-			userId: user.userId || data.userId,
-			userName: user.name || data.name || 'anonymous',
-			headerId: data.headerId,
-			userCount: userCount,
-			headerTitle: headTitle
-		};
-		share.notifyNewUserJoined('TEXT', msg, 'LEAVE');
+		// var msg = {
+		// 	time: new Date(),
+		// 	userId: user.userId || data.userId,
+		// 	userName: user.name || data.name || 'anonymous',
+		// 	headerId: data.headerId,
+		// 	userCount: userCount,
+		// 	headerTitle: headTitle
+		// };
+		// share.notifyNewUserJoined('TEXT', msg, 'LEAVE');
 
 		// if (data.headerId === currentRoom.headerId) {
 		// 	var privateMsg = {
