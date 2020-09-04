@@ -160,7 +160,7 @@ var WRTC_Room = (function WRTC_Room() {
 		var paddingTop = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
 		var aceOuterPadding = parseInt(paddingTop, 10);
 		var offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
-		return offsetTop + height / 2 - 20;
+		return offsetTop + height / 2 - 26;
 	}
 
 	function getHeaderRoomX($element) {
