@@ -75,21 +75,21 @@ var videoChat = (function videoChat() {
 			$videoChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_video" data-action="JOIN" data-id="' + headerId + '" data-join="VIDEO"><b>video-chat</b></button></li>');
 		}
 
-		// var user = share.getUserFromId(data.userId);
+		var user = share.getUserFromId(data.userId);
 
-		// if(user && data.action !== 'JOIN' && data.action !== 'RELOAD' ){
-		// 	// notify, a user join the video-chat room
-		// 	var msg = {
-		// 		time: new Date(),
-		// 		userId: data.userId || user.userId,
-		// 		userName: data.name || user.name || 'anonymous',
-		// 		headerId: data.headerId,
-		// 		userCount: userCount,
-		// 		headerTitle: headerTitle,
-		// 		VIDEOCHATLIMIT: VIDEOCHATLIMIT
-		// 	};
-		// 	share.notifyNewUserJoined('VIDEO', msg, 'LEAVE');
-		// }
+		if(user && data.action !== 'JOIN' && data.action !== 'RELOAD' ){
+			// notify, a user join the video-chat room
+			var msg = {
+				time: new Date(),
+				userId: data.userId || user.userId,
+				userName: data.name || user.name || 'anonymous',
+				headerId: data.headerId,
+				userCount: userCount,
+				headerTitle: headerTitle,
+				VIDEOCHATLIMIT: VIDEOCHATLIMIT
+			};
+			share.notifyNewUserJoined('VIDEO', msg, 'LEAVE');
+		}
 
 		if (data.userId === clientVars.userId) {
 			$headingRoom.removeAttr('data-video');
@@ -137,19 +137,19 @@ var videoChat = (function videoChat() {
 
 		share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.videoChat ul'));
 
-		// if(data.action == 'JOIN'){
+		if(data.action == 'JOIN'){
 			// notify, a user join the video-chat room
-			// var msg = {
-			// 	time: new Date(),
-			// 	userId: data.userId,
-			// 	userName: user.name || data.name || 'anonymous',
-			// 	headerId: data.headerId,
-			// 	userCount: userCount,
-			// 	headerTitle: headerTitle,
-			// 	VIDEOCHATLIMIT: VIDEOCHATLIMIT
-			// };
+			var msg = {
+				time: new Date(),
+				userId: data.userId,
+				userName: user.name || data.name || 'anonymous',
+				headerId: data.headerId,
+				userCount: userCount,
+				headerTitle: headerTitle,
+				VIDEOCHATLIMIT: VIDEOCHATLIMIT
+			};
 
-			// share.notifyNewUserJoined('VIDEO', msg, 'JOIN');
+			share.notifyNewUserJoined('VIDEO', msg, 'JOIN');
 
 			// if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
 			// 	$.gritter.add({
@@ -160,7 +160,7 @@ var videoChat = (function videoChat() {
 			// 		class_name: 'chat-gritter-msg'
 			// 	});
 			// }
-		// }
+		}
 
 		if (data.userId === clientVars.userId) {
 			$headingRoom.attr({ 'data-video': true });

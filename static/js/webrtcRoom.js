@@ -122,12 +122,27 @@ var WRTC_Room = (function WRTC_Room() {
 		var target = urlParams.get('target');
 		var join = urlParams.get('join');
 
+		var isHeading = share.$body_ace_outer().find('#' + headerId);
+
+		if(!isHeading.length){
+			$.gritter.add({
+				title: 'Error',
+				text: "The header seems not to exist anymore!",
+				time: 3000,
+				sticky: false,
+				class_name: 'error'
+			});
+			return false;
+		}
+
 		if (headerId) {
 			scroll2Header(headerId);
 		}
 		if (join === 'true') {
 			target = target.toUpperCase();
-			roomBtnHandler('JOIN', headerId, target);
+			setTimeout(function makeSureHeadingReady() {
+				roomBtnHandler('JOIN', headerId, target);
+			}, 700);
 		}
 	}
 
