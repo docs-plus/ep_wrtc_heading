@@ -122,6 +122,8 @@ var WRTC_Room = (function WRTC_Room() {
 		var target = urlParams.get('target');
 		var join = urlParams.get('join');
 
+		if(!headerId) return true;
+
 		var isHeading = share.$body_ace_outer().find('#' + headerId);
 
 		if(!isHeading.length){
