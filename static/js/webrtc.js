@@ -489,10 +489,11 @@ var WRTC = (function WRTC() {
 			var mediaConstraints = {
 				audio: true,
 				video: {
-					facingMode: "user",
 					optional: [],
-					width: {exact: 640}, 
-					height: {exact: 480}
+					mandatory: {
+						maxWidth: 320,
+						maxHeight: 240
+					}
 				}
 			};
 
