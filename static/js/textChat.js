@@ -1,5 +1,6 @@
 'use strict';
 var share = require('ep_wrtc_heading/static/js/clientShare');
+var padutils = require('ep_etherpad-lite/static/js/pad_utils').padutils;
 
 var textChat = (function textChat() {
 	var socket = null;
@@ -22,9 +23,10 @@ var textChat = (function textChat() {
 		var userName = $('<b>').text(msg.userName + ': ');
 		var tim = $('<span>').attr({ 'class': 'time' }).text(timeStr);
 
+		var text = padutils.escapeHtmlWithClickableLinks(msg.text, "_blank");
 		var message = $('<p>').attr({
 			'data-authorid': msg.author
-		}).append(userName).append(tim).append(msg.text);
+		}).append(userName).append(tim).append(text);
 
 		$('#wrtc_textChat').append(message);
 		share.scrollDownToLastChatText('#wrtc_textChat');
