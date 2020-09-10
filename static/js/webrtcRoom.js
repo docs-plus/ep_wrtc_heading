@@ -195,7 +195,7 @@ var WRTC_Room = (function WRTC_Room() {
 		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_video', roomBtnHandler);
 		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_chatRoom', roomBtnHandler);
 
-		$(document).on('click', '#werc_toolbar .btn_leave, #chattext .wrtc_roomLink', roomBtnHandler);
+		$(document).on('click', '#chattext .wrtc_roomLink', roomBtnHandler);
 
 		$(document).on('click', '#werc_toolbar .btn_roomHandler, .btn_controllers .btn_roomHandler', roomBtnHandler);
 
