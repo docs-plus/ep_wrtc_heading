@@ -27,7 +27,8 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 	function disableWrtcHeading() {
 		padOuter.find('#wbrtc_chatBox').removeClass('active');
 		$('#rtcbox').removeClass('active');
-		WRTC_Room.hangupAll();
+		// TODO: fully disable plugin
+		// WRTC_Room.hangupAll();
 	}
 
 	function init(ace, padId, userId) {
@@ -54,6 +55,8 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 		});
 
 		$('#options-wrtc-heading').trigger('change');
+
+
 
 		if (browser.chrome || browser.firefox) {
 			padInner.contents().on('copy', function copy(e) {
@@ -193,6 +196,31 @@ var hooks = {
 	aceInitialized: function aceInitialized(hook, context) {
 		var editorInfo = context.editorInfo;
 		editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
+	},
+	chatNewMessage: function chatNewMessage(hook, context, callback) {
+		var text = context.text;
+		// If the incoming message is a link and the link has the title attribute wrtc
+		if(text.indexOf('href=') > 0){
+			text = $(text);
+			var href = text.attr("href");
+			var currentPath = location.origin + location.pathname;
+			console.log(href, currentPath, href.indexOf(currentPath));
+			// If the link is belong to this header
+			if(href.indexOf(currentPath) === 0){
+				var urlParams = new URLSearchParams(href);
+				var headerId = urlParams.get('id');
+				var target = urlParams.get('target');
+				if(headerId) {
+					text = text.attr({
+						"data-join": target,
+						"data-action":"JOIN",
+						"data-id": headerId
+					}).addClass('btn_roomHandler');
+					context.text = jQuery('<div />').append(text.eq(0).clone()).html();
+				}
+			}
+		}
+		callback(context);
 	}
 };
 
@@ -205,3 +233,4 @@ exports.userLeave = hooks.userLeave;
 exports.handleClientMessage_RTC_MESSAGE = hooks.handleClientMessage_RTC_MESSAGE;
 exports.aceSelectionChanged = hooks.aceSelectionChanged;
 exports.aceInitialized = hooks.aceInitialized;
+exports.chatNewMessage = hooks.chatNewMessage;
