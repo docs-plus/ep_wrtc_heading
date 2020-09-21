@@ -60,7 +60,7 @@ var videoChat = (function videoChat() {
 	function deactivateModal() {}
 
 	function removeUserFromRoom(data, roomInfo, cb) {
-		if (!data || !roomInfo) return false;
+		if (!data || !roomInfo || !data.userId) return false;
 		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 		var headerTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
@@ -116,7 +116,7 @@ var videoChat = (function videoChat() {
 	}
 
 	function addUserToRoom(data, roomInfo) {
-		if (!data) return false;
+		if (!data || !data.userId) return false;
 		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 		var headerTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();

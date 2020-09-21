@@ -24,6 +24,21 @@ var textChat = (function textChat() {
 		var tim = $('<span>').attr({ 'class': 'time' }).text(timeStr);
 
 		var text = padutils.escapeHtmlWithClickableLinks(msg.text, "_blank");
+
+		// var urlParams = new URLSearchParams(msg.text.split("?")[1]);
+
+		// if(urlParams.get('id')) {
+		// 	var headerId = urlParams.get('id');
+		// 	var target = urlParams.get('target');
+		// 	var join = urlParams.get('join');
+		// 	text = $(text).attr({
+		// 		"data-join": join,
+		// 		"data-action":"JOIN",
+		// 		"data-id": headerId
+		// 	}).addClass('btn_roomHandler')
+		// }
+
+
 		var message = $('<p>').attr({
 			'data-authorid': msg.author
 		}).append(userName).append(tim).append(text);
@@ -134,7 +149,7 @@ var textChat = (function textChat() {
 	}
 
 	function addUserToRoom(data, roomInfo) {
-		if (!data) return true;
+		if (!data || !data.userId) return true;
 		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 		var headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
@@ -196,7 +211,7 @@ var textChat = (function textChat() {
 	}
 
 	function removeUserFromRoom(data, roomInfo, target, cb) {
-		if (!data) return true;
+		if (!data || !data.userId) return true;
 		var headerId = data.headerId;
 		var $headingRoom = share.$body_ace_outer().find('#' + headerId);
 		var headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
@@ -213,7 +228,7 @@ var textChat = (function textChat() {
 			$textChatUserList.append('<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="' + headerId + '" data-join="TEXT"><b>text-chat</b></button></li>');
 		}
 
-		var user = share.getUserFromId(data.userId);
+		// var user = share.getUserFromId(data.userId);
 
 		// notify, a user join the text-chat room
 		// var msg = {

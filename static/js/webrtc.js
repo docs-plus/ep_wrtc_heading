@@ -177,6 +177,7 @@ var WRTC = (function WRTC() {
 			self.getUserMedia(headerId);
 		},
 		deactivate: function deactivate(userId, headerId) {
+			if (!userId) return false;
 			self.hide(userId);
 			self.hangupAll(headerId);
 			self.hangup(userId, true, headerId);
