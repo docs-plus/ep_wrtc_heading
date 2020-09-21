@@ -62,13 +62,22 @@ var WRTC_Room = (function WRTC_Room() {
   * @param {string} target @enum (chatRoom|video|text)
   */
 	function roomBtnHandler(actions, headerId, target) {
+		if(typeof actions !== 'string') {
+			actions.preventDefault();
+			// actions.stopPropagation();
+		}
+
 		headerId = $(this).attr('data-id') || headerId;
 		actions = $(this).attr('data-action') || actions;
 		target = $(this).attr('data-join') || target;
 
-		if (!headerId || !target) return true;
+		console.log(headerId,actions,target)
+
+		if (!headerId || !target ) return true;
 
 		var $joinBtn = $(this);
+
+
 
 		var userInfo = {
 			padId: clientVars.padId || window.pad.getPadId(),
@@ -199,6 +208,10 @@ var WRTC_Room = (function WRTC_Room() {
 
 		$(document).on('click', '#werc_toolbar .btn_roomHandler, .btn_controllers .btn_roomHandler', roomBtnHandler);
 
+	
+		// ep_full_hyperlinks link listner
+		$wbrtc_roomBox.on('click', 'a.btn_roomHandler', roomBtnHandler)
+		$(document).on('click', 'a.btn_roomHandler', roomBtnHandler)
 		// share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function mouseenter() {
 		// 	$(this).parent().css({ overflow: 'initial' });
 		// 	$(this).addClass('active').find('.wrtc_contentBody').css({ display: 'block' });
