@@ -204,7 +204,6 @@ var hooks = {
 			text = $(text);
 			var href = text.attr("href");
 			var currentPath = location.origin + location.pathname;
-			console.log(href, currentPath, href.indexOf(currentPath));
 			// If the link is belong to this header
 			if(href.indexOf(currentPath) === 0){
 				var urlParams = new URLSearchParams(href);
