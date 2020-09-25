@@ -89,7 +89,7 @@ exports.appendUserList = function appendUserList(roomInfo, selector) {
 	var $element = typeof selector === 'string' ? $(document).find(selector) : selector;
 	$element.empty();
 	roomInfo.list.forEach(function reOrderUserList(el) {
-		var userInList = exports.getUserFromId(el.userId) || { colorId: '', name: 'anonymous' };
+		var userInList = exports.getUserFromId(el.userId) || { colorId: '', name: 'anonymous', userId: '0000000' };
 		if (clientVars.ep_profile_list && clientVars.ep_profile_list[el.userId]) {
 			avatarUrl = clientVars.ep_profile_list[el.userId].imageUrl || clientVars.ep_profile_list[el.userId].img;
 		}
@@ -135,15 +135,18 @@ var inlineAvatar = {
 		$element.find('.avatar').remove();
 		$element.parent().css({ left: WRTC_Room.getHeaderRoomX($element.parent()) + 'px' });
 		Object.keys(room).forEach(function reOrderUserList(key, index) {
-			var userInList = exports.getUserFromId(room[key].userId);
-			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
-				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
-			}
-			if (index < inlineAvatarLimit) {
-				$element.find('.avatarMore').hide();
-				$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
-			} else {
-				$element.find('.avatarMore').show().text('+' + (index + 1 - inlineAvatarLimit));
+			var userInList = exports.getUserFromId(room[key].userId) || { colorId: '', name: 'anonymous'};
+			if(userInList.userId){
+				// TODO: If the user is not found, we hangup the user.
+				if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
+					avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+				}
+				if (index < inlineAvatarLimit) {
+					$element.find('.avatarMore').hide();
+					$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+				} else {
+					$element.find('.avatarMore').show().text('+' + (index + 1 - inlineAvatarLimit));
+				}
 			}
 		});
 	},
@@ -160,15 +163,17 @@ var inlineAvatar = {
 	append: function appendAvatart(list, $element) {
 		var inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
 		list.forEach(function reOrderUserList(el, index) {
-			var userInList = exports.getUserFromId(el.userId);
-			if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
-				avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
-			}
-			if (index < inlineAvatarLimit) {
-				$element.find('.avatarMore').hide();
-				$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
-			} else {
-				$element.find('.avatarMore').show().text('+' + (index + 1 - inlineAvatarLimit));
+			var userInList = exports.getUserFromId(el.userId) || { colorId: '', name: 'anonymous'};
+			if(userInList.userId){
+				if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
+					avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
+				}
+				if (index < inlineAvatarLimit) {
+					$element.find('.avatarMore').hide();
+					$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+				} else {
+					$element.find('.avatarMore').show().text('+' + (index + 1 - inlineAvatarLimit));
+				}
 			}
 		});
 	}
@@ -176,6 +181,8 @@ var inlineAvatar = {
 
 exports.wrtcPubsub.on('update store', function (requestUser, headerId, action, target, roomInfo, callback) {
 	if (!requestUser || !headerId || !action || !roomInfo || !target) return false;
+
+	if(!exports.wrtcStore[headerId]) exports.wrtcStore[headerId] = {};
 	if(!exports.wrtcStore[headerId].USERS) exports.wrtcStore[headerId].USERS = {};
 
 	var users = exports.wrtcStore[headerId].USERS;
