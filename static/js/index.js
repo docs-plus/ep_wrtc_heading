@@ -3,12 +3,7 @@
 var $ = require('ep_etherpad-lite/static/js/rjquery').$;
 var _ = require('ep_etherpad-lite/static/js/underscore');
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
-var events = require('ep_wrtc_heading/static/js/copyPasteEvents');
-var textChat = require('ep_wrtc_heading/static/js/textChat');
-var videoChat = require('ep_wrtc_heading/static/js/videoChat');
 
-// var _require = require('ep_etherpad-lite/static/js/pad');
-// var pad = _require.pad;
 
 /** **********************************************************************/
 /*                              Plugin                                  */
@@ -124,7 +119,12 @@ var hooks = {
 
 		var socket = EPwrtcHeading.init(ace, padId, userId);
 
-		WRTC.postAceInit(hook, context);
+		// TODO: make sure the priority of these components are in line
+		// TODO: make sure clientVars contain all data that's necessary
+
+		if(!clientVars.userId || !clientVars.padId) throw new Error("[wrtc]: clientVars doesn't exists");
+
+		WRTC.postAceInit(hook, context, socket, padId);
 		WRTC_Room.postAceInit(hook, context, socket, padId);
 		videoChat.postAceInit(hook, context, socket, padId);
 		textChat.postAceInit(hook, context, socket, padId);

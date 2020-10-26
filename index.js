@@ -139,8 +139,7 @@ exports.eejsBlock_mySettings = function (hookName, args, cb) {
 
 exports.eejsBlock_scripts = function (hookName, args, cb) {
 	args.content = args.content + eejs.require("ep_wrtc_heading/templates/webrtcComponent.html", {}, module)
-	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtc.js?v=" + packageJson.version + "'></script>"
-	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/webrtcRoom.js?v=" + packageJson.version + "'></script>"
+	args.content += "<script src='../static/plugins/ep_wrtc_heading/static/js/wrtc.heading.mini.js?v=" + packageJson.version + "' defer></script>"
 	return cb();
 }
 
@@ -244,6 +243,3 @@ function handleRTCMessage (client, payload) {
 		}
 	}
 }
-
-
-// ExpressJs 

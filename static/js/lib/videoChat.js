@@ -1,5 +1,4 @@
 'use strict';
-var share = require('ep_wrtc_heading/static/js/clientShare');
 
 var videoChat = (function videoChat() {
 	var socket = null;
@@ -338,5 +337,3 @@ var videoChat = (function videoChat() {
 		reloadSession: reloadSession
 	};
 })();
-
-module.exports = videoChat;

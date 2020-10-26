@@ -1,9 +1,5 @@
 'use strict';
 
-var share = require('ep_wrtc_heading/static/js/clientShare');
-var textChat = require('ep_wrtc_heading/static/js/textChat');
-var videoChat = require('ep_wrtc_heading/static/js/videoChat');
-
 var WRTC_Room = (function WRTC_Room() {
 	var self = null;
 	var socket = null;

@@ -98,6 +98,14 @@ You can see metrics for various errors that users have when attempting to connec
 * `ep_webrtc_err_Unknown`: Some other unspecified error. Perhaps a bug in this plugin.
 
 
+## changelog
+
+### [v0.27.0]:
+  - Brought up the Gulp, to organize development workflow
+  - Create the Gulp tasks for development and production flow
+  - Priority of loading js file, to avoid loss of variable allocation
+  - Minify and concat js files
+  - If webrtc "failed to configure sdp remote response", the system now tries 10 times to reconnect and establish a stable connection between peers.
 
 ## License
 This project is licensed under the [MIT License](./LICENSE).

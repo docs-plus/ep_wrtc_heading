@@ -15,10 +15,9 @@
  */
 'use strict';
 
-require('ep_wrtc_heading/static/js/adapter');
-require('ep_wrtc_heading/static/js/getUserMediaPolyfill');
-
 var WRTC = (function WRTC() {
+	var attemptRonnect = 10;
+	var reconnected = 0;
 	var videoSizes = { large: '260px', small: '160px' };
 	var pcConfig = {};
 	var audioInputSelect = null;
@@ -187,6 +186,7 @@ var WRTC = (function WRTC() {
 				});
 				localStream = null;
 			}
+			attemptRonnect = 0;
 		},
 		toggleMuted: function toggleMuted() {
 			var audioTrack = localStream.getAudioTracks()[0];
@@ -642,7 +642,21 @@ var WRTC = (function WRTC() {
 		return merged;
 	}
 
+	function randomIntFromInterval(min, max) {
+		return Math.floor(Math.random() * (max - min + 1) + min);
+	}
+
 	function logError(error) {
+		if(error && error.message.includes("Failed to set remote answer sdp")){
+			reconnected++;
+			console.log("[wrtc]: Try reconnecting", reconnected, attemptRonnect);
+			if(attemptRonnect <= reconnected)
+				throw new Error("[wrtc]: please reload the video chat and try again to connect!");
+			setTimeout(() => {
+				console.log("[wrtc]: reconnecting...")
+				self.getUserMedia(window.headerId)
+			}, randomIntFromInterval(200, 2000));
+		}
 		console.error('WebRTC ERROR:', error);
 	}
 

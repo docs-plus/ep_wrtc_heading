@@ -1,5 +1,4 @@
 'use strict';
-var share = require('ep_wrtc_heading/static/js/clientShare');
 var padutils = require('ep_etherpad-lite/static/js/pad_utils').padutils;
 
 var textChat = (function textChat() {
@@ -336,5 +335,3 @@ var textChat = (function textChat() {
 		bulkUpdateRooms: bulkUpdateRooms
 	};
 })();
-
-module.exports = textChat;
