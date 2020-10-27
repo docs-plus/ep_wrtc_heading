@@ -34,16 +34,21 @@ var WRTC = (function WRTC() {
 			OfferToReceiveVideo: true
 		}
 	};
-	var localStream;
+	var localStream = null;
 	var remoteStream = {};
 	var pc = {};
 	var callQueue = [];
 	var enlargedVideos = new Set();
 	var localVideoElement = null;
+	var padId = null;
+	var socket = null;
 
 	var self = {
 		// API HOOKS
-		postAceInit: function postAceInit(hook, context) {
+		postAceInit: function postAceInit(hook, context, webSocket, docId) {
+			padId = docId;
+			socket = webSocket;
+
 			pcConfig.iceServers = clientVars.webrtc && clientVars.webrtc.iceServers ? clientVars.webrtc.iceServers : [{
 				url: 'stun:stun.l.google.com:19302'
 			}];
@@ -53,7 +58,18 @@ var WRTC = (function WRTC() {
 			if (clientVars.webrtc.video.sizes.small) {
 				videoSizes.small = clientVars.webrtc.video.sizes.small + 'px';
 			}
-			self.init(context.pad);
+
+			self._pad = context.pad || window.pad;
+
+			$(document).on('change', 'select#audioSource', self.audioVideoInputChange);
+			$(document).on('change', 'select#videoSource', self.audioVideoInputChange);
+			$(document).on('change', 'select#audioOutput', self.changeAudioDestination);
+
+			$(window).on('unload', function () {
+				console.info("[wrtc]: windos unloaded, now hangupAll")
+				self.hangupAll();
+			});
+
 		},
 		appendInterfaceLayout: function appendInterfaceLayout() {
 			// TODO: legacy code, move it to template
@@ -97,12 +113,14 @@ var WRTC = (function WRTC() {
 				}
 			}
 		},
-		userLeave: function userLeave(hook, context, callback) {
-			var userId = context.userInfo.userId;
+		userLeave: function userLeave(userId, context, callback) {
+			userId = userId || context.userInfo.userId;
 			if (userId && pc[userId]) {
+				gState = "LEAVING"
+				self.hide(userId)
 				self.hangup(userId, true);
 			}
-			callback();
+			if(callback) callback();
 		},
 		handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
 			if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
@@ -181,9 +199,7 @@ var WRTC = (function WRTC() {
 			self.hangupAll(headerId);
 			self.hangup(userId, true, headerId);
 			if (localStream) {
-				localStream.getTracks().forEach(function (track) {
-					track.stop();
-				});
+				share.stopStreaming(localStream);
 				localStream = null;
 			}
 			attemptRonnect = 0;
@@ -212,7 +228,7 @@ var WRTC = (function WRTC() {
 		},
 		setStream: function setStream(userId, stream) {
 			if (!userId) return false;
-			var isLocal = userId === self.getUserId();
+			var isLocal = userId === share.getUserId();
 			var videoId = 'video_' + userId.replace(/\./g, '_');
 			var video = $('#' + videoId)[0];
 
@@ -251,7 +267,7 @@ var WRTC = (function WRTC() {
 		},
 		addInterface: function addInterface(userId) {
 			if (!userId) return false;
-			var isLocal = userId === self.getUserId();
+			var isLocal = userId === share.getUserId();
 			var videoId = 'video_' + userId.replace(/\./g, '_');
 			var $video = $('#' + videoId);
 
@@ -322,7 +338,7 @@ var WRTC = (function WRTC() {
 			var peer = msg.from;
 			var data = msg.data;
 			var type = data.type;
-			if (peer === self.getUserId()) {
+			if (peer === share.getUserId()) {
 				// console.info('ignore own messages');
 				return;
 			}
@@ -386,11 +402,11 @@ var WRTC = (function WRTC() {
 			});
 		},
 		getUserId: function getUserId() {
-			return self._pad && self._pad.getUserId();
+			return self._pad && share.getUserId();
 		},
 		hangup: function hangup(userId, notify, headerId) {
 			notify = arguments.length === 1 ? true : notify;
-			if (pc[userId] && userId !== self.getUserId()) {
+			if (pc[userId] && userId !== share.getUserId()) {
 				self.setStream(userId, '');
 				pc[userId].close();
 				delete pc[userId];
@@ -447,9 +463,8 @@ var WRTC = (function WRTC() {
 			};
 		},
 		audioVideoInputChange: function audioVideoInputChange() {
-			localStream.getTracks().forEach(function (track) {
-				track.stop();
-			});
+			share.stopStreaming(localStream);
+			localStream = null
 
 			self.getUserMedia(window.headerId);
 		},
@@ -509,9 +524,9 @@ var WRTC = (function WRTC() {
 
 			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
 				localStream = stream;
-				self.setStream(self._pad.getUserId(), stream);
+				self.setStream(share.getUserId(), stream);
 				self._pad.collabClient.getConnectedUsers().forEach(function (user) {
-					if (user.userId !== self.getUserId()) {
+					if (user.userId !== share.getUserId()) {
 						if (pc[user.userId]) {
 							self.hangup(user.userId, false, headerId);
 						}
@@ -520,17 +535,6 @@ var WRTC = (function WRTC() {
 				});
 			})['catch'](function (err) {
 				self.showUserMediaError(err);
-			});
-		},
-		init: function init(pad) {
-			self._pad = pad || window.pad;
-
-			$(document).on('change', 'select#audioSource', self.audioVideoInputChange);
-			$(document).on('change', 'select#videoSource', self.audioVideoInputChange);
-			$(document).on('change', 'select#audioOutput', self.changeAudioDestination);
-
-			$(window).on('unload', function () {
-				self.hangupAll();
 			});
 		}
 	};
@@ -628,8 +632,30 @@ var WRTC = (function WRTC() {
 	}
 
 	function cleanupSdp(sdp) {
-		sdp = preferOpus(sdp);
-		sdp = sdpRate(sdp);
+		// sdp = preferOpus(sdp);
+		// sdp = sdpRate(sdp);
+		// return sdp;
+
+
+		var bandwidth = {
+			screen: 300, // 300kbits minimum
+			audio: 50,   // 50kbits  minimum
+			minVideo: 125, // 125kbits  min
+			maxVideo: 125, // 125kbits  max
+			videoCodec: clientVars.webrtc.video.codec
+		};
+
+		var isScreenSharing = false;
+
+		sdp = CodecsHandler.setApplicationSpecificBandwidth(sdp, bandwidth, isScreenSharing);
+		sdp = CodecsHandler.setVideoBitrates(sdp, {
+			min: bandwidth.minVideo,
+			max: bandwidth.maxVideo,
+		});
+		sdp = CodecsHandler.preferCodec(sdp, 'vp9')
+		sdp = CodecsHandler.setOpusAttributes(sdp);
+		// sdp = CodecsHandler.forceStereoAudio(sdp);
+
 		return sdp;
 	}
 

@@ -159,7 +159,7 @@ exports.clientVars = function (hook, context, callback) {
 		iceServers = settings.ep_wrtc_heading.iceServers
 	}
 
-	var video = { sizes: {} }
+	var video = { sizes: {}, codec: Config.get("VIDEO_CODEC")}
 	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.video && settings.ep_wrtc_heading.video.sizes) {
 		video.sizes = {
 			large: settings.ep_wrtc_heading.video.sizes.large,
@@ -169,6 +169,10 @@ exports.clientVars = function (hook, context, callback) {
 
 	if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoChatLimit) {
 		VIDEO_CHAT_LIMIT = Config.update("VIDEO_CHAT_LIMIT", settings.ep_wrtc_heading.videoChatLimit)
+	}
+
+	if(settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoCodec) {
+		video.codec = settings.ep_wrtc_heading.videoCodec
 	}
 
 	var result = {
