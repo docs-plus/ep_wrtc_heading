@@ -101,11 +101,18 @@ You can see metrics for various errors that users have when attempting to connec
 ## changelog
 
 ### [v0.27.0]:
-  - Brought up the Gulp, to organize development workflow
-  - Create the Gulp tasks for development and production flow
-  - Priority of loading js file, to avoid loss of variable allocation
-  - Minify and concat js files
+  - Brought up the Gulp, to organize and speed up development workflow.
+  - Create the Gulp tasks for development and production flow.
+  - Priority of loading js file, to avoid loss of variable allocation.
+  - Minify and concat js files.
   - If webrtc "failed to configure sdp remote response", the system now tries 10 times to reconnect and establish a stable connection between peers.
+
+### [v0.28.0]:
+  - Leaving the user now happens immediately, the video interface is removed immediately. and make sure that if the main socket is inactive, a leaving will occur.
+  - The `findTags` features is optimized.
+  - Fixed audio change, in case of changing audio, there was a problem that the audio source does not change properly.
+  - You can now set the video codec from the Etherpad settings. by defualt we set `vp9` for video and `opus` for audio.
+  - Bandwidth usage for video and audio is now limited. audio `50kbits min`, video `125kbits min/max`
 
 ## License
 This project is licensed under the [MIT License](./LICENSE).
