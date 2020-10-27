@@ -41,14 +41,6 @@ var videoChat = (function videoChat() {
 		});
 	}
 
-	function stopStreaming(stream) {
-		if (stream) {
-			stream.getTracks().forEach(function stopStream(track) {
-				track.stop();
-			});
-			stream = null;
-		}
-	}
 
 	function isUserMediaAvailable() {
 		return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true });
@@ -103,7 +95,10 @@ var videoChat = (function videoChat() {
 				opacity: 0
 			}).attr({ 'data-active': false });
 
-			stopStreaming(localStream);
+
+			// WRTC.deactivate(data.userId, data.headerId);
+			share.stopStreaming(localStream);
+			localStream = null;
 			socket.removeListener('receiveTextMessage:' + data.headerId);
 		}
 
@@ -112,6 +107,8 @@ var videoChat = (function videoChat() {
 		share.wrtcPubsub.emit('update store', data, headerId, 'LEAVE', 'VIDEO', roomInfo, function updateStore() {});
 
 		share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+
+		WRTC.userLeave(data.userId)
 	}
 
 	function addUserToRoom(data, roomInfo) {
@@ -310,7 +307,9 @@ var videoChat = (function videoChat() {
 		} else if (bulkUpdate) {
 			return addUserToRoom(data, roomInfo);
 		}
-		return stopStreaming(localStream);
+		share.stopStreaming(localStream);
+		localStream = null;
+		return false;
 	}
 
 	function gateway_userLeave(data, roomInfo, cb) {

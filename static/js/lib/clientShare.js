@@ -4,6 +4,20 @@ var share = (function share() {
 
 	var avatarUrl = '../static/plugins/ep_profile_modal/static/img/user.png';
 
+	var getUserId = function getUserId() {
+		return clientVars.userId || window.pad.getUserId();
+	}
+
+	function stopStreaming(stream) {
+		if (stream) {
+			stream.getTracks().forEach(function stopStream(track) {
+				track.stop();
+				stream.removeTrack(track);
+			});
+			stream = null;
+		}
+	}
+
 	var scrollDownToLastChatText = function scrollDownToLastChatText(selector) {
 		var $element = $(selector);
 		if ($element.length <= 0 || !$element[0]) return true;
@@ -271,7 +285,9 @@ var share = (function share() {
 		appendUserList,
 		wrtcStore,
 		wrtcPubsub,
+		getUserId,
+		stopStreaming,
 		
 	}
 
-})()
+})();
