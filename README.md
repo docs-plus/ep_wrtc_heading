@@ -1,4 +1,3 @@
-
 <p align="center">
 
 <a href="LICENSE">
@@ -22,9 +21,10 @@
 </p>
 
 # ep_wrtc_heading
+
 Video Headings Plugin for Etherpad.
 
-WebRTC video/audio, a dedicated chat room for each headlines (h tags).  
+WebRTC video/audio, a dedicated chat room for each headlines (h tags).
 
 > Note: for better expriance use [ep_heading2](https://github.com/ether/ep_headings2), [ep_profile_modal](https://github.com/samirsayyad/ep_profile_modal)
 
@@ -35,7 +35,9 @@ $ npm install ep_wrtc_heading
 ```
 
 ## Settings
+
 To set a custom stun server, set ep_wrtc_heading.iceServer in your settings.json:
+
 ```json
 "ep_wrtc_heading" : {
     "iceServers":[
@@ -45,6 +47,7 @@ To set a custom stun server, set ep_wrtc_heading.iceServer in your settings.json
 ```
 
 To ensure reliable connectivity we recommend setting both a STUN and TURN server. We don't set this by default and below are just example servers, you should ensure you use reliable STUN and TURN servers.
+
 ```json
 "ep_wrtc_heading" : {
   "iceServers":[
@@ -68,6 +71,7 @@ To ensure reliable connectivity we recommend setting both a STUN and TURN server
 ```
 
 To set a custom small and/or large size in pixels, for the video displays, set one or both of the following in your settings.json:
+
 ```json
 "ep_wrtc_heading": {
   "video": {
@@ -80,6 +84,7 @@ To set a custom small and/or large size in pixels, for the video displays, set o
 ```
 
 To set Limitation for video-chat room:
+
 ```json
 "ep_wrtc_heading": {
   "videoChatLimit": 4 // default
@@ -87,34 +92,43 @@ To set Limitation for video-chat room:
 ```
 
 ## Metrics
+
 You can see metrics for various errors that users have when attempting to connect their camera/microphone:
 
-* `ep_webrtc_err_Hardware`: Some sort of hardware-related connection problem on the users' computer.
-* `ep_webrtc_err_NotFound`: Could not find user's camera/microphone.
-* `ep_webrtc_err_Abort`: Some sort of other, non-hardware related connection problem on the user's computer.
-* `ep_webrtc_err_NotSupported`: User's environment does not support webrtc.
-* `ep_webrtc_err_Permission`: User did not grant permission to their camera/microphone
-* `ep_webrtc_err_SecureConnection`: Etherpad is not set up on a secure connection, which is requried for webrtc
-* `ep_webrtc_err_Unknown`: Some other unspecified error. Perhaps a bug in this plugin.
-
+- `ep_webrtc_err_Hardware`: Some sort of hardware-related connection problem on the users' computer.
+- `ep_webrtc_err_NotFound`: Could not find user's camera/microphone.
+- `ep_webrtc_err_Abort`: Some sort of other, non-hardware related connection problem on the user's computer.
+- `ep_webrtc_err_NotSupported`: User's environment does not support webrtc.
+- `ep_webrtc_err_Permission`: User did not grant permission to their camera/microphone
+- `ep_webrtc_err_SecureConnection`: Etherpad is not set up on a secure connection, which is requried for webrtc
+- `ep_webrtc_err_Unknown`: Some other unspecified error. Perhaps a bug in this plugin.
 
 ## changelog
 
-### [v0.27.0]:
-  - Brought up the Gulp, to organize and speed up development workflow.
-  - Create the Gulp tasks for development and production flow.
-  - Priority of loading js file, to avoid loss of variable allocation.
-  - Minify and concat js files.
-  - If webrtc "failed to configure sdp remote response", the system now tries 10 times to reconnect and establish a stable connection between peers.
+### [v0.27.0]
 
-### [v0.28.0]:
-  - Leaving the user now happens immediately, the video interface is removed immediately. and make sure that if the main socket is inactive, a leaving will occur.
-  - The `findTags` features is optimized.
-  - Fixed audio change, in case of changing audio, there was a problem that the audio source does not change properly.
-  - You can now set the video codec from the Etherpad settings. by defualt we set `vp9` for video and `opus` for audio.
-  - Bandwidth usage for video and audio is now limited. audio `50kbits min`, video `125kbits min/max`
+- Brought up the Gulp, to organize and speed up development workflow.
+- Create the Gulp tasks for development and production flow.
+- Priority of loading js file, to avoid loss of variable allocation.
+- Minify and concat js files.
+- If webrtc "failed to configure sdp remote response", the system now tries 10 times to reconnect and establish a stable connection between peers.
+
+### [v0.28.0]
+
+- Leaving the user now happens immediately, the video interface is removed immediately. and make sure that if the main socket is inactive, a leaving will occur.
+- The `findTags` features is optimized.
+- Fixed audio change, in case of changing audio, there was a problem that the audio source does not change properly.
+- You can now set the video codec from the Etherpad settings. by defualt we set `vp9` for video and `opus` for audio.
+- Bandwidth usage for video and audio is now limited. audio `50kbits min`, video `128kbits min/max`
+
+### [v0.28.3]
+
+- Added a new modal to display peer-to-peer video/audio realTime information, use [`getStats.js`](https://github.com/muaz-khan/getStats)
+- Fixed reconnecting attempts, reset retry counting happening when we have a successful connection to the other peers
+- Fixed bandwidth limit, this was an issue where bandwidth usage was not locked at "128 kbps".
 
 ## License
+
 This project is licensed under the [MIT License](./LICENSE).
 
 > Inspire and use [ep_webrtc](https://github.com/ether/ep_webrtc)
