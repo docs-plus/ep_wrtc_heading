@@ -387,12 +387,38 @@
 	margin-top: 6px;
 }
 
-#wrtc_settings .btn_close{
+#wrtc_settings .btn_close, #wrtc_settings .btn_info{
 	float: right;
-	width: 20px;
+	width: 25px;
 	height: 25px;
 	padding: 0;
 	outline: none;
+	margin-left: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all .3s linear;
+}
+
+.wrtc_info{
+	border-radius: 6px;
+	display:none;
+	width: 300px;
+	overflow: auto;
+	background: #69d88acf;
+	color: black;
+	z-index: 9000;
+	font-size: 12px;
+	font-family: monospace;
+	padding: 10px;
+	font-weight: bold;
+	position: absolute;
+	left: 0;
+	box-shadow: 1px 1px 10px rgba(0,0,0,.2);
+}
+
+#wrtc_settings button:hover{
+	background: #eee;
 }
 
 

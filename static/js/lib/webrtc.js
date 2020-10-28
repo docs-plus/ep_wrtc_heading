@@ -102,6 +102,67 @@ var WRTC = (function WRTC() {
 					});
 				}
 			});
+			$(document).on('click', '#wrtc_settings .btn_info', function click() {
+				var userID = Object.keys(pc)
+				var $this =  $(this)
+				var isActive = $this.attr('data-active')
+				var $modal = $(document).find("#wrtc_settings .wrtc_info")
+
+				if(isActive){
+					$modal.hide();
+					if(pc[userID[0]]){
+						getStats(pc[userID[0]], function(result) {
+							result.nomore();
+						})
+					}
+					$this.removeAttr("data-active")
+					return true;
+				} else {
+					$this.attr({'data-active': true})
+					$modal.show()
+				}
+
+				if(pc[userID[0]] && !isActive){
+					function bytesToSize(bytes) {
+							var k = 1000;
+							var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+							if (bytes <= 0) {
+									return '0 Bytes';
+							}
+							var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
+							
+							if(!sizes[i]) {
+									return '0 Bytes';
+							}
+		
+							return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+					}
+					getStats(pc[userID[0]], function(result) {
+							const statistic ={
+								"speed": bytesToSize(result.bandwidth.speed),
+								"availableSendBandwidth": bytesToSize(result.bandwidth.availableSendBandwidth),
+								"video": {
+									"send.codecs": result.video.send.codecs.join(", "),
+									// "recv.codecs": result.video.recv.codecs.join(", "),
+									"bytesSent": bytesToSize(result.video.bytesSent),
+									"bytesReceived": bytesToSize(result.video.bytesReceived)
+								},
+								"audio":{
+									"send.codecs": result.audio.send.codecs.join(", "),
+									// "recv.codecs": result.audio.recv.codecs.join(", "),
+									"bytesSent": bytesToSize(result.audio.bytesSent),
+									"bytesReceived": bytesToSize(result.audio.bytesReceived)
+								}
+							}
+							$(document).find("#wrtc_settings .wrtc_info").html(`<pre>${JSON.stringify(statistic, undefined, 2)}</pre>`)
+					}, 1000);
+				}
+			})
+			$(document).on('click', '#wrtc_settings .btn_close', function click() {
+				$('#wrtc_settings').toggleClass('active');
+				var $btnInfo = $("#wrtc_settings .btn_info")
+				if($btnInfo.attr('data-active')) $btnInfo.trigger("click")
+			});
 		},
 		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
 			if (context.author) {
@@ -202,7 +263,6 @@ var WRTC = (function WRTC() {
 				share.stopStreaming(localStream);
 				localStream = null;
 			}
-			attemptRonnect = 0;
 		},
 		toggleMuted: function toggleMuted() {
 			var audioTrack = localStream.getAudioTracks()[0];
@@ -452,6 +512,8 @@ var WRTC = (function WRTC() {
 						headerId: headerId,
 						candidate: event.candidate
 					});
+				}else{
+					attemptRonnect = 0;
 				}
 			};
 			pc[userId].onaddstream = function (event) {
@@ -554,94 +616,13 @@ var WRTC = (function WRTC() {
 	};
 	var webrtcDetectedBrowser = 'chrome';
 
-	// Set Opus as the default audio codec if it's present.
-	function preferOpus(sdp) {
-		var sdpLines = sdp.split('\r\n');
-		var mLineIndex = null;
-
-		// Search for m line.
-		for (var i = 0; i < sdpLines.length; i++) {
-			if (sdpLines[i].search('m=audio') !== -1) {
-				mLineIndex = i;
-				break;
-			}
-		}
-		if (mLineIndex === null) return sdp;
-
-		// If Opus is available, set it as the default in m line.
-		for (var j = 0; j < sdpLines.length; j++) {
-			if (sdpLines[j].search('opus/48000') !== -1) {
-				var opusPayload = extractSdp(sdpLines[j], /:(\d+) opus\/48000/i);
-				if (opusPayload) sdpLines[mLineIndex] = setDefaultCodec(sdpLines[mLineIndex], opusPayload);
-				break;
-			}
-		}
-
-		// Remove CN in m line and sdp.
-		sdpLines = removeCN(sdpLines, mLineIndex);
-
-		sdp = sdpLines.join('\r\n');
-		return sdp;
-	}
-
-	function extractSdp(sdpLine, pattern) {
-		var result = sdpLine.match(pattern);
-		return result && result.length === 2 ? result[1] : null;
-	}
-
-	// Set the selected codec to the first in m line.
-	function setDefaultCodec(mLine, payload) {
-		var elements = mLine.split(' ');
-		var newLine = [];
-		var index = 0;
-		for (var i = 0; i < elements.length; i++) {
-			if (index === 3) {
-				// Format of media starts from the fourth.
-				newLine[index++] = payload;
-			}
-			// Put target payload to the first.
-			if (elements[i] !== payload) newLine[index++] = elements[i];
-		}
-		return newLine.join(' ');
-	}
-
-	// Strip CN from sdp before CN constraints is ready.
-	function removeCN(sdpLines, mLineIndex) {
-		var mLineElements = sdpLines[mLineIndex].split(' ');
-		// Scan from end for the convenience of removing an item.
-		for (var i = sdpLines.length - 1; i >= 0; i--) {
-			var payload = extractSdp(sdpLines[i], /a=rtpmap:(\d+) CN\/\d+/i);
-			if (payload) {
-				var cnPos = mLineElements.indexOf(payload);
-				if (cnPos !== -1) {
-					// Remove CN payload from m line.
-					mLineElements.splice(cnPos, 1);
-				}
-				// Remove CN line in sdp
-				sdpLines.splice(i, 1);
-			}
-		}
-
-		sdpLines[mLineIndex] = mLineElements.join(' ');
-		return sdpLines;
-	}
-
-	function sdpRate(sdp, rate) {
-		rate = rate || 1638400;
-		return sdp.replace(/b=AS:\d+\r/g, 'b=AS:' + rate + '\r');
-	}
-
 	function cleanupSdp(sdp) {
-		// sdp = preferOpus(sdp);
-		// sdp = sdpRate(sdp);
-		// return sdp;
-
-
 		var bandwidth = {
 			screen: 300, // 300kbits minimum
 			audio: 50,   // 50kbits  minimum
-			minVideo: 125, // 125kbits  min
-			maxVideo: 125, // 125kbits  max
+			video: 128,
+			minVideo: 128, // 125kbits  min
+			maxVideo: 128, // 125kbits  max
 			videoCodec: clientVars.webrtc.video.codec
 		};
 
@@ -651,10 +632,10 @@ var WRTC = (function WRTC() {
 		sdp = CodecsHandler.setVideoBitrates(sdp, {
 			min: bandwidth.minVideo,
 			max: bandwidth.maxVideo,
+			codec: bandwidth.videoCodec
 		});
-		sdp = CodecsHandler.preferCodec(sdp, 'vp9')
 		sdp = CodecsHandler.setOpusAttributes(sdp);
-		// sdp = CodecsHandler.forceStereoAudio(sdp);
+		sdp = CodecsHandler.preferCodec(sdp, bandwidth.videoCodec)
 
 		return sdp;
 	}

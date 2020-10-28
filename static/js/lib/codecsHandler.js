@@ -148,44 +148,38 @@ var CodecsHandler = (function() {
 	}
 
 	function setBAS(sdp, bandwidth, isScreen) {
-			if (!bandwidth) {
-					return sdp;
-			}
-
-			if (typeof isFirefox !== 'undefined' && isFirefox) {
-					return sdp;
-			}
-
-			if (isScreen) {
-					if (!bandwidth.screen) {
-							console.warn('It seems that you are not using bandwidth for screen. Screen sharing is expected to fail.');
-					} else if (bandwidth.screen < 300) {
-							console.warn('It seems that you are using wrong bandwidth value for screen. Screen sharing is expected to fail.');
-					}
-			}
-
-			// if screen; must use at least 300kbs
-			if (bandwidth.screen && isScreen) {
-					sdp = sdp.replace(/b=AS([^\r\n]+\r\n)/g, '');
-					sdp = sdp.replace(/a=mid:video\r\n/g, 'a=mid:video\r\nb=AS:' + bandwidth.screen + '\r\n');
-			}
-
-			// remove existing bandwidth lines
-			if (bandwidth.audio || bandwidth.video) {
-					sdp = sdp.replace(/b=AS([^\r\n]+\r\n)/g, '');
-			}
-
-			if (bandwidth.audio) {
-					sdp = sdp.replace(/a=mid:audio\r\n/g, 'a=mid:audio\r\nb=AS:' + bandwidth.audio + '\r\n');
-			}
-
-			if (bandwidth.screen) {
-					sdp = sdp.replace(/a=mid:video\r\n/g, 'a=mid:video\r\nb=AS:' + bandwidth.screen + '\r\n');
-			} else if (bandwidth.video) {
-					sdp = sdp.replace(/a=mid:video\r\n/g, 'a=mid:video\r\nb=AS:' + bandwidth.video + '\r\n');
-			}
-
+		if (!!navigator.mozGetUserMedia || !bandwidth) {
 			return sdp;
+		}
+
+		if (isScreen) {
+			if (!bandwidth.screen) {
+				console.warn('It seems that you are not using bandwidth for screen. Screen sharing is expected to fail.');
+			} else if (bandwidth.screen < 300) {
+				console.warn('It seems that you are using wrong bandwidth value for screen. Screen sharing is expected to fail.');
+			}
+		}
+
+		// if screen; must use at least 300kbs
+		if (bandwidth.screen && isScreen) {
+			sdp = sdp.replace(/b=AS([^\r\n]+\r\n)/g, '');
+			sdp = sdp.replace(/a=mid:video\r\n/g, 'a=mid:video\r\nb=AS:' + bandwidth.screen + '\r\n');
+		}
+
+		// remove existing bandwidth lines
+		if (bandwidth.audio || bandwidth.video || bandwidth.data) {
+			sdp = sdp.replace(/b=AS([^\r\n]+\r\n)/g, '');
+		}
+
+		if (bandwidth.audio) {
+			sdp = sdp.replace(/a=mid:audio\r\n/g, 'a=mid:audio\r\nb=AS:' + bandwidth.audio + '\r\n');
+		}
+
+		if (bandwidth.video) {
+			sdp = sdp.replace(/a=mid:video\r\n/g, 'a=mid:video\r\nb=AS:' + (isScreen ? bandwidth.screen : bandwidth.video) + '\r\n');
+		}
+
+		return sdp;
 	}
 
 	// Find the line in sdpLines that starts with |prefix|, and, if specified,
@@ -220,11 +214,14 @@ var CodecsHandler = (function() {
 			params = params || {};
 			var xgoogle_min_bitrate = params.min;
 			var xgoogle_max_bitrate = params.max;
+			var videoCodec = params.codec.toUpperCase() || "VP8";
+			
+
 
 			var sdpLines = sdp.split('\r\n');
 
 			// VP8
-			var vp8Index = findLine(sdpLines, 'a=rtpmap', 'VP8/90000');
+			var vp8Index = findLine(sdpLines, 'a=rtpmap', videoCodec+'/90000');
 			var vp8Payload;
 			if (vp8Index) {
 					vp8Payload = getCodecPayloadType(sdpLines[vp8Index]);
@@ -251,6 +248,7 @@ var CodecsHandler = (function() {
 					sdpLines[rtxFmtpLineIndex] = sdpLines[rtxFmtpLineIndex].concat(appendrtxNext);
 					sdp = sdpLines.join('\r\n');
 			}
+
 
 			return sdp;
 	}
