@@ -127,6 +127,14 @@ You can see metrics for various errors that users have when attempting to connec
 - Fixed reconnecting attempts, reset retry counting happening when we have a successful connection to the other peers
 - Fixed bandwidth limit, this was an issue where bandwidth usage was not locked at "128 kbps".
 
+### [v0.28.5]
+- Fixed copy and paste functionality, this feature was lost during bundling
+- Increase bandwidth cap and decrease and lock down video resolution to `QVGA` (`width: {exact: 320}, height: {exact: 240}`)
+- Adjust reconnection process, increase the effort to 50 times, and delay cap between `200` to `1000` milliseconds
+
+
+
+
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).
