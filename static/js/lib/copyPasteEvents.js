@@ -2,6 +2,8 @@
 // inspired by ep_comments_page plugin, used and modified copyPasteEvents.js
 
 'use strict';
+var _ = require('ep_etherpad-lite/static/js/underscore');
+var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 
 var events = (function(){
 	var padInner = null;

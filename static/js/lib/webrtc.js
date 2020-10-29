@@ -16,7 +16,7 @@
 'use strict';
 
 var WRTC = (function WRTC() {
-	var attemptRonnect = 10;
+	var attemptRonnect = 50;
 	var reconnected = 0;
 	var videoSizes = { large: '260px', small: '160px' };
 	var pcConfig = {};
@@ -140,10 +140,12 @@ var WRTC = (function WRTC() {
 					getStats(pc[userID[0]], function(result) {
 							const statistic ={
 								"speed": bytesToSize(result.bandwidth.speed),
+								"systemNetworkType": result.connectionType.systemNetworkType,
 								"availableSendBandwidth": bytesToSize(result.bandwidth.availableSendBandwidth),
 								"video": {
 									"send.codecs": result.video.send.codecs.join(", "),
-									// "recv.codecs": result.video.recv.codecs.join(", "),
+									"resolutions": "width " + result.resolutions.send.width + ", height " + result.resolutions.send.height,
+									"resolutions": "width " + result.resolutions.recv.width + ", height " + result.resolutions.recv.height,
 									"bytesSent": bytesToSize(result.video.bytesSent),
 									"bytesReceived": bytesToSize(result.video.bytesReceived)
 								},
@@ -265,7 +267,7 @@ var WRTC = (function WRTC() {
 			}
 		},
 		toggleMuted: function toggleMuted() {
-			var audioTrack = localStream.getAudioTracks()[0];
+			var audioTrack = localStream.getAudioTracks();
 			if (audioTrack) {
 				audioTrack.enabled = !audioTrack.enabled;
 				return !audioTrack.enabled;
@@ -535,7 +537,7 @@ var WRTC = (function WRTC() {
 			if (element && element[0] && typeof element[0].sinkId !== 'undefined') {
 				element[0].setSinkId(sinkId)
 						.then(() => {
-							console.info(`Success, audio output device attached: ${sinkId}`);
+							// console.info(`Success, audio output device attached: ${sinkId}`);
 						})['catch'](error => {
 							var errorMessage = error;
 							if (error.name === 'SecurityError') {
@@ -567,19 +569,18 @@ var WRTC = (function WRTC() {
 			var mediaConstraints = {
 				audio: true,
 				video: {
-					optional: [],
-					mandatory: {
-						maxWidth: 320,
-						maxHeight: 240
-					}
+					width: {exact: 320},
+					height: {exact: 240},
+					frameRate: { ideal: 15, max: 30 },
+					facingMode: "user" 
 				}
 			};
 
 			if (audioSource) {
-				mediaConstraints.audio = { deviceId: { exact: audioSource } };
+				mediaConstraints.audio.deviceId = { exact: audioSource };
 			}
 			if (videoSource) {
-				mediaConstraints.video = { deviceId: { exact: videoSource } };
+				mediaConstraints.video.deviceId = { exact: videoSource };
 			}
 			
 			localStorage.setItem('videoSettings', JSON.stringify({ microphone: audioSource, speaker: audioOutput, camera: videoSource }));
@@ -619,10 +620,10 @@ var WRTC = (function WRTC() {
 	function cleanupSdp(sdp) {
 		var bandwidth = {
 			screen: 300, // 300kbits minimum
-			audio: 50,   // 50kbits  minimum
-			video: 128,
+			audio: 64,   // 64kbits  minimum
+			video: 300,
 			minVideo: 128, // 125kbits  min
-			maxVideo: 128, // 125kbits  max
+			maxVideo: 1024, // 125kbits  max
 			videoCodec: clientVars.webrtc.video.codec
 		};
 
@@ -662,7 +663,7 @@ var WRTC = (function WRTC() {
 			setTimeout(() => {
 				console.log("[wrtc]: reconnecting...")
 				self.getUserMedia(window.headerId)
-			}, randomIntFromInterval(200, 2000));
+			}, randomIntFromInterval(200, 1000));
 		}
 		console.error('WebRTC ERROR:', error);
 	}
