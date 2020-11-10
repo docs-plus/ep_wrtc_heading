@@ -8,6 +8,12 @@ var collectContentPre = function collectContentPre(hook, context) {
 	var tname = context.tname;
 	var tagIndex = tags.indexOf(tname);
 	var existTagId = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(context.cls);
+	var state = context.state;
+	var lineAttributes = state.lineAttributes;
+
+	if(lineAttributes['heading'] && context.cls && !existTagId){
+		context.cc.doAttrib(context.state, 'headingTagId::' + randomString(16));
+	}
 
 	if (existTagId && existTagId[1]) {
 		context.cc.doAttrib(context.state, 'headingTagId::' + existTagId[1]);
