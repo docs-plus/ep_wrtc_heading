@@ -45,7 +45,7 @@ var WRTC = (function WRTC() {
 
 	var self = {
 		// API HOOKS
-		postAceInit: function postAceInit(hook, context, webSocket, docId) {
+		postAceInit: function postAceInit(hook, context, webSocket,docId) {
 			padId = docId;
 			socket = webSocket;
 

@@ -320,7 +320,8 @@ var textChat = (function textChat() {
 
 	function postAceInit(hook, context, webSocket, docId) {
 		socket = webSocket;
-		padId = docId || window.pad.getPadId();
+		padId = docId;
+		share.wrtcPubsub.emit('component status', 'text', true)
 		eventListers();
 	}
 

@@ -177,7 +177,7 @@ var WRTC_Room = (function WRTC_Room() {
 		var paddingTop = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
 		var aceOuterPadding = parseInt(paddingTop, 10);
 		var offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
-		return offsetTop + height / 2 - 26;
+		return offsetTop + height / 2 - 31;
 	}
 
 	function getHeaderRoomX($element) {
@@ -270,9 +270,9 @@ var WRTC_Room = (function WRTC_Room() {
 		},
 		postAceInit: function postAceInit(hook, context, webSocket, docId) {
 			socket = webSocket;
-			padId = docId || window.pad.getPadId();
-
+			padId = docId;
 			VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
+			share.wrtcPubsub.emit('component status', 'room', true)
 
 			socket.on('userJoin', function (data, roomInfo, target) {
 				if (target === 'video') {
@@ -320,6 +320,8 @@ var WRTC_Room = (function WRTC_Room() {
 			});
 		},
 		findTags: function findTags() {
+			var components = share.wrtcStore.components;
+			if(!components.text.active && !components.video.active && !components.room.active) return false;
 			var hTagList = [];
 			var hTagElements = hElements;
 			var hTags = share.$body_ace_outer().find('iframe').contents().find('#innerdocbody').children('div').children(hTagElements);

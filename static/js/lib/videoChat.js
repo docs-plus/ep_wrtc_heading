@@ -41,14 +41,9 @@ var videoChat = (function videoChat() {
 		});
 	}
 
-
 	function isUserMediaAvailable() {
 		return window.navigator.mediaDevices.getUserMedia({ audio: true, video: true });
 	}
-
-	function activateModal() {}
-
-	function deactivateModal() {}
 
 	function removeUserFromRoom(data, roomInfo, cb) {
 		if (!data || !roomInfo || !data.userId) return false;
@@ -318,16 +313,14 @@ var videoChat = (function videoChat() {
 
 	function postAceInit(hook, context, webSocket, docId) {
 		socket = webSocket;
-		padId = docId || window.pad.getPadId();
+		padId = docId;
 		VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
-
+		share.wrtcPubsub.emit('component status', 'video', true)
 		mediaDevices();
 	}
 
 	return {
 		postAceInit: postAceInit,
-		activateModal: activateModal,
-		deactivateModal: deactivateModal,
 		userJoin: userJoin,
 		userLeave: userLeave,
 		gateway_userJoin: gateway_userJoin,

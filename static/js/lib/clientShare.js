@@ -113,7 +113,13 @@ var share = (function share() {
 		});
 	};
 
-	var wrtcStore = {};
+	var wrtcStore = {
+		components: {
+			text: {active: false},
+			video: {active: false},
+			room: {active: false}
+		}
+	};
 
 	var wrtcPubsub = {
 		events: {},
@@ -195,6 +201,10 @@ var share = (function share() {
 		}
 	};
 
+	wrtcPubsub.on('component status', function(componentName, status) {
+		wrtcStore.components[componentName].active = status
+	})
+
 	wrtcPubsub.on('update store', function (requestUser, headerId, action, target, roomInfo, callback) {
 		if (!requestUser || !headerId || !action || !roomInfo || !target) return false;
 
@@ -231,6 +241,8 @@ var share = (function share() {
 		var $btnText = $headingRoom.find('.btn_icon[data-join="TEXT"]');
 		var $btnPlus = $headingRoom.find('.btn_icon[data-join="PLUS"]');
 
+		$btnPlus.append('<div class="loader"></div>');
+
 		if (target === 'TEXT' || target === 'VIDEO') {
 			// disable target and plus buttton
 			$headingRoom.find('.btn_icon[data-join="' + target + '"]').prop('disabled', true);
@@ -252,6 +264,8 @@ var share = (function share() {
 		var $btnVideo = $headingRoom.find('.btn_icon[data-join="VIDEO"]');
 		var $btnText = $headingRoom.find('.btn_icon[data-join="TEXT"]');
 		var $btnPlus = $headingRoom.find('.btn_icon[data-join="PLUS"]');
+
+		$btnPlus.find('.loader').remove();
 
 		if (target === 'TEXT' || target === 'VIDEO') {
 			// enable target and plus buttton

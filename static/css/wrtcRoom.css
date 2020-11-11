@@ -97,14 +97,15 @@
 	outline: none;
 	/* width: 26px;
 	height: 26px; */
-	width: 30px;
-	height: 30px;
+	width: 40px;
+	height: 40px;
 	padding: 0 6px;
 	margin-right: 4px;
 	transition: all .2s linear;
 	display: flex;
 	align-items: center;
 	color: #333333;
+	justify-content: center;
 }
 .wrtc_box .wrtc_header .btn_icon svg{
 	width: 16px;
@@ -227,12 +228,16 @@
 }
 
 .wbrtc_roomBox .loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid #3498db;
+	border-radius: 50%;
+	animation: spin 2s linear infinite;
+	padding: 16px;
+	position: absolute;
+	z-index: 2;
+	background: transparent;
+	left: -1px;
+	top: -1px;
 }
 
 @keyframes spin {
@@ -284,9 +289,9 @@
 	background-color: #fff;
 	display: flex;
 	flex-direction: row;
-	width: 24px;
+	width: 34px;
+	height: 34px;
 	border: 2px solid #ddd;
-	height: 24px;
 	border-radius: 50%;
 	float: left;
 	overflow: hidden;

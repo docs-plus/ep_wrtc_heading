@@ -114,20 +114,19 @@ var hooks = {
 		});
 
 		var ace = context.ace;
-		var userId = window.pad.getUserId();
-		var padId = window.pad.getPadId();
-
-		var socket = EPwrtcHeading.init(ace, padId, userId);
+		var userId = window.pad.getUserId() || clientVars.padId;
+		var padId = window.pad.getPadId() || clientVars.userId;
 
 		// TODO: make sure the priority of these components are in line
 		// TODO: make sure clientVars contain all data that's necessary
-
+		
 		if(!clientVars.userId || !clientVars.padId) throw new Error("[wrtc]: clientVars doesn't exists");
-
+		
+		var socket = EPwrtcHeading.init(ace, padId, userId);
 		WRTC.postAceInit(hook, context, socket, padId);
-		WRTC_Room.postAceInit(hook, context, socket, padId);
 		videoChat.postAceInit(hook, context, socket, padId);
 		textChat.postAceInit(hook, context, socket, padId);
+		WRTC_Room.postAceInit(hook, context, socket, padId);
 		
 		$('#editorcontainer iframe').ready(function readyObj() {
 			WRTC.appendInterfaceLayout();
