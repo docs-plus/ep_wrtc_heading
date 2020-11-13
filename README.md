@@ -127,13 +127,14 @@ You can see metrics for various errors that users have when attempting to connec
 - Fixed reconnecting attempts, reset retry counting happening when we have a successful connection to the other peers
 - Fixed bandwidth limit, this was an issue where bandwidth usage was not locked at "128 kbps".
 
-### [v0.28.7]
+### [v0.28.9]
 - Fixed copy and paste functionality, this feature was lost during bundling
 - Increase bandwidth cap and decrease and lock down video resolution to `QVGA` (`width: {exact: 320}, height: {exact: 240}`)
 - Adjust reconnection process, increase the effort to 50 times, and delay cap between `200` to `1000` milliseconds
 - Fixed header icon, the video icon did not display when the header was removed or then replaced with new content.
 - A spinner is added when the user is waiting to join the room.
-- Css adjustment
+- Css adjustment, fixed misalignment(video and inline avatar icons)
+- `inlineAvatars` now are clickable, and use the [ep_profile_modal](https://github.com/samirsayyad/ep_profile_modal) model to display user information.
 
 
 

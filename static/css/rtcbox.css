@@ -628,6 +628,7 @@
 	background-color: #fff;
 	display: flex;
 	flex-direction: row;
+	cursor: pointer;
 }
 .wrtc_inlineAvatars > .avatar img{
 	float: left;

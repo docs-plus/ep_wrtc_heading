@@ -3,6 +3,26 @@
 var share = (function share() {
 
 	var avatarUrl = '../static/plugins/ep_profile_modal/static/img/user.png';
+	var getAvatarUrl = function (userId) {
+		if(!userId) return avatarUrl;
+
+		return '/p/getUserProfileImage/'+userId+"/"+window.pad.getPadId()+"?t=" + new Date().getTime();
+	}
+
+	getValidUrl = function(url = ""){
+		if(url=="") return "";
+		let newUrl = window.decodeURIComponent(url);
+		newUrl = newUrl.trim().replace(/\s/g, "");
+
+		if(/^(:\/\/)/.test(newUrl)){
+				return `http${newUrl}`;
+		}
+		if(!/^(f|ht)tps?:\/\//i.test(newUrl)){
+				return `http://${newUrl}`;
+		}
+
+		return newUrl;
+	};
 
 	var getUserId = function getUserId() {
 		return clientVars.userId || window.pad.getUserId();
@@ -106,10 +126,7 @@ var share = (function share() {
 		$element.empty();
 		roomInfo.list.forEach(function reOrderUserList(el) {
 			var userInList = getUserFromId(el.userId) || { colorId: '', name: 'anonymous', userId: '0000000' };
-			if (clientVars.ep_profile_list && clientVars.ep_profile_list[el.userId]) {
-				avatarUrl = clientVars.ep_profile_list[el.userId].imageUrl || clientVars.ep_profile_list[el.userId].img;
-			}
-			$element.append('<li data-id=' + el.userId + " style='border-color: " + userInList.colorId + "'><div class='avatar'><img src='" + avatarUrl + "'></div>" + userInList.name + '</li>');
+			$element.append('<li data-id=' + el.userId + " style='border-color: " + userInList.colorId + "'><div class='avatar'><img title='" + userInList.name + "' src='" + getAvatarUrl(el.userId) + "'></div>" + userInList.name + '</li>');
 		});
 	};
 
@@ -159,13 +176,9 @@ var share = (function share() {
 			Object.keys(room).forEach(function reOrderUserList(key, index) {
 				var userInList = getUserFromId(room[key].userId) || { colorId: '', name: 'anonymous'};
 				if(userInList.userId){
-					// TODO: If the user is not found, we hangup the user.
-					if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
-						avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
-					}
 					if (index < inlineAvatarLimit) {
 						$element.find('.avatarMore').hide();
-						$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+						$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img title="' + userInList.name + '" src="' + getAvatarUrl(userInList.userId) + '"></div>');
 					} else {
 						$element.find('.avatarMore').show().text('+' + (index + 1 - inlineAvatarLimit));
 					}
@@ -187,22 +200,47 @@ var share = (function share() {
 			list.forEach(function reOrderUserList(el, index) {
 				var userInList = getUserFromId(el.userId) || { colorId: '', name: 'anonymous'};
 				if(userInList.userId){
-					if (clientVars.ep_profile_list && clientVars.ep_profile_list[userInList.userId]) {
-						avatarUrl = clientVars.ep_profile_list[userInList.userId].imageUrl || clientVars.ep_profile_list[userInList.userId].img;
-					}
 					if (index < inlineAvatarLimit) {
 						$element.find('.avatarMore').hide();
-						$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img src="' + avatarUrl + '"></div>');
+						$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img title="' + userInList.name + '" src="' + getAvatarUrl(userInList.userId) + '"></div>');
 					} else {
 						$element.find('.avatarMore').show().text('+' + (index + 1 - inlineAvatarLimit));
 					}
 				}
 			});
+		},
+		update: function updateInfo(userId, data){
+			var $roomBox = $body_ace_outer().find('#wbrtc_avatarCol .wrtc_inlineAvatars');
+			var $textBox = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
+			var $videoBox = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
+
+			if($roomBox)
+				$roomBox.find('.avatar[data-id="' + userId + '"] img').attr({
+					'src': data.imageUrl,
+					'title': data.userName
+				});
+
+			if($videoBox)
+				$videoBox.find('.avatar img').attr({
+					'src': data.imageUrl,
+					'title': data.userName
+				});
+
+			if($textBox)
+				$textBox.find('.avatar img').attr({
+					'src': data.imageUrl,
+					'title': data.userName
+				});
+
 		}
 	};
 
 	wrtcPubsub.on('component status', function(componentName, status) {
-		wrtcStore.components[componentName].active = status
+		wrtcStore.components[componentName].active = status;
+	})
+
+	wrtcPubsub.on('update inlineAvater info', function(userId, data) {
+		inlineAvatar.update(userId, data);
 	})
 
 	wrtcPubsub.on('update store', function (requestUser, headerId, action, target, roomInfo, callback) {
@@ -240,7 +278,8 @@ var share = (function share() {
 		var $btnVideo = $headingRoom.find('.btn_icon[data-join="VIDEO"]');
 		var $btnText = $headingRoom.find('.btn_icon[data-join="TEXT"]');
 		var $btnPlus = $headingRoom.find('.btn_icon[data-join="PLUS"]');
-
+		
+		$btnPlus.find('.loader').remove();
 		$btnPlus.append('<div class="loader"></div>');
 
 		if (target === 'TEXT' || target === 'VIDEO') {
@@ -301,6 +340,7 @@ var share = (function share() {
 		wrtcPubsub,
 		getUserId,
 		stopStreaming,
+		getValidUrl
 		
 	}
 

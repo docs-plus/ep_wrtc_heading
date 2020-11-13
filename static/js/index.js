@@ -109,6 +109,9 @@ var hooks = {
 				}
 				if (data.action === 'EP_PROFILE_USER_LOGIN_UPDATE') {
 					window.clientVars.ep_profile_list[data.userId] = data;
+					if(share && share.wrtcPubsub) {
+						share.wrtcPubsub.emit('update inlineAvater info', data.userId, data, function() {});
+					}
 				}
 			}
 		});

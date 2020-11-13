@@ -185,7 +185,35 @@ var WRTC_Room = (function WRTC_Room() {
 		var paddingLeft = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-left');
 		var aceOuterPadding = parseInt(paddingLeft, 10);
 		var offsetLeft = Math.ceil(share.$body_ace_outer().find('iframe[name="ace_inner"]').offset().left - aceOuterPadding);
-		return offsetLeft - width - 6;
+		return offsetLeft - width - 10;
+	}
+
+	function showUserProfileModal () {
+		var userId = $(this).attr('data-id');
+		var user = window.clientVars.ep_profile_list[userId];
+		var imageUrl = user.imageUrl || '/p/getUserProfileImage/'+userId+"/"+padId +"?t=" + new Date().getTime();
+		if(!user) return false;
+		$("#ep_profile_users_profile_name").text(user.userName);
+		$("#ep_profile_users_profile_desc").text(user.about);
+		$("#ep_profile_users_profile_homepage").attr({
+			"href":share.getValidUrl(user.homepage),
+			target:"_blank"
+		});
+		
+		$("#ep_profile_users_profile_homepage").text(user.homepage);
+
+		// shared.showGeneralOverlay()
+		$('#ep_profile_users_profile').addClass('ep_profile_formModal_show');
+		$('#ep_profile_general_overlay').addClass('ep_profile_formModal_overlay_show');
+		$('#ep_profile_general_overlay').css({"display":"block"});
+
+		$("#ep_profile_users_profile_userImage").css({
+			"background-position":"50% 50%",
+			"background-image":"url("+imageUrl+")" ,
+			"background-repeat":"no-repeat",
+			"background-size": "128px",
+			"background-color":"#485365"
+		});
 	}
 
 	function activeEventListener() {
@@ -194,6 +222,9 @@ var WRTC_Room = (function WRTC_Room() {
 		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_text', roomBtnHandler);
 		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_video', roomBtnHandler);
 		$wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_chatRoom', roomBtnHandler);
+
+		$wbrtc_roomBox.on('click', '#wbrtc_avatarCol .wrtc_roomInlineAvatar .avatar', showUserProfileModal);
+		$(document).on('click', '.wrtc_inlineAvatars > .avatar, .wrtc_inlineAvatars > .avatarMore', showUserProfileModal);
 
 		$(document).on('click', '#chattext .wrtc_roomLink', roomBtnHandler);
 

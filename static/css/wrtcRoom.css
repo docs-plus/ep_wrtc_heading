@@ -4,7 +4,7 @@
 	position: relative;
 	z-index: 20;
 	/* left: 44px; */
-	left: 27px;
+	left: 22px;
 	overflow: hidden;
 	width: 50px;
 }
@@ -289,12 +289,14 @@
 	background-color: #fff;
 	display: flex;
 	flex-direction: row;
-	width: 34px;
-	height: 34px;
+	width: 30px;
+	height: 30px;
 	border: 2px solid #ddd;
 	border-radius: 50%;
 	float: left;
 	overflow: hidden;
+	top:3px;
+	cursor: pointer;
 }
 .wrtc_inlineAvatars  .avatar img{
 	float: left;
