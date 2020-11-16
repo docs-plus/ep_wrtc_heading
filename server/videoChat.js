@@ -4,6 +4,7 @@ const Config = require("../config")
 // data Structure
 // "padId:headerId": [{object}]
 const rooms = {}
+const roomsQueue = {}
 
 const socketUserJoin = data => {
 	const padId = data.padId
@@ -12,8 +13,9 @@ const socketUserJoin = data => {
 	let canUserJoin = false
 
 	// if the room does not exist create the room for the first time.
-	if(!rooms[roomKey])
+	if(!rooms[roomKey]){
 		rooms[roomKey] = []
+	}
 	
 	// does user already joined the room?
 	const isUserInRoom = rooms[roomKey].find(x => x.userId === data.userId)

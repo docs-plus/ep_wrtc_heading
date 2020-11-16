@@ -516,6 +516,7 @@ var WRTC = (function WRTC() {
 					});
 				}else{
 					attemptRonnect = 0;
+					socket.emit('acceptNewCall', padId, window.headerId, function(){})
 				}
 			};
 			pc[userId].onaddstream = function (event) {

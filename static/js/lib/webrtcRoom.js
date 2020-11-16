@@ -1,7 +1,6 @@
 'use strict';
 
 var WRTC_Room = (function WRTC_Room() {
-	var self = null;
 	var socket = null;
 	var padId = null;
 	var VIDEOCHATLIMIT = 0;
@@ -67,8 +66,6 @@ var WRTC_Room = (function WRTC_Room() {
 		target = $(this).attr('data-join') || target;
 
 		if (!headerId || !target ) return true;
-
-		var $joinBtn = $(this);
 
 		var userInfo = {
 			padId: clientVars.padId || window.pad.getPadId(),
@@ -278,7 +275,7 @@ var WRTC_Room = (function WRTC_Room() {
 		});
 	}
 
-	self = {
+	var self = {
 		getHeaderRoomX: getHeaderRoomX,
 		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
 			if (context.author) {
