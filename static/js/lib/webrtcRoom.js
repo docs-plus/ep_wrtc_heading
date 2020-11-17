@@ -76,6 +76,20 @@ var WRTC_Room = (function WRTC_Room() {
 			action: actions
 		};
 
+		// Before handel request, check socket state
+		if(share.wrtcStore.socketState !== 'OPEND') {
+			// show the alert that user must reload the page
+			$.gritter.add({
+				title: 'Video chat no longer responds',
+				text: 'The socket was disconnected and we can no longer make a stable call, please go to the stable internet and then reload the page then try again.',
+				sticky: false,
+				class_name: 'error',
+				time: '15000'
+			});
+
+			return false;
+		}
+
 		share.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
 
 		if (actions === 'JOIN') {

@@ -172,7 +172,7 @@ var videoChat = (function videoChat() {
 			}).attr({ 'data-active': true });
 
 			share.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
-			socket.emit('acceptNewCall', padId, window.headerId, function(){})
+			socket.emit('acceptNewCall', padId, window.headerId)
 
 			socket.on('receiveTextMessage:' + headerId, function receiveTextMessage(headingId, msg) {
 				var active = $(document).find('#wrtc_textChatWrapper').hasClass('active');

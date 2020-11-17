@@ -32,6 +32,29 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 		var url = loc.protocol + '//' + loc.hostname + ':' + port + '/' + 'heading_chat_room';
 		var socket = io.connect(url);
 
+		// reason (String) either ‘io server disconnect’, ‘io client disconnect’, or ‘ping timeout’
+		socket.on('disconnect', function(reason){
+			console.error('[wrtc]: socket disconnection, reason:', reason);
+			share.wrtcPubsub.emit('socket state', 'DISCONNECTED');
+			$.gritter.add({
+				title: 'Video socket connection has been disconnected',
+				text: 'Plase use stable internet connection, open up your console for more information; reason:' + reason,
+				sticky: false,
+				class_name: 'error',
+				time: '6000'
+			});
+		});
+
+		// unfortunately when reconnection happen, etherpad break down totally
+		socket.on('connect', function() {
+			console.info('[wrtc]: socket connect', socket.id);
+		});
+		
+		socket.on('connect_error', function(error){
+			console.error('[wrtc]: socket connect_error:', error);
+			share.wrtcPubsub.emit('socket state', 'DISCONNECTED');
+		});
+
 		socket.emit('join pad', padId, userId, function joinPad() {});
 
 		// find containers

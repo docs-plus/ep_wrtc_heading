@@ -17,7 +17,6 @@ const textChat = require("./server/textChat")
 
 let VIDEO_CHAT_LIMIT = Config.get("VIDEO_CHAT_LIMIT")
 
-console.log(require('./server/socket'), "========3333")
 const {socketInit, socketIo, handleRTCMessage} =  require('./server/socket')
 
 

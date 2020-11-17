@@ -164,8 +164,10 @@ function socketInit (hookName, args, cb) {
 				else if (chatRoom === "text")
 					room = textChat.socketDisconnect(userData[chatRoom])
 
-				if(room && room.padId)
-					socket.broadcast.to(room.padId).emit("userLeave", room.data, room.roomInfo, chatRoom)
+				console.info("socket disconnect: userLeave", room.data)
+
+				// if(room && room.padId)
+					// socket.broadcast.to(room.padId).emit("userLeave", room.data, room.roomInfo, chatRoom)
 			})
 
 		})

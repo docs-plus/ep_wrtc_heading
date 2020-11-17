@@ -130,7 +130,9 @@ var share = (function share() {
 		});
 	};
 
+	// socketState: 'CLOSED', 'OPEND', 'DISCONNECTED'
 	var wrtcStore = {
+		socketState: 'CLOSED',
 		components: {
 			text: {active: false},
 			video: {active: false},
@@ -234,6 +236,11 @@ var share = (function share() {
 
 		}
 	};
+
+	wrtcPubsub.on('socket state', function(state){
+		wrtcStore.socketState = state
+		console.info('[wrtc]: socket state has been change, new state:', state);
+	});
 
 	wrtcPubsub.on('component status', function(componentName, status) {
 		wrtcStore.components[componentName].active = status;

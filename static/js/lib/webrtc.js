@@ -388,6 +388,7 @@ var WRTC = (function WRTC() {
 		// approved list on the server side.
 		sendErrorStat: function sendErrorStat(statName) {
 			var msg = { component: 'pad', type: 'STATS', data: { statName: statName, type: 'RTC_MESSAGE' } };
+			socket.emit('acceptNewCall', padId, window.headerId)
 			self._pad.socket.json.send(msg);
 		},
 		sendMessage: function sendMessage(to, data) {
@@ -516,7 +517,7 @@ var WRTC = (function WRTC() {
 					});
 				}else{
 					attemptRonnect = 0;
-					socket.emit('acceptNewCall', padId, window.headerId, function(){})
+					socket.emit('acceptNewCall', padId, window.headerId)
 				}
 			};
 			pc[userId].onaddstream = function (event) {
@@ -621,10 +622,10 @@ var WRTC = (function WRTC() {
 	function cleanupSdp(sdp) {
 		var bandwidth = {
 			screen: 300, // 300kbits minimum
-			audio: 64,   // 64kbits  minimum
-			video: 300,
+			audio: 256,   // 64kbits  minimum
+			video: 500,
 			minVideo: 128, // 125kbits  min
-			maxVideo: 1024, // 125kbits  max
+			maxVideo: 2048, // 125kbits  max
 			videoCodec: clientVars.webrtc.video.codec
 		};
 
@@ -656,6 +657,7 @@ var WRTC = (function WRTC() {
 	}
 
 	function logError(error) {
+
 		if(error && error.message.includes("Failed to set remote answer sdp")){
 			reconnected++;
 			console.log("[wrtc]: Try reconnecting", reconnected, attemptRonnect);
@@ -665,9 +667,12 @@ var WRTC = (function WRTC() {
 				console.log("[wrtc]: reconnecting...")
 				self.getUserMedia(window.headerId)
 			}, randomIntFromInterval(200, 1000));
+		}else {
+			console.error("[wrtc]: LogError", error)
+			socket.emit('acceptNewCall', padId, window.headerId)
 		}
-		console.error('WebRTC ERROR:', error);
-	}
+		console.error('[wrtc]: WebRTC ERROR:', error);
+	} 
 
 	self.pc = pc;
 	return self;
