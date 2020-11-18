@@ -46,8 +46,9 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 		});
 
 		// unfortunately when reconnection happen, etherpad break down totally
+		share.wrtcPubsub.emit('socket state', 'OPEND');
 		socket.on('connect', function() {
-			share.wrtcPubsub.emit('socket state', 'OPEND');
+			// share.wrtcPubsub.emit('socket state', 'OPEND');
 			console.info('[wrtc]: socket connect', socket.id);
 		});
 		
