@@ -21,6 +21,25 @@
 	opacity: 0;
 }
 
+
+#wrtc_modal #networkStatus {
+	background: #ddd;
+	padding: 4px 10px;
+	height: 30px;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	z-index: -2;
+	border-radius: 0 0 4px 4px;
+	transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	font-family: monospace;
+}
+
+#wrtc_modal #networkStatus.active {
+	bottom: -30px;
+}
+
 /*=========toolbar=========*/
 #werc_toolbar{
 	width: 100%;
@@ -31,6 +50,9 @@
 	align-items: center;
 	border-top: 1px solid rgb(218, 220, 224);
 	font-weight: bold;
+	background: inherit;
+	z-index: 2;
+	border-radius: 0 0 4px 4px;
 }
 #werc_toolbar .nd_title, .textChatToolbar .nd_title{
 	display: flex;
@@ -233,6 +255,19 @@
 	opacity: 1;
 }
 
+.interface-container .latency{
+	position: absolute;
+	right: 2px;
+	padding: 0 4px;
+	background: rgba(0,0,0,0.5);
+	border-radius: 4px;
+	color: #fff;
+	font-size: 10px;
+	font-weight: bold;
+	opacity: 0;
+	transition: all 0.2s linear;
+}
+
 .interface-container {
 	display: flex;
 	position: absolute;
@@ -322,9 +357,11 @@
 #wrtc_modal .video-container.local-user .interface-btn {
 	background-color: rgba(255, 255, 255, 1);
 }
-#wrtc_modal .video-container:hover .user-name {
+#wrtc_modal .video-container:hover .user-name, #wrtc_modal .video-container:hover .interface-container .latency {
 	opacity: 1;
 }
+
+
 
 /* =========text-chat========= */
 

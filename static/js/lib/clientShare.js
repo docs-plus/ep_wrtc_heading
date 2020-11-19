@@ -9,7 +9,7 @@ var share = (function share() {
 		return '/p/getUserProfileImage/'+userId+"/"+window.pad.getPadId()+"?t=" + new Date().getTime();
 	}
 
-	getValidUrl = function(url = ""){
+	var getValidUrl = function(url = ""){
 		if(url=="") return "";
 		let newUrl = window.decodeURIComponent(url);
 		newUrl = newUrl.trim().replace(/\s/g, "");
@@ -236,6 +236,10 @@ var share = (function share() {
 
 		}
 	};
+
+	wrtcPubsub.on('update network information', function(){
+
+	});
 
 	wrtcPubsub.on('socket state', function(state){
 		wrtcStore.socketState = state

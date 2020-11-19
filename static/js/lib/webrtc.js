@@ -77,7 +77,7 @@ var WRTC = (function WRTC() {
 				videoChatLimit: clientVars.webrtc.videoChatLimit,
 				headerId: ''
 			});
-			var $wrtc_modal = $('<div id="wrtc_modal"><div class="videoWrapper" class="thin-scrollbar"></div></div');
+			var $wrtc_modal = $('<div id="wrtc_modal"><div id="networkStatus"></div><div class="videoWrapper" class="thin-scrollbar"></div></div');
 			$wrtc_modal.append(werc_toolbar);
 			$('body').prepend($wrtc_modal);
 			$(document).on('click', '#wrtc_modal .btn_toggle_modal', function () {
@@ -380,8 +380,15 @@ var WRTC = (function WRTC() {
 
 			if(isLocal) localVideoElement = $video;
 
+			var $networkLatancy = $("<div class='latency'></div>");
+
 			$('#interface_' + videoId).remove();
-			$("<div class='interface-container'>").attr('id', 'interface_' + videoId).append($mute).append($disableVideo).append($largeVideo).insertAfter($video);
+			$("<div class='interface-container'>").attr('id', 'interface_' + videoId)
+			.append($mute)
+			.append($disableVideo)
+			.append($largeVideo)
+			.append($networkLatancy)
+			.insertAfter($video);
 			self.changeAudioDestination();
 		},
 		// Sends a stat to the back end. `statName` must be in the

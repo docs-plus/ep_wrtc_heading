@@ -9,10 +9,7 @@ const roomStatus = {}
 const maxTryToWaitAcceptNewCall = 10
 
 const acceptNewConnection = ({socket, padId, userData, target, callback}) => {
-	let room = null
-	console.log('acceptNewConnection=====>>>>>>>>', padId)
-
-
+	let room = null;
 	if(target === "video"){
 		room = videoChat.socketUserJoin(userData)
 		_.set(socket, 'ndHolder.video', room.data)
@@ -146,6 +143,10 @@ function socketInit (hookName, args, cb) {
 			callback(room.collection, room.info, target)
 		})
 
+		socket.on("pingil", () => {
+			socket.emit('pongol');
+		});
+
 		socket.on('disconnect', () => {
 			// remove the user from text and video chat
 			const userData = socket.ndHolder
@@ -177,7 +178,7 @@ function socketInit (hookName, args, cb) {
 }
 
 function handleRTCMessage (client, payload) {
-	console.log('handleRTCMessage', "========")
+	// console.log('handleRTCMessage', "========")
 	// if(!socketIo) return false
 	var userId = sessioninfos[client.id].author
 	var to = payload.to

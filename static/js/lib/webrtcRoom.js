@@ -252,6 +252,13 @@ var WRTC_Room = (function WRTC_Room() {
 		// 	$(this).removeClass('active').find('.wrtc_contentBody').css({ display: 'none' });
 		// });
 
+
+		$(document).on('mouseenter', '.video-container.local-user', function mouseenter() {
+			$(document).find('#wrtc_modal #networkStatus').addClass('active');
+		}).on('mouseleave', '.video-container.local-user', function mouseleave() {
+			$(document).find('#wrtc_modal #networkStatus').removeClass('active');
+		});
+
 		share.$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_share', function click() {
 			var headerURI = $(this).find('input').val();
 			link2Clipboard(headerURI);
