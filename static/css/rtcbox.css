@@ -34,10 +34,15 @@
 	border-radius: 0 0 4px 4px;
 	transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 	font-family: monospace;
+	unnecessary 	font-size: 11px;
+	font-weight: bold;
+	overflow: hidden;
+	opacity: 1;
 }
 
 #wrtc_modal #networkStatus.active {
 	bottom: -30px;
+	opacity: 1;
 }
 
 /*=========toolbar=========*/
@@ -266,6 +271,7 @@
 	font-weight: bold;
 	opacity: 0;
 	transition: all 0.2s linear;
+	font-family: monospace;
 }
 
 .interface-container {

@@ -353,13 +353,13 @@ var videoChat = (function videoChat() {
 			if(pingos.LineAvg.length < 4) pingos.LineAvg.push( ((pingos.LMax + pingos.LMin) / 2) )
 			else {
 				pingos.avg = pingos.LineAvg.reduce(function(a, b){return a + b}) / pingos.LineAvg.length
-				console.log(pingos.LineAvg)
+				// console.log(pingos.LineAvg)
 				pingos.LineAvg = []
 				pingos.LMax=0;
 			}
 
 			$(document).find('.video-container.local-user .latency').text( Math.ceil(pingos.avg) + 'ms');
-			$(document).find('#networkStatus').html("Websocket RTT: " + pingos.latency + "ms, min: "+ pingos.LMin + "ms, max: " + pingos.LMax +"ms, avg:" + pingos.avg + "ms");
+			$(document).find('#networkStatus').html("RTT: " + pingos.latency + "ms, min: "+ pingos.LMin + "ms, max: " + pingos.LMax +"ms, avg:" + pingos.avg + "ms");
 
 			// share.wrtcPubsub.emit('update network information', pingos);
 		});

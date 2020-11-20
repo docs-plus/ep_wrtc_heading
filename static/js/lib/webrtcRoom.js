@@ -86,7 +86,6 @@ var WRTC_Room = (function WRTC_Room() {
 				class_name: 'error',
 				time: '15000'
 			});
-
 			return false;
 		}
 
