@@ -34,10 +34,10 @@
 	border-radius: 0 0 4px 4px;
 	transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 	font-family: monospace;
-	unnecessary 	font-size: 11px;
+	font-size: 11px;
 	font-weight: bold;
 	overflow: hidden;
-	opacity: 1;
+	opacity: 0;
 }
 
 #wrtc_modal #networkStatus.active {
