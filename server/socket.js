@@ -178,7 +178,6 @@ function socketInit (hookName, args, cb) {
 }
 
 function handleRTCMessage (client, payload) {
-	// console.log('handleRTCMessage', "========")
 	// if(!socketIo) return false
 	var userId = sessioninfos[client.id].author
 	var to = payload.to

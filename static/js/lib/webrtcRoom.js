@@ -371,12 +371,11 @@ var WRTC_Room = (function WRTC_Room() {
 			var components = share.wrtcStore.components;
 			if(!components.text.active && !components.video.active && !components.room.active) return false;
 			var hTagList = [];
-			var hTagElements = hElements;
+			var hTagElements = hElements.join(',');
 			var hTags = share.$body_ace_outer().find('iframe').contents().find('#innerdocbody').children('div').children(hTagElements);
 			var aceInnerOffset = share.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
 			var target = share.$body_ace_outer().find('#outerdocbody');
 			var newHTagAdded = false;
-
 			$(hTags).each(function createWrtcRoomBox() {
 				var $el = $(this);
 				// var lineNumber = $el.parent().prevAll().length;
