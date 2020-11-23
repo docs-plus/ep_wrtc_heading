@@ -77,7 +77,7 @@ var WRTC = (function WRTC() {
 				videoChatLimit: clientVars.webrtc.videoChatLimit,
 				headerId: ''
 			});
-			var $wrtc_modal = $('<div id="wrtc_modal"><div id="networkStatus"></div><div class="videoWrapper" class="thin-scrollbar"></div></div');
+			var $wrtc_modal = $('<div id="wrtc_modal"><div id="networkStatus"></div><div class="videoWrapper" class="thin-scrollbar"></div><div id="networkError"></div></div');
 			$wrtc_modal.append(werc_toolbar);
 			$('body').prepend($wrtc_modal);
 			$(document).on('click', '#wrtc_modal .btn_toggle_modal', function () {
@@ -458,7 +458,7 @@ var WRTC = (function WRTC() {
 						p.then(function () {
 							// Do stuff when the candidate is successfully passed to the ICE agent
 						})['catch'](function () {
-							console.error('Error: Failure during addIceCandidate()', data);
+							console.error('[wrtc]: Failure during addIceCandidate()', data);
 						});
 					}
 				}
@@ -664,21 +664,22 @@ var WRTC = (function WRTC() {
 	}
 
 	function logError(error) {
-
 		if(error && error.message.includes("Failed to set remote answer sdp")){
 			reconnected++;
 			console.log("[wrtc]: Try reconnecting", reconnected, attemptRonnect);
 			if(attemptRonnect <= reconnected)
 				throw new Error("[wrtc]: please reload the video chat and try again to connect!");
 			setTimeout(() => {
-				console.log("[wrtc]: reconnecting...")
-				self.getUserMedia(window.headerId)
+				console.log("[wrtc]: reconnecting...");
+				self.getUserMedia(window.headerId);
 			}, randomIntFromInterval(200, 1000));
 		}else {
-			console.error("[wrtc]: LogError", error)
-			socket.emit('acceptNewCall', padId, window.headerId)
+			socket.emit('acceptNewCall', padId, window.headerId);
 		}
-		console.error('[wrtc]: WebRTC ERROR:', error);
+		console.error('[wrtc]: LogError:', error);
+		$("#wrtc_modal #networkError")
+		.addClass('active')
+		.text("[wrtc]: Error:", error, " ,Reload the session.");
 	} 
 
 	self.pc = pc;

@@ -136,7 +136,7 @@ You can see metrics for various errors that users have when attempting to connec
 - Css adjustment, fixed misalignment(video and inline avatar icons)
 - `inlineAvatars` now are clickable, and use the [ep_profile_modal](https://github.com/samirsayyad/ep_profile_modal) model to display user information.
 
-### [v0.29.9]
+### [v0.29.10]
 - Full mesh network for Webrtc, set up and create queues for more stable handshake strategy. (beta-0)
 - Revert user disconnection from socket.io to the etherpad userleave native function; (
   In the event of an unstable internet connection, the socket may fail and be disabled for a second, then try to connect again. in this case, etherpad is unlikely to make another request and the user will have to load the page. we will be waiting for the new version of Etherpad to optimize this feature again.
@@ -145,6 +145,7 @@ You can see metrics for various errors that users have when attempting to connec
 - A badge was added to the video interface to display network latency.
 - Finding H tags function fixed, we only need searching lines that has an H tag.
 - Adjust the new socket settings
+- Webrtc modal error.
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).

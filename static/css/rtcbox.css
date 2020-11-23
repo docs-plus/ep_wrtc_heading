@@ -22,7 +22,8 @@
 }
 
 
-#wrtc_modal #networkStatus {
+#wrtc_modal #networkStatus, 
+#wrtc_modal #networkError {
 	background: #ddd;
 	padding: 4px 10px;
 	height: 30px;
@@ -40,7 +41,17 @@
 	opacity: 0;
 }
 
-#wrtc_modal #networkStatus.active {
+#wrtc_modal #networkError{
+	background: rgba(255,15,15,0.8);
+	top: 0;
+	height: 114px;
+	z-index: 8;
+	color: #fff;
+  padding: 8px;
+}
+
+#wrtc_modal #networkStatus.active,
+#wrtc_modal #networkError.active {
 	bottom: -30px;
 	opacity: 1;
 }
@@ -56,7 +67,8 @@
 	border-top: 1px solid rgb(218, 220, 224);
 	font-weight: bold;
 	background: inherit;
-	z-index: 2;
+	z-index: 10;
+	position: relative;
 	border-radius: 0 0 4px 4px;
 }
 #werc_toolbar .nd_title, .textChatToolbar .nd_title{
