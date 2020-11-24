@@ -594,7 +594,7 @@ var WRTC = (function WRTC() {
 			
 			localStorage.setItem('videoSettings', JSON.stringify({ microphone: audioSource, speaker: audioOutput, camera: videoSource }));
 			// console.log("joining data: videoSettings", { microphone: audioSource, speaker: audioOutput, camera: videoSource })
-			$("#wrtc_modal #networkError").removClass('active').hide();
+			$("#wrtc_modal #networkError").removeClass('active').hide();
 
 			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
 				localStream = stream;
