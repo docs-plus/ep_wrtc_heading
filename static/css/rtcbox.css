@@ -47,7 +47,8 @@
 	height: 114px;
 	z-index: 8;
 	color: #fff;
-  padding: 8px;
+	padding: 8px;
+	display: none;
 }
 
 #wrtc_modal #networkStatus.active,

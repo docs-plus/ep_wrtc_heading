@@ -593,6 +593,8 @@ var WRTC = (function WRTC() {
 			}
 			
 			localStorage.setItem('videoSettings', JSON.stringify({ microphone: audioSource, speaker: audioOutput, camera: videoSource }));
+			// console.log("joining data: videoSettings", { microphone: audioSource, speaker: audioOutput, camera: videoSource })
+			$("#wrtc_modal #networkError").removClass('active').hide();
 
 			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
 				localStream = stream;
@@ -678,6 +680,7 @@ var WRTC = (function WRTC() {
 		}
 		console.error('[wrtc]: LogError:', error);
 		$("#wrtc_modal #networkError")
+		.show()
 		.addClass('active')
 		.text("[wrtc]: Error:", error, " ,Reload the session.");
 	} 
