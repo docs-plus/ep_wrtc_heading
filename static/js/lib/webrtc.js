@@ -682,7 +682,7 @@ var WRTC = (function WRTC() {
 		$("#wrtc_modal #networkError")
 		.show()
 		.addClass('active')
-		.text("[wrtc]: Error:", error, " ,Reload the session.");
+		.text("[wrtc]: Error: " + error + " ,Reload the session.");
 	} 
 
 	self.pc = pc;

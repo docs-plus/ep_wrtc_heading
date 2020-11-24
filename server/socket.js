@@ -70,7 +70,6 @@ function socketInit (hookName, args, cb) {
 
 		socket.on("join pad", function (padId ,userId, callback) {
 			socket.ndHolder = {video: {}, text: {}}
-
 			socket.ndHolder.video = {userId, padId}
 			socket.ndHolder.text = {userId, padId}
 			socket.join(padId)
