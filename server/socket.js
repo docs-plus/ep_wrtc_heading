@@ -32,7 +32,7 @@ const q = new Queue(function ({socket, padId, userData, target, callback, retry}
 
 
 	// console.log("===>>>>>>",padId, userData, target, `${padId}.${userData.headerId}.acceptCall`)
-	console.log(_.has(roomStatus, `${padId}.${userData.headerId}.acceptCall`))
+	// console.log(_.has(roomStatus, `${padId}.${userData.headerId}.acceptCall`))
 	// acceptNewConnection({socket, padId, userData, target, callback, retry})
 
 
@@ -45,7 +45,7 @@ const q = new Queue(function ({socket, padId, userData, target, callback, retry}
 		return cb()
 	}
 
-	console.log("in queue", retry, "========", _.get(roomStatus, `${padId}.${userData.headerId}.acceptCall`,false))
+	// console.log("in queue", retry, "========", _.get(roomStatus, `${padId}.${userData.headerId}.acceptCall`,false))
 
 	// second check the room that can accept new call
 	// if it is, then `acceptNewConnection` otherwise push the request at the end of queue
@@ -77,16 +77,14 @@ function socketInit (hookName, args, cb) {
 		})
 
 		socket.on('acceptNewCall', (padId, headerId, callback) => {
-			console.log("new acceptCall ", padId, headerId)
+			// console.log("new acceptCall ", padId, headerId)
 			_.set(roomStatus, `${padId}.${headerId}.acceptCall`, true)
-			console.log("new acceptCall ", padId, headerId, _.get(roomStatus, `${padId}.${headerId}.acceptCall`))
+			// console.log("new acceptCall ", padId, headerId, _.get(roomStatus, `${padId}.${headerId}.acceptCall`))
 		})
 
 		socket.on("userJoin", (padId, userData, target, callback) => {
-			console.log("USERJOINING", padId, userData, target)
-
+			// console.log("USERJOINING", padId, userData, target)
 			q.push({socket, padId, userData, target, callback, retry: 0})
-
 		})
 
 		socket.on("userLeave", (padId, userData, target, callback) => {
