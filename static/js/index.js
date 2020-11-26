@@ -4,7 +4,6 @@ var $ = require('ep_etherpad-lite/static/js/rjquery').$;
 var _ = require('ep_etherpad-lite/static/js/underscore');
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 
-
 /** **********************************************************************/
 /*                              Plugin                                  */
 /** **********************************************************************/
@@ -30,15 +29,15 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 		var loc = document.location;
 		var port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
 		var url = loc.protocol + '//' + loc.hostname + ':' + port + '/' + 'heading_chat_room';
-		var socket = io.connect(url,{
+		var socket = io.connect(url, {
 			'reconnectionAttempts': 5,
-			'reconnection' : true,
-			'reconnectionDelay' : 1000,
-			'reconnectionDelayMax' : 5000
+			'reconnection': true,
+			'reconnectionDelay': 1000,
+			'reconnectionDelayMax': 5000
 		});
 
 		// reason (String) either ‘io server disconnect’, ‘io client disconnect’, or ‘ping timeout’
-		socket.on('disconnect', function(reason){
+		socket.on('disconnect', function (reason) {
 			console.error('[wrtc]: socket disconnection, reason:', reason);
 			share.wrtcPubsub.emit('socket state', 'DISCONNECTED');
 			$.gritter.add({
@@ -52,12 +51,12 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 
 		// unfortunately when reconnection happen, etherpad break down totally
 		share.wrtcPubsub.emit('socket state', 'OPEND');
-		socket.on('connect', function() {
+		socket.on('connect', function () {
 			// share.wrtcPubsub.emit('socket state', 'OPEND');
 			console.info('[wrtc]: socket connect', socket.id);
 		});
-		
-		socket.on('connect_error', function(error){
+
+		socket.on('connect_error', function (error) {
 			console.error('[wrtc]: socket connect_error:', error);
 			share.wrtcPubsub.emit('socket state', 'DISCONNECTED');
 		});
@@ -80,8 +79,6 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 		});
 
 		$('#options-wrtc-heading').trigger('change');
-
-
 
 		if (browser.chrome || browser.firefox) {
 			padInner.contents().on('copy', function copy(e) {
@@ -139,8 +136,8 @@ var hooks = {
 				}
 				if (data.action === 'EP_PROFILE_USER_LOGIN_UPDATE') {
 					window.clientVars.ep_profile_list[data.userId] = data;
-					if(share && share.wrtcPubsub) {
-						share.wrtcPubsub.emit('update inlineAvater info', data.userId, data, function() {});
+					if (share && share.wrtcPubsub) {
+						share.wrtcPubsub.emit('update inlineAvater info', data.userId, data, function () {});
 					}
 				}
 			}
@@ -152,15 +149,15 @@ var hooks = {
 
 		// TODO: make sure the priority of these components are in line
 		// TODO: make sure clientVars contain all data that's necessary
-		
-		if(!clientVars.userId || !clientVars.padId) throw new Error("[wrtc]: clientVars doesn't exists");
-		
+
+		if (!clientVars.userId || !clientVars.padId) throw new Error("[wrtc]: clientVars doesn't exists");
+
 		var socket = EPwrtcHeading.init(ace, padId, userId);
 		WRTC.postAceInit(hook, context, socket, padId);
 		videoChat.postAceInit(hook, context, socket, padId);
 		textChat.postAceInit(hook, context, socket, padId);
 		WRTC_Room.postAceInit(hook, context, socket, padId);
-		
+
 		$('#editorcontainer iframe').ready(function readyObj() {
 			WRTC.appendInterfaceLayout();
 			setTimeout(function () {
@@ -232,19 +229,19 @@ var hooks = {
 	chatNewMessage: function chatNewMessage(hook, context, callback) {
 		var text = context.text;
 		// If the incoming message is a link and the link has the title attribute wrtc
-		if(text.indexOf('href=') > 0){
+		if (text.indexOf('href=') > 0) {
 			text = $(text);
 			var href = text.attr("href");
 			var currentPath = location.origin + location.pathname;
 			// If the link is belong to this header
-			if(href.indexOf(currentPath) === 0){
+			if (href.indexOf(currentPath) === 0) {
 				var urlParams = new URLSearchParams(href);
 				var headerId = urlParams.get('id');
 				var target = urlParams.get('target');
-				if(headerId) {
+				if (headerId) {
 					text = text.attr({
 						"data-join": target,
-						"data-action":"JOIN",
+						"data-action": "JOIN",
 						"data-id": headerId
 					}).addClass('btn_roomHandler');
 					context.text = jQuery('<div />').append(text.eq(0).clone()).html();

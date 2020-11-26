@@ -45,7 +45,7 @@ var WRTC = (function WRTC() {
 
 	var self = {
 		// API HOOKS
-		postAceInit: function postAceInit(hook, context, webSocket,docId) {
+		postAceInit: function postAceInit(hook, context, webSocket, docId) {
 			padId = docId;
 			socket = webSocket;
 
@@ -66,10 +66,9 @@ var WRTC = (function WRTC() {
 			$(document).on('change', 'select#audioOutput', self.changeAudioDestination);
 
 			$(window).on('unload', function () {
-				console.info("[wrtc]: windos unloaded, now hangupAll")
+				console.info("[wrtc]: windos unloaded, now hangupAll");
 				self.hangupAll();
 			});
-
 		},
 		appendInterfaceLayout: function appendInterfaceLayout() {
 			// TODO: legacy code, move it to template
@@ -103,42 +102,44 @@ var WRTC = (function WRTC() {
 				}
 			});
 			$(document).on('click', '#wrtc_settings .btn_info', function click() {
-				var userID = Object.keys(pc)
-				var $this =  $(this)
-				var isActive = $this.attr('data-active')
-				var $modal = $(document).find("#wrtc_settings .wrtc_info")
+				var userID = Object.keys(pc);
+				var $this = $(this);
+				var isActive = $this.attr('data-active');
+				var $modal = $(document).find("#wrtc_settings .wrtc_info");
 
-				if(isActive){
+				if (isActive) {
 					$modal.hide();
-					if(pc[userID[0]]){
-						getStats(pc[userID[0]], function(result) {
+					if (pc[userID[0]]) {
+						getStats(pc[userID[0]], function (result) {
 							result.nomore();
-						})
+						});
 					}
-					$this.removeAttr("data-active")
+					$this.removeAttr("data-active");
 					return true;
 				} else {
-					$this.attr({'data-active': true})
-					$modal.show()
+					$this.attr({ 'data-active': true });
+					$modal.show();
 				}
 
-				if(pc[userID[0]] && !isActive){
-					function bytesToSize(bytes) {
+				if (pc[userID[0]] && !isActive) {
+					(function () {
+						var bytesToSize = function bytesToSize(bytes) {
 							var k = 1000;
 							var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
 							if (bytes <= 0) {
-									return '0 Bytes';
+								return '0 Bytes';
 							}
 							var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
-							
-							if(!sizes[i]) {
-									return '0 Bytes';
+
+							if (!sizes[i]) {
+								return '0 Bytes';
 							}
-		
+
 							return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
-					}
-					getStats(pc[userID[0]], function(result) {
-							const statistic ={
+						};
+
+						getStats(pc[userID[0]], function (result) {
+							var statistic = {
 								"speed": bytesToSize(result.bandwidth.speed),
 								"systemNetworkType": result.connectionType.systemNetworkType,
 								"availableSendBandwidth": bytesToSize(result.bandwidth.availableSendBandwidth),
@@ -149,21 +150,22 @@ var WRTC = (function WRTC() {
 									"bytesSent": bytesToSize(result.video.bytesSent),
 									"bytesReceived": bytesToSize(result.video.bytesReceived)
 								},
-								"audio":{
+								"audio": {
 									"send.codecs": result.audio.send.codecs.join(", "),
 									// "recv.codecs": result.audio.recv.codecs.join(", "),
 									"bytesSent": bytesToSize(result.audio.bytesSent),
 									"bytesReceived": bytesToSize(result.audio.bytesReceived)
 								}
-							}
-							$(document).find("#wrtc_settings .wrtc_info").html(`<pre>${JSON.stringify(statistic, undefined, 2)}</pre>`)
-					}, 1000);
+							};
+							$(document).find("#wrtc_settings .wrtc_info").html('<pre>' + JSON.stringify(statistic, undefined, 2) + '</pre>');
+						}, 1000);
+					})();
 				}
-			})
+			});
 			$(document).on('click', '#wrtc_settings .btn_close', function click() {
 				$('#wrtc_settings').toggleClass('active');
-				var $btnInfo = $("#wrtc_settings .btn_info")
-				if($btnInfo.attr('data-active')) $btnInfo.trigger("click")
+				var $btnInfo = $("#wrtc_settings .btn_info");
+				if ($btnInfo.attr('data-active')) $btnInfo.trigger("click");
 			});
 		},
 		aceSetAuthorStyle: function aceSetAuthorStyle(context) {
@@ -179,11 +181,11 @@ var WRTC = (function WRTC() {
 		userLeave: function userLeave(userId, context, callback) {
 			userId = userId || context.userInfo.userId;
 			if (userId && pc[userId]) {
-				gState = "LEAVING"
-				self.hide(userId)
+				gState = "LEAVING";
+				self.hide(userId);
 				self.hangup(userId, true);
 			}
-			if(callback) callback();
+			if (callback) callback();
 		},
 		handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
 			if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
@@ -373,29 +375,24 @@ var WRTC = (function WRTC() {
 				}
 			});
 
-			if($(document).find('#wrtc_modal .ndbtn.btn_enlarge').hasClass('large')){
+			if ($(document).find('#wrtc_modal .ndbtn.btn_enlarge').hasClass('large')) {
 				$video.parent().css({ width: videoSizes.large, 'max-height': videoSizes.large });
 				$video.css({ width: videoSizes.large, 'max-height': videoSizes.large });
 			}
 
-			if(isLocal) localVideoElement = $video;
+			if (isLocal) localVideoElement = $video;
 
 			var $networkLatancy = $("<div class='latency'></div>");
 
 			$('#interface_' + videoId).remove();
-			$("<div class='interface-container'>").attr('id', 'interface_' + videoId)
-			.append($mute)
-			.append($disableVideo)
-			.append($largeVideo)
-			.append($networkLatancy)
-			.insertAfter($video);
+			$("<div class='interface-container'>").attr('id', 'interface_' + videoId).append($mute).append($disableVideo).append($largeVideo).append($networkLatancy).insertAfter($video);
 			self.changeAudioDestination();
 		},
 		// Sends a stat to the back end. `statName` must be in the
 		// approved list on the server side.
 		sendErrorStat: function sendErrorStat(statName) {
 			var msg = { component: 'pad', type: 'STATS', data: { statName: statName, type: 'RTC_MESSAGE' } };
-			socket.emit('acceptNewCall', padId, window.headerId)
+			socket.emit('acceptNewCall', padId, window.headerId);
 			self._pad.socket.json.send(msg);
 		},
 		sendMessage: function sendMessage(to, data) {
@@ -522,9 +519,9 @@ var WRTC = (function WRTC() {
 						headerId: headerId,
 						candidate: event.candidate
 					});
-				}else{
+				} else {
 					attemptRonnect = 0;
-					socket.emit('acceptNewCall', padId, window.headerId)
+					socket.emit('acceptNewCall', padId, window.headerId);
 				}
 			};
 			pc[userId].onaddstream = function (event) {
@@ -537,25 +534,24 @@ var WRTC = (function WRTC() {
 		},
 		audioVideoInputChange: function audioVideoInputChange() {
 			share.stopStreaming(localStream);
-			localStream = null
+			localStream = null;
 
 			self.getUserMedia(window.headerId);
 		},
 		attachSinkId: function attachSinkId(element, sinkId) {
 			// Attach audio output device to video element using device/sink ID.
 			if (element && element[0] && typeof element[0].sinkId !== 'undefined') {
-				element[0].setSinkId(sinkId)
-						.then(() => {
-							// console.info(`Success, audio output device attached: ${sinkId}`);
-						})['catch'](error => {
-							var errorMessage = error;
-							if (error.name === 'SecurityError') {
-								errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
-							}
-							console.error(errorMessage);
-							// Jump back to first output device in the list as it's the default.
-							audioOutputSelect.selectedIndex = 0;
-						});
+				element[0].setSinkId(sinkId).then(function () {
+					// console.info(`Success, audio output device attached: ${sinkId}`);
+				})['catch'](function (error) {
+					var errorMessage = error;
+					if (error.name === 'SecurityError') {
+						errorMessage = 'You need to use HTTPS for selecting audio output device: ' + error;
+					}
+					console.error(errorMessage);
+					// Jump back to first output device in the list as it's the default.
+					audioOutputSelect.selectedIndex = 0;
+				});
 			} else {
 				console.warn('Browser does not support output device selection.');
 			}
@@ -563,14 +559,14 @@ var WRTC = (function WRTC() {
 		changeAudioDestination: function changeAudioDestination() {
 			var audioOutputSelect = document.querySelector('select#audioOutput');
 			var audioDestination = audioOutputSelect.value;
-			var videoElement = localVideoElement
+			var videoElement = localVideoElement;
 			self.attachSinkId(videoElement, audioDestination);
 		},
 		getUserMedia: function getUserMedia(headerId) {
 			audioInputSelect = document.querySelector('select#audioSource');
 			videoSelect = document.querySelector('select#videoSource');
 			audioOutputSelect = document.querySelector('select#audioOutput');
-			
+
 			var audioSource = audioInputSelect.value;
 			var videoSource = videoSelect.value;
 			var audioOutput = audioOutputSelect.value;
@@ -578,10 +574,10 @@ var WRTC = (function WRTC() {
 			var mediaConstraints = {
 				audio: true,
 				video: {
-					width: {exact: 320},
-					height: {exact: 240},
+					width: { exact: 320 },
+					height: { exact: 240 },
 					frameRate: { ideal: 15, max: 30 },
-					facingMode: "user" 
+					facingMode: "user"
 				}
 			};
 
@@ -591,7 +587,7 @@ var WRTC = (function WRTC() {
 			if (videoSource) {
 				mediaConstraints.video.deviceId = { exact: videoSource };
 			}
-			
+
 			localStorage.setItem('videoSettings', JSON.stringify({ microphone: audioSource, speaker: audioOutput, camera: videoSource }));
 			// console.log("joining data: videoSettings", { microphone: audioSource, speaker: audioOutput, camera: videoSource })
 			$("#wrtc_modal #networkError").removeClass('active').hide();
@@ -631,7 +627,7 @@ var WRTC = (function WRTC() {
 	function cleanupSdp(sdp) {
 		var bandwidth = {
 			screen: 300, // 300kbits minimum
-			audio: 256,   // 64kbits  minimum
+			audio: 256, // 64kbits  minimum
 			video: 500,
 			minVideo: 128, // 125kbits  min
 			maxVideo: 2048, // 125kbits  max
@@ -647,7 +643,7 @@ var WRTC = (function WRTC() {
 			codec: bandwidth.videoCodec
 		});
 		sdp = CodecsHandler.setOpusAttributes(sdp);
-		sdp = CodecsHandler.preferCodec(sdp, bandwidth.videoCodec)
+		sdp = CodecsHandler.preferCodec(sdp, bandwidth.videoCodec);
 
 		return sdp;
 	}
@@ -666,24 +662,20 @@ var WRTC = (function WRTC() {
 	}
 
 	function logError(error) {
-		if(error && error.message.includes("Failed to set remote answer sdp")){
+		if (error && error.message.includes("Failed to set remote answer sdp")) {
 			reconnected++;
 			console.log("[wrtc]: Try reconnecting", reconnected, attemptRonnect);
-			if(attemptRonnect <= reconnected)
-				throw new Error("[wrtc]: please reload the video chat and try again to connect!");
-			setTimeout(() => {
+			if (attemptRonnect <= reconnected) throw new Error("[wrtc]: please reload the video chat and try again to connect!");
+			setTimeout(function () {
 				console.log("[wrtc]: reconnecting...");
 				self.getUserMedia(window.headerId);
 			}, randomIntFromInterval(200, 1000));
-		}else {
+		} else {
 			socket.emit('acceptNewCall', padId, window.headerId);
 		}
 		console.error('[wrtc]: LogError:', error);
-		$("#wrtc_modal #networkError")
-		.show()
-		.addClass('active')
-		.text("[wrtc]: Error: " + error + " ,Reload the session.");
-	} 
+		$("#wrtc_modal #networkError").show().addClass('active').text("[wrtc]: Error: " + error + " ,Reload the session.");
+	}
 
 	self.pc = pc;
 	return self;

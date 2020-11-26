@@ -16,18 +16,18 @@ var videoChat = (function videoChat() {
 		avg: 0,
 		LineAvg: [],
 		interavCheck: 1000
-	}
+	};
 
 	var startWatchNetwork = function startWatchNetwork() {
-		networkInterval = setInterval(function() {
+		networkInterval = setInterval(function () {
 			pingos.startTime = Date.now();
 			socket.emit('pingil');
 		}, pingos.interavCheck);
-	}
+	};
 
 	var stopWatchNetwork = function stopWatchNetwork() {
 		clearInterval(networkInterval);
-	}
+	};
 
 	function mediaDevices() {
 		navigator.mediaDevices.enumerateDevices().then(function enumerateDevices(data) {
@@ -84,7 +84,7 @@ var videoChat = (function videoChat() {
 
 		var user = share.getUserFromId(data.userId);
 
-		if(user && data.action !== 'JOIN' && data.action !== 'RELOAD' ){
+		if (user && data.action !== 'JOIN' && data.action !== 'RELOAD') {
 			// notify, a user join the video-chat room
 			var msg = {
 				time: new Date(),
@@ -111,7 +111,6 @@ var videoChat = (function videoChat() {
 				transform: 'translate(-50%, -100%)',
 				opacity: 0
 			}).attr({ 'data-active': false });
-
 
 			// WRTC.deactivate(data.userId, data.headerId);
 			share.stopStreaming(localStream);
@@ -150,7 +149,7 @@ var videoChat = (function videoChat() {
 
 		share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.videoChat ul'));
 
-		if(data.action == 'JOIN'){
+		if (data.action == 'JOIN') {
 			// notify, a user join the video-chat room
 			var msg = {
 				time: new Date(),
@@ -195,7 +194,7 @@ var videoChat = (function videoChat() {
 			}).attr({ 'data-active': true });
 
 			share.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
-			socket.emit('acceptNewCall', padId, window.headerId)
+			socket.emit('acceptNewCall', padId, window.headerId);
 
 			socket.on('receiveTextMessage:' + headerId, function receiveTextMessage(headingId, msg) {
 				var active = $(document).find('#wrtc_textChatWrapper').hasClass('active');
@@ -203,12 +202,11 @@ var videoChat = (function videoChat() {
 					textChat.userJoin(headerId, data, 'TEXT');
 				}
 			});
-
 		}
 
 		share.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'VIDEO', roomInfo, function updateStore() {});
 	}
-	
+
 	function createSession(headerId, userInfo, $joinButton) {
 		share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
 		$joinBtn = $joinButton;
@@ -232,7 +230,6 @@ var videoChat = (function videoChat() {
 			});
 			WRTC.showUserMediaError(err);
 		});
-
 	}
 
 	function userJoin(headerId, userInfo, $joinButton) {
@@ -250,7 +247,7 @@ var videoChat = (function videoChat() {
 		createSession(headerId, userInfo, $joinButton);
 	}
 
-	function reloadSession(headerId, userInfo, $joinButton){
+	function reloadSession(headerId, userInfo, $joinButton) {
 		if (!userInfo || !userInfo.userId) {
 			share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
 			return false;
@@ -339,27 +336,27 @@ var videoChat = (function videoChat() {
 		socket = webSocket;
 		padId = docId;
 		VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
-		share.wrtcPubsub.emit('component status', 'video', true)
+		share.wrtcPubsub.emit('component status', 'video', true);
 		mediaDevices();
 
-		socket.on('pongol', function() {
+		socket.on('pongol', function () {
 			pingos.latency = Date.now() - pingos.startTime;
 
-			if(pingos.LMin <= pingos.latency && pingos.latency >= pingos.LMax ) pingos.LMax = pingos.latency
-			else pingos.LMin = pingos.latency;
-			
+			if (pingos.LMin <= pingos.latency && pingos.latency >= pingos.LMax) pingos.LMax = pingos.latency;else pingos.LMin = pingos.latency;
+
 			// console.log( 'Websocket RTT: ' + pingos.latency + ' ms', "min:", pingos.LMin, "max", pingos.LMax, "avg:", pingos.avg );
-			
-			if(pingos.LineAvg.length < 4) pingos.LineAvg.push( ((pingos.LMax + pingos.LMin) / 2) )
-			else {
-				pingos.avg = pingos.LineAvg.reduce(function(a, b){return a + b}) / pingos.LineAvg.length
+
+			if (pingos.LineAvg.length < 4) pingos.LineAvg.push((pingos.LMax + pingos.LMin) / 2);else {
+				pingos.avg = pingos.LineAvg.reduce(function (a, b) {
+					return a + b;
+				}) / pingos.LineAvg.length;
 				// console.log(pingos.LineAvg)
-				pingos.LineAvg = []
-				pingos.LMax=0;
+				pingos.LineAvg = [];
+				pingos.LMax = 0;
 			}
 
-			$(document).find('.video-container.local-user .latency').text( Math.ceil(pingos.avg) + 'ms');
-			$(document).find('#networkStatus').html("RTT: " + pingos.latency + "ms, min: "+ pingos.LMin + "ms, max: " + pingos.LMax +"ms, avg:" + pingos.avg + "ms");
+			$(document).find('.video-container.local-user .latency').text(Math.ceil(pingos.avg) + 'ms');
+			$(document).find('#networkStatus').html("RTT: " + pingos.latency + "ms, min: " + pingos.LMin + "ms, max: " + pingos.LMax + "ms, avg:" + pingos.avg + "ms");
 
 			// share.wrtcPubsub.emit('update network information', pingos);
 		});

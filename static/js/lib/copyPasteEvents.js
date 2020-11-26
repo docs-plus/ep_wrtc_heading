@@ -1,11 +1,10 @@
-
 // inspired by ep_comments_page plugin, used and modified copyPasteEvents.js
 
-'use strict';
-var _ = require('ep_etherpad-lite/static/js/underscore');
-var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
+"use strict";
+var _ = require("ep_etherpad-lite/static/js/underscore");
+var randomString = require("ep_etherpad-lite/static/js/pad_utils").randomString;
 
-var events = (function(){
+var events = (function () {
 	var padInner = null;
 
 	var getFirstColumnOfSelection = function getFirstColumnOfSelection(line, rep, firstLineOfSelection) {
@@ -28,8 +27,8 @@ var events = (function(){
 		if (line !== lastLineOfSelection) {
 			lastColumnOfSelection = getLength(line, rep); // length of line
 		} else {
-			lastColumnOfSelection = rep.selEnd[1] - 1; // position of last character selected
-		}
+				lastColumnOfSelection = rep.selEnd[1] - 1; // position of last character selected
+			}
 		return lastColumnOfSelection;
 	};
 
@@ -76,22 +75,26 @@ var events = (function(){
 		} else {
 			hasVideoHeader = hasCommentOnLine(firstLineOfSelection, firstColumn, lastColumn, attributeManager);
 		}
-		return { hasVideoHeader: hasVideoHeader.foundHeadOnLine, headId: hasVideoHeader.headId, hasMultipleLine: selectionOfMultipleLine };
+		return {
+			hasVideoHeader: hasVideoHeader.foundHeadOnLine,
+			headId: hasVideoHeader.headId,
+			hasMultipleLine: selectionOfMultipleLine
+		};
 	};
 
 	function getSelectionHtml() {
-		var html = '';
-		if (typeof window.getSelection !== 'undefined') {
+		var html = "";
+		if (typeof window.getSelection !== "undefined") {
 			var sel = padInner.contents()[0].getSelection();
 			if (sel.rangeCount) {
-				var container = document.createElement('div');
+				var container = document.createElement("div");
 				for (var i = 0, len = sel.rangeCount; i < len; ++i) {
 					container.appendChild(sel.getRangeAt(i).cloneContents());
 				}
 				html = container.innerHTML;
 			}
-		} else if (typeof document.selection !== 'undefined') {
-			if (document.selection.type === 'Text') {
+		} else if (typeof document.selection !== "undefined") {
+			if (document.selection.type === "Text") {
 				html = document.selection.createRange().htmlText;
 			}
 		}
@@ -100,22 +103,22 @@ var events = (function(){
 
 	function selectionMultipleLine() {
 		var rawHtml = getSelectionHtml();
-		rawHtml = $('<div></div>').append(rawHtml);
-		rawHtml.find(':header span').removeClass(function removeClass(index, css) {
-			return (css.match(/\headingTagId_\S+/g) || []).join(' ');
+		rawHtml = $("<div></div>").append(rawHtml);
+		rawHtml.find(":header span").removeClass(function removeClass(index, css) {
+			return (css.match(/\headingTagId_\S+/g) || []).join(" ");
 		}).addClass(function addClass(index, css) {
-			return 'headingTagId_' + randomString(16) + ' ' + css;
+			return "headingTagId_" + randomString(16) + " " + css;
 		});
 		return rawHtml.html();
 	}
 
 	function selectionOneLine(headerId) {
-		var hTag = padInner.contents().find('.headingTagId_' + headerId).closest(':header').eq(0).prop("tagName").toLowerCase();
-		var content = padInner.contents().find('.headingTagId_' + headerId).closest(':header span').removeClass(function(index, css) {
-			return (css.match(/\headingTagId_\S+/g) || []).join(' ');
+		var hTag = padInner.contents().find(".headingTagId_" + headerId).closest(":header").eq(0).prop("tagName").toLowerCase();
+		var content = padInner.contents().find(".headingTagId_" + headerId).closest(":header span").removeClass(function (index, css) {
+			return (css.match(/\headingTagId_\S+/g) || []).join(" ");
 		}).html();
-		if(!hTag && !content) return false;
-		var rawHtml = $('<div></div>').append('<' + hTag + "><span class='headingTagId_" + randomString(16) + "'>" + content + '</span></' + hTag + '>');
+		if (!hTag && !content) return false;
+		var rawHtml = $("<div></div>").append("<" + hTag + "><span class='headingTagId_" + randomString(16) + "'>" + content + "</span></" + hTag + ">");
 		return rawHtml.html();
 	}
 
@@ -133,27 +136,25 @@ var events = (function(){
 				var htmlSelection = getSelectionHtml();
 				rawHtml = selectionMultipleLine(htmlSelection);
 			} else {
-				if(!selection.headId) return false;
+				if (!selection.headId) return false;
 				rawHtml = selectionOneLine(selection.headId);
 			}
 
 			if (rawHtml) {
-				e.originalEvent.clipboardData.setData('text/html', rawHtml);
+				e.originalEvent.clipboardData.setData("text/html", rawHtml);
 				e.preventDefault();
 				return false;
 			}
 
 			// if it is a cut event we have to remove the selection
 			if (removeSelection) {
-				padInner.contents()[0].execCommand('delete');
+				padInner.contents()[0].execCommand("delete");
 			}
 		}
 	};
 
 	return {
-		hasHeaderOnSelection,
-		addTextOnClipboard,
-	}
-
+		hasHeaderOnSelection: hasHeaderOnSelection,
+		addTextOnClipboard: addTextOnClipboard
+	};
 })();
-

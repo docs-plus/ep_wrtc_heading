@@ -3,22 +3,23 @@
 var share = (function share() {
 
 	var avatarUrl = '../static/plugins/ep_profile_modal/static/img/user.png';
-	var getAvatarUrl = function (userId) {
-		if(!userId) return avatarUrl;
+	var getAvatarUrl = function getAvatarUrl(userId) {
+		if (!userId) return avatarUrl;
+		return '/p/getUserProfileImage/' + userId + "/" + window.pad.getPadId() + "?t=" + new Date().getTime();
+	};
 
-		return '/p/getUserProfileImage/'+userId+"/"+window.pad.getPadId()+"?t=" + new Date().getTime();
-	}
+	var getValidUrl = function getValidUrl() {
+		var url = arguments.length <= 0 || arguments[0] === undefined ? "" : arguments[0];
 
-	var getValidUrl = function(url = ""){
-		if(url=="") return "";
-		let newUrl = window.decodeURIComponent(url);
+		if (url == "") return "";
+		var newUrl = window.decodeURIComponent(url);
 		newUrl = newUrl.trim().replace(/\s/g, "");
 
-		if(/^(:\/\/)/.test(newUrl)){
-				return `http${newUrl}`;
+		if (/^(:\/\/)/.test(newUrl)) {
+			return 'http' + newUrl;
 		}
-		if(!/^(f|ht)tps?:\/\//i.test(newUrl)){
-				return `http://${newUrl}`;
+		if (!/^(f|ht)tps?:\/\//i.test(newUrl)) {
+			return 'http://' + newUrl;
 		}
 
 		return newUrl;
@@ -26,7 +27,7 @@ var share = (function share() {
 
 	var getUserId = function getUserId() {
 		return clientVars.userId || window.pad.getUserId();
-	}
+	};
 
 	function stopStreaming(stream) {
 		if (stream) {
@@ -134,9 +135,9 @@ var share = (function share() {
 	var wrtcStore = {
 		socketState: 'CLOSED',
 		components: {
-			text: {active: false},
-			video: {active: false},
-			room: {active: false}
+			text: { active: false },
+			video: { active: false },
+			room: { active: false }
 		}
 	};
 
@@ -176,8 +177,8 @@ var share = (function share() {
 			$element.find('.avatar').remove();
 			$element.parent().css({ left: WRTC_Room.getHeaderRoomX($element.parent()) + 'px' });
 			Object.keys(room).forEach(function reOrderUserList(key, index) {
-				var userInList = getUserFromId(room[key].userId) || { colorId: '', name: 'anonymous'};
-				if(userInList.userId){
+				var userInList = getUserFromId(room[key].userId) || { colorId: '', name: 'anonymous' };
+				if (userInList.userId) {
 					if (index < inlineAvatarLimit) {
 						$element.find('.avatarMore').hide();
 						$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img title="' + userInList.name + '" src="' + getAvatarUrl(userInList.userId) + '"></div>');
@@ -200,8 +201,8 @@ var share = (function share() {
 		append: function appendAvatart(list, $element) {
 			var inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
 			list.forEach(function reOrderUserList(el, index) {
-				var userInList = getUserFromId(el.userId) || { colorId: '', name: 'anonymous'};
-				if(userInList.userId){
+				var userInList = getUserFromId(el.userId) || { colorId: '', name: 'anonymous' };
+				if (userInList.userId) {
 					if (index < inlineAvatarLimit) {
 						$element.find('.avatarMore').hide();
 						$element.append('<div class="avatar" data-id="' + userInList.userId + '"><img title="' + userInList.name + '" src="' + getAvatarUrl(userInList.userId) + '"></div>');
@@ -211,54 +212,48 @@ var share = (function share() {
 				}
 			});
 		},
-		update: function updateInfo(userId, data){
+		update: function updateInfo(userId, data) {
 			var $roomBox = $body_ace_outer().find('#wbrtc_avatarCol .wrtc_inlineAvatars');
 			var $textBox = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
 			var $videoBox = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
 
-			if($roomBox)
-				$roomBox.find('.avatar[data-id="' + userId + '"] img').attr({
-					'src': data.imageUrl,
-					'title': data.userName
-				});
+			if ($roomBox) $roomBox.find('.avatar[data-id="' + userId + '"] img').attr({
+				'src': data.imageUrl,
+				'title': data.userName
+			});
 
-			if($videoBox)
-				$videoBox.find('.avatar img').attr({
-					'src': data.imageUrl,
-					'title': data.userName
-				});
+			if ($videoBox) $videoBox.find('.avatar img').attr({
+				'src': data.imageUrl,
+				'title': data.userName
+			});
 
-			if($textBox)
-				$textBox.find('.avatar img').attr({
-					'src': data.imageUrl,
-					'title': data.userName
-				});
-
+			if ($textBox) $textBox.find('.avatar img').attr({
+				'src': data.imageUrl,
+				'title': data.userName
+			});
 		}
 	};
 
-	wrtcPubsub.on('update network information', function(){
+	wrtcPubsub.on('update network information', function () {});
 
-	});
-
-	wrtcPubsub.on('socket state', function(state){
-		wrtcStore.socketState = state
+	wrtcPubsub.on('socket state', function (state) {
+		wrtcStore.socketState = state;
 		console.info('[wrtc]: socket state has been change, new state:', state);
 	});
 
-	wrtcPubsub.on('component status', function(componentName, status) {
+	wrtcPubsub.on('component status', function (componentName, status) {
 		wrtcStore.components[componentName].active = status;
-	})
+	});
 
-	wrtcPubsub.on('update inlineAvater info', function(userId, data) {
+	wrtcPubsub.on('update inlineAvater info', function (userId, data) {
 		inlineAvatar.update(userId, data);
-	})
+	});
 
 	wrtcPubsub.on('update store', function (requestUser, headerId, action, target, roomInfo, callback) {
 		if (!requestUser || !headerId || !action || !roomInfo || !target) return false;
 
-		if(!wrtcStore[headerId]) wrtcStore[headerId] = {};
-		if(!wrtcStore[headerId].USERS) wrtcStore[headerId].USERS = {};
+		if (!wrtcStore[headerId]) wrtcStore[headerId] = {};
+		if (!wrtcStore[headerId].USERS) wrtcStore[headerId].USERS = {};
 
 		var users = wrtcStore[headerId].USERS;
 		wrtcStore[headerId][target] = roomInfo;
@@ -289,7 +284,7 @@ var share = (function share() {
 		var $btnVideo = $headingRoom.find('.btn_icon[data-join="VIDEO"]');
 		var $btnText = $headingRoom.find('.btn_icon[data-join="TEXT"]');
 		var $btnPlus = $headingRoom.find('.btn_icon[data-join="PLUS"]');
-		
+
 		$btnPlus.find('.loader').remove();
 		$btnPlus.append('<div class="loader"></div>');
 
@@ -339,20 +334,19 @@ var share = (function share() {
 	});
 
 	return {
-		scrollDownToLastChatText,
-		getUserFromId,
-		slugify,
-		$body_ace_outer,
-		createShareLink,
-		notifyNewUserJoined,
-		roomBoxIconActive,
-		appendUserList,
-		wrtcStore,
-		wrtcPubsub,
-		getUserId,
-		stopStreaming,
-		getValidUrl
-		
-	}
+		scrollDownToLastChatText: scrollDownToLastChatText,
+		getUserFromId: getUserFromId,
+		slugify: slugify,
+		$body_ace_outer: $body_ace_outer,
+		createShareLink: createShareLink,
+		notifyNewUserJoined: notifyNewUserJoined,
+		roomBoxIconActive: roomBoxIconActive,
+		appendUserList: appendUserList,
+		wrtcStore: wrtcStore,
+		wrtcPubsub: wrtcPubsub,
+		getUserId: getUserId,
+		stopStreaming: stopStreaming,
+		getValidUrl: getValidUrl
 
+	};
 })();

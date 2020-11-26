@@ -37,7 +37,6 @@ var textChat = (function textChat() {
 		// 	}).addClass('btn_roomHandler')
 		// }
 
-
 		var message = $('<p>').attr({
 			'data-authorid': msg.author
 		}).append(userName).append(tim).append(text);
@@ -67,7 +66,7 @@ var textChat = (function textChat() {
 			if (!textMessage) return true;
 			$(this).val('');
 			var user = share.getUserFromId(clientVars.userId);
-			if(!user) return true;
+			if (!user) return true;
 			var msg = { text: textMessage, userName: user.name, author: user.userId, time: new Date().getTime() };
 			socket.emit('sendTextMessage', padId, currentRoom.headerId, msg, function sendTextMessage(incomMsg) {
 				createAndAppendMessage(incomMsg);
@@ -321,7 +320,7 @@ var textChat = (function textChat() {
 	function postAceInit(hook, context, webSocket, docId) {
 		socket = webSocket;
 		padId = docId;
-		share.wrtcPubsub.emit('component status', 'text', true)
+		share.wrtcPubsub.emit('component status', 'text', true);
 		eventListers();
 	}
 
