@@ -146,6 +146,8 @@ You can see metrics for various errors that users have when attempting to connec
 - Finding H tags function fixed, we only need searching lines that has an H tag.
 - Adjust the new socket settings
 - Webrtc modal error.
+- Display latency status for all users who participate in video calling.
+
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).

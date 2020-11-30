@@ -15,13 +15,18 @@ var videoChat = (function videoChat() {
 		LMax: 0,
 		avg: 0,
 		LineAvg: [],
+		colors: {
+			normal: "#fff",
+			warning: "#ffcc00", 
+			danger: "#cc3300"
+		},
 		interavCheck: 1000
 	};
 
 	var startWatchNetwork = function startWatchNetwork() {
 		networkInterval = setInterval(function () {
 			pingos.startTime = Date.now();
-			socket.emit('pingil');
+			socket.emit('pingil', padId, window.headerId, share.getUserId(), pingos.avg );
 		}, pingos.interavCheck);
 	};
 
@@ -339,7 +344,21 @@ var videoChat = (function videoChat() {
 		share.wrtcPubsub.emit('component status', 'video', true);
 		mediaDevices();
 
-		socket.on('pongol', function () {
+		socket.on('userLatancy', function (data) {
+			if(share.getUserId() !== data.userId){
+				var videoId = 'interface_video_' + data.userId.replace(/\./g, '_');
+
+				var color = pingos.colors.normal;
+				if(data.latency > 200 && data.latency <300) color = pingos.colors.warning;
+				if(data.latency > 300) color = pingos.colors.danger;
+
+				$(document)
+				.find('#'+videoId+' .latency')
+				.css({color: color})
+				.text(Math.ceil(data.latency) + 'ms');
+			}
+		})
+		socket.on('pongol', function (data) {
 			pingos.latency = Date.now() - pingos.startTime;
 
 			if (pingos.LMin <= pingos.latency && pingos.latency >= pingos.LMax) pingos.LMax = pingos.latency;else pingos.LMin = pingos.latency;
@@ -355,7 +374,14 @@ var videoChat = (function videoChat() {
 				pingos.LMax = 0;
 			}
 
-			$(document).find('.video-container.local-user .latency').text(Math.ceil(pingos.avg) + 'ms');
+			var color = pingos.colors.normal;
+			if(pingos.avg > 200 && pingos.avg <300) color = pingos.colors.warning;
+			if(pingos.avg > 300) color = pingos.colors.danger;
+
+			$(document)
+			.find('.video-container.local-user .latency')
+			.css({color: color})
+			.text(Math.ceil(pingos.avg) + 'ms');
 			$(document).find('#networkStatus').html("RTT: " + pingos.latency + "ms, min: " + pingos.LMin + "ms, max: " + pingos.LMax + "ms, avg:" + pingos.avg + "ms");
 
 			// share.wrtcPubsub.emit('update network information', pingos);

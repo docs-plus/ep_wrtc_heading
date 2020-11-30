@@ -279,13 +279,14 @@
 	padding: 0 4px;
 	background: rgba(0,0,0,0.5);
 	border-radius: 4px;
-	color: #fff;
 	font-size: 10px;
 	font-weight: bold;
-	opacity: 0;
+	/* opacity: 0; */
 	transition: all 0.2s linear;
 	font-family: monospace;
 }
+
+
 
 .interface-container {
 	display: flex;

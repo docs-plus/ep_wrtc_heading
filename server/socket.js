@@ -31,11 +31,6 @@ const q = new Queue(function ({socket, padId, userData, target, callback, retry}
 	// Some processing here ...
 
 
-	// console.log("===>>>>>>",padId, userData, target, `${padId}.${userData.headerId}.acceptCall`)
-	// console.log(_.has(roomStatus, `${padId}.${userData.headerId}.acceptCall`))
-	// acceptNewConnection({socket, padId, userData, target, callback, retry})
-
-
 	// Firt check if the room has accept call Prop
 	if(!_.has(roomStatus, `${padId}.${userData.headerId}.acceptCall`)){
 		// if the Header does not exist create and set 'acceptCall' to false, for next request are comming throw
@@ -140,8 +135,9 @@ function socketInit (hookName, args, cb) {
 			callback(room.collection, room.info, target)
 		})
 
-		socket.on("pingil", () => {
-			socket.emit('pongol');
+		socket.on("pingil", (padId, headerId, userId, latency) => {
+			socket.broadcast.to(padId).emit('userLatancy', {padId, headerId, userId, latency})
+			socket.emit('pongol', {padId, headerId, userId, latency})
 		});
 
 		socket.on('disconnect', () => {
