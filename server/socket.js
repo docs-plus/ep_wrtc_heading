@@ -53,7 +53,7 @@ const q = new Queue(
 
 		cb(null, true);
 	},
-	{ afterProcessDelay: 2000 }
+	{ afterProcessDelay: 3000 }
 );
 
 function socketInit(hookName, args, cb) {

@@ -16,7 +16,7 @@
 'use strict';
 
 var WRTC = (function WRTC() {
-	var attemptRonnect = 50;
+	var attemptRonnect = 60;
 	var reconnected = 0;
 	var videoSizes = { large: '260px', small: '160px' };
 	var pcConfig = {};
@@ -195,7 +195,7 @@ var WRTC = (function WRTC() {
 		show: function show() {
 			$('#pad_title').addClass('f_wrtcActive');
 		},
-		showUserMediaError: function showUserMediaError(err) {
+		showUserMediaError: function showUserMediaError(err, userId, headerId) {
 			// show an error returned from getUserMedia
 			var reason;
 			// For reference on standard errors returned by getUserMedia:
@@ -243,11 +243,12 @@ var WRTC = (function WRTC() {
 			}
 			$.gritter.add({
 				title: 'Error',
-				text: reason,
-				sticky: true,
+				text: reason + " ,try again!",
+				time: 4000,
+				sticky: false,
 				class_name: 'error'
 			});
-			self.hide();
+			self.deactivate(userId, headerId);
 		},
 		hide: function hide(userId) {
 			if (!userId) return false;
@@ -523,7 +524,7 @@ var WRTC = (function WRTC() {
 						candidate: event.candidate
 					});
 				} else {
-					attemptRonnect = 0;
+					reconnected = 0;
 					socket.emit('acceptNewCall', padId, window.headerId);
 				}
 			};
@@ -595,7 +596,9 @@ var WRTC = (function WRTC() {
 			// console.log("joining data: videoSettings", { microphone: audioSource, speaker: audioOutput, camera: videoSource })
 			$("#wrtc_modal #networkError").removeClass('active').hide();
 
-			window.navigator.mediaDevices.getUserMedia(mediaConstraints).then(function (stream) {
+			window.navigator.mediaDevices
+			.getUserMedia(mediaConstraints)
+			.then(function (stream) {
 				localStream = stream;
 				self.setStream(share.getUserId(), stream);
 				self._pad.collabClient.getConnectedUsers().forEach(function (user) {
@@ -607,7 +610,7 @@ var WRTC = (function WRTC() {
 					}
 				});
 			})['catch'](function (err) {
-				self.showUserMediaError(err);
+				self.showUserMediaError(err, share.getUserId(), headerId);
 			});
 		},
 		attemptToReconnect: function attemptToReconnect () {

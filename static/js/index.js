@@ -45,12 +45,12 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 			// 	text: 'Plase use stable internet connection, open up your console for more information; reason:' + reason,
 			// 	sticky: false,
 			// 	class_name: 'error',
-			// 	time: '6000'
+			// 	time: '300'
 			// });
 		});
 
 		// unfortunately when reconnection happen, etherpad break down totally
-		share.wrtcPubsub.emit('socket state', 'OPEND');
+		// share.wrtcPubsub.emit('socket state', 'OPEND');
 		socket.on('connect', function () {
 			share.wrtcPubsub.emit('socket state', 'OPEND');
 			console.info('[wrtc]: socket connect', socket.id);

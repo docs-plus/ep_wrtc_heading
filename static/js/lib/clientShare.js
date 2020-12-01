@@ -240,7 +240,7 @@ var share = (function share() {
 	wrtcPubsub.on('socket state', function (state) {
 		wrtcStore.socketState = state;
 		console.info('[wrtc]: socket state has been change, new state:', state, wrtcStore.userInRoom, window.headerId);
-		if(state === "OPEND" && wrtcStore.userInRoom && window.headerId){
+		if(state === "OPEND" && wrtcStore.userInRoom){
 			console.info("Try reconnecting...")
 			WRTC.attemptToReconnect()
 		}
