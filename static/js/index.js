@@ -30,23 +30,23 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 		var port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
 		var url = loc.protocol + '//' + loc.hostname + ':' + port + '/' + 'heading_chat_room';
 		var socket = io.connect(url, {
-			'reconnectionAttempts': 5,
+			'reconnectionAttempts': 9,
 			'reconnection': true,
 			'reconnectionDelay': 1000,
-			'reconnectionDelayMax': 5000
+			'reconnectionDelayMax': 6000
 		});
 
 		// reason (String) either ‘io server disconnect’, ‘io client disconnect’, or ‘ping timeout’
 		socket.on('disconnect', function (reason) {
 			console.error('[wrtc]: socket disconnection, reason:', reason);
 			share.wrtcPubsub.emit('socket state', 'DISCONNECTED');
-			$.gritter.add({
-				title: 'Video socket connection has been disconnected',
-				text: 'Plase use stable internet connection, open up your console for more information; reason:' + reason,
-				sticky: false,
-				class_name: 'error',
-				time: '6000'
-			});
+			// $.gritter.add({
+			// 	title: 'Video socket connection has been disconnected',
+			// 	text: 'Plase use stable internet connection, open up your console for more information; reason:' + reason,
+			// 	sticky: false,
+			// 	class_name: 'error',
+			// 	time: '6000'
+			// });
 		});
 
 		// unfortunately when reconnection happen, etherpad break down totally
