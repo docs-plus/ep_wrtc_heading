@@ -133,6 +133,7 @@ var share = (function share() {
 
 	// socketState: 'CLOSED', 'OPEND', 'DISCONNECTED'
 	var wrtcStore = {
+		userInRoom: false,
 		socketState: 'CLOSED',
 		components: {
 			text: { active: false },
@@ -238,7 +239,11 @@ var share = (function share() {
 
 	wrtcPubsub.on('socket state', function (state) {
 		wrtcStore.socketState = state;
-		console.info('[wrtc]: socket state has been change, new state:', state);
+		console.info('[wrtc]: socket state has been change, new state:', state, wrtcStore.userInRoom, window.headerId);
+		if(state === "OPEND" && wrtcStore.userInRoom && window.headerId){
+			console.info("Try reconnecting...")
+			WRTC.attemptToReconnect()
+		}
 	});
 
 	wrtcPubsub.on('component status', function (componentName, status) {

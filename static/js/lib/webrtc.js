@@ -185,6 +185,7 @@ var WRTC = (function WRTC() {
 				self.hide(userId);
 				self.hangup(userId, true);
 			}
+			share.wrtcStore.userInRoom = false;
 			if (callback) callback();
 		},
 		handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
@@ -257,6 +258,7 @@ var WRTC = (function WRTC() {
 			self.show();
 			self.hangupAll();
 			self.getUserMedia(headerId);
+			share.wrtcStore.userInRoom = true;
 		},
 		deactivate: function deactivate(userId, headerId) {
 			if (!userId) return false;
@@ -267,6 +269,7 @@ var WRTC = (function WRTC() {
 				share.stopStreaming(localStream);
 				localStream = null;
 			}
+			share.wrtcStore.userInRoom = false;
 		},
 		toggleMuted: function toggleMuted() {
 			var audioTrack = localStream.getAudioTracks();
@@ -606,6 +609,15 @@ var WRTC = (function WRTC() {
 			})['catch'](function (err) {
 				self.showUserMediaError(err);
 			});
+		},
+		attemptToReconnect: function attemptToReconnect () {
+			reconnected++;
+			console.log("[wrtc]: Try reconnecting", reconnected, attemptRonnect);
+			if (attemptRonnect <= reconnected) throw new Error("[wrtc]: please reload the video chat and try again to connect!");
+			setTimeout(function () {
+				console.log("[wrtc]: reconnecting...");
+				self.getUserMedia(window.headerId);
+			}, randomIntFromInterval(200, 1000));
 		}
 	};
 
@@ -661,15 +673,10 @@ var WRTC = (function WRTC() {
 		return Math.floor(Math.random() * (max - min + 1) + min);
 	}
 
+
 	function logError(error) {
 		if (error && error.message.includes("Failed to set remote answer sdp")) {
-			reconnected++;
-			console.log("[wrtc]: Try reconnecting", reconnected, attemptRonnect);
-			if (attemptRonnect <= reconnected) throw new Error("[wrtc]: please reload the video chat and try again to connect!");
-			setTimeout(function () {
-				console.log("[wrtc]: reconnecting...");
-				self.getUserMedia(window.headerId);
-			}, randomIntFromInterval(200, 1000));
+			self.attemptToReconnect()
 		} else {
 			socket.emit('acceptNewCall', padId, window.headerId);
 		}
