@@ -616,7 +616,10 @@ var WRTC = (function WRTC() {
 		attemptToReconnect: function attemptToReconnect () {
 			reconnected++;
 			console.log("[wrtc]: Try reconnecting", reconnected, attemptRonnect);
-			if (attemptRonnect <= reconnected) throw new Error("[wrtc]: please reload the video chat and try again to connect!");
+			if (attemptRonnect <= reconnected){
+				socket.emit('acceptNewCall', padId, window.headerId);
+				throw new Error("[wrtc]: please reload the video chat and try again to connect!");
+			}
 			setTimeout(function () {
 				console.log("[wrtc]: reconnecting...");
 				self.getUserMedia(window.headerId);
@@ -676,13 +679,12 @@ var WRTC = (function WRTC() {
 		return Math.floor(Math.random() * (max - min + 1) + min);
 	}
 
-
 	function logError(error) {
-		if (error && error.message.includes("Failed to set remote answer sdp")) {
+		// if (error && error.message.includes("Failed to set remote answer sdp")) {
 			self.attemptToReconnect()
-		} else {
-			socket.emit('acceptNewCall', padId, window.headerId);
-		}
+		// } else {
+			// socket.emit('acceptNewCall', padId, window.headerId);
+		// }
 		console.error('[wrtc]: LogError:', error);
 		$("#wrtc_modal #networkError").show().addClass('active').text("[wrtc]: Error: " + error + " ,Reload the session.");
 	}

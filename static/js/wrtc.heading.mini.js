@@ -7085,17 +7085,17 @@ var WRTC_Room = (function WRTC_Room() {
 		};
 
 		// Before handel request, check socket state
-		// if (share.wrtcStore.socketState !== 'OPEND') {
-		// 	// show the alert that user must reload the page
-		// 	$.gritter.add({
-		// 		title: 'Video chat no longer responds',
-		// 		text: 'The socket was disconnected and we can no longer make a stable call, please go to the stable internet and then reload the page then try again.',
-		// 		sticky: false,
-		// 		class_name: 'error',
-		// 		time: '15000'
-		// 	});
-		// 	return false;
-		// }
+		if (share.wrtcStore.socketState !== 'OPEND') {
+			// show the alert that user must reload the page
+			$.gritter.add({
+				title: 'Video chat no longer responds',
+				text: 'The socket is disconnected and we can no longer make a stable call, please go to stable internet and then reload the page.',
+				sticky: false,
+				class_name: 'error',
+				time: '15000'
+			});
+			return false;
+		}
 
 		share.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
 
@@ -8054,7 +8054,10 @@ var WRTC = (function WRTC() {
 		attemptToReconnect: function attemptToReconnect () {
 			reconnected++;
 			console.log("[wrtc]: Try reconnecting", reconnected, attemptRonnect);
-			if (attemptRonnect <= reconnected) throw new Error("[wrtc]: please reload the video chat and try again to connect!");
+			if (attemptRonnect <= reconnected){
+				socket.emit('acceptNewCall', padId, window.headerId);
+				throw new Error("[wrtc]: please reload the video chat and try again to connect!");
+			}
 			setTimeout(function () {
 				console.log("[wrtc]: reconnecting...");
 				self.getUserMedia(window.headerId);
@@ -8114,13 +8117,12 @@ var WRTC = (function WRTC() {
 		return Math.floor(Math.random() * (max - min + 1) + min);
 	}
 
-
 	function logError(error) {
-		if (error && error.message.includes("Failed to set remote answer sdp")) {
+		// if (error && error.message.includes("Failed to set remote answer sdp")) {
 			self.attemptToReconnect()
-		} else {
-			socket.emit('acceptNewCall', padId, window.headerId);
-		}
+		// } else {
+			// socket.emit('acceptNewCall', padId, window.headerId);
+		// }
 		console.error('[wrtc]: LogError:', error);
 		$("#wrtc_modal #networkError").show().addClass('active').text("[wrtc]: Error: " + error + " ,Reload the session.");
 	}
