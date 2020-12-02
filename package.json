@@ -1,10 +1,14 @@
 {
 	"name": "ep_wrtc_heading",
 	"description": "Video Headings Plugin for Etherpad",
-	"version": "0.29.20",
+	"version": "0.29.21",
 	"author": {
 		"name": "Hossein Marzban",
 		"email": "marzban98@gmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/HMarzban/ep_wrtc_heading"
 	},
 	"main": "index.js",
 	"keywords": [
@@ -16,16 +20,23 @@
 	],
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"lint": "npx eslint --fix ./static/js/*.js",
 		"start": "gulp watch",
 		"build": "gulp js",
-		"build:prod": "gulp js --production"
+		"build:prod": "gulp js --production",
+		"lint": "eslint --fix",
+		"lint:dry": "fix-dry-run"
+	},
+	"dependencies": {
+		"better-queue": "^3.8.10",
+		"lodash": "^4.17.20"
 	},
 	"devDependencies": {
-		"babel-eslint": "^10.1.0",
-		"eslint": "^7.5.0",
-		"eslint-config-es5": "^0.5.0",
-		"eslint-plugin-es5": "^1.5.0",
+		"eslint": "^7.14.0",
+		"eslint-config-etherpad": "^1.0.17",
+		"eslint-plugin-mocha": "^8.0.0",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-prefer-arrow": "^1.2.2",
+		"eslint-plugin-promise": "^4.2.1",
 		"gulp": "^4.0.2",
 		"gulp-concat": "^2.6.1",
 		"gulp-htmlmin": "^5.0.1",
@@ -33,15 +44,23 @@
 		"gulp-rename": "^2.0.0",
 		"gulp-sourcemaps": "^2.6.5",
 		"gulp-uglify-es": "^2.0.0",
-		"husky": "^4.2.5"
+		"husky": "^4.3.0"
 	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/HMarzban/ep_wrtc_heading"
+	"peerDependencies": {
+		"ep_etherpad-lite": ">=1.8.6"
 	},
-	"dependencies": {
-		"better-queue": "^3.8.10",
-		"lodash": "^4.17.20"
+	"engines": {
+		"node": ">=10.13.0"
+	},
+	"eslintConfig": {
+		"root": true,
+		"extends": "etherpad/plugin",
+		"ignorePatterns": [
+			"/static/js/lib/getStats.min.js",
+			"/static/js/lib/getUserMediaPolyfill.js",
+			"/static/js/lib/jquery.tmpl.min.js",
+			"/static/js/wrtc.heading.mini.js"
+		]
 	},
 	"husky": {
 		"pre-commit": "npm run lint"
