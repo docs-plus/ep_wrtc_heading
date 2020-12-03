@@ -275,11 +275,12 @@ var WRTC = (function WRTC() {
       share.wrtcStore.userInRoom = false;
     },
     toggleMuted: function toggleMuted() {
-      const audioTrack = localStream.getAudioTracks();
+      var audioTrack = localStream.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
-        return !audioTrack.enabled;
+        return !audioTrack.enabled; // returning "Muted" state, which is !enabled
       }
+      return true; // if there's no audio track, it's muted
     },
     toggleVideo: function toggleVideo() {
       const videoTrack = localStream.getVideoTracks()[0];
@@ -335,13 +336,13 @@ var WRTC = (function WRTC() {
     },
     addInterface: function addInterface(userId) {
       if (!userId) return false;
-      const isLocal = userId === share.getUserId();
-      const videoId = `video_${userId.replace(/\./g, '_')}`;
-      const $video = $(`#${videoId}`);
+      var isLocal = userId === share.getUserId();
+      var videoId = `video_${userId.replace(/\./g, '_')}`;
+      var $video = $(`#${videoId}`);
 
       var $mute = $("<span class='interface-btn audio-btn buttonicon'>").attr('title', 'Mute').on({
         click: function click() {
-          let muted;
+					var muted;
           if (isLocal) {
             muted = self.toggleMuted();
           } else {
@@ -351,7 +352,7 @@ var WRTC = (function WRTC() {
           $mute.attr('title', muted ? 'Unmute' : 'Mute').toggleClass('muted', muted);
         },
       });
-      let videoEnabled = true;
+      var videoEnabled = true;
       var $disableVideo = isLocal ? $("<span class='interface-btn video-btn buttonicon'>").attr('title', 'Disable video').on({
         click: function click() {
           self.toggleVideo();
@@ -360,7 +361,7 @@ var WRTC = (function WRTC() {
         },
       }) : null;
 
-      let videoEnlarged = false;
+      var videoEnlarged = false;
       var $largeVideo = $("<span class='interface-btn enlarge-btn buttonicon'>").attr('title', 'Make video larger').on({
         click: function click() {
           videoEnlarged = !videoEnlarged;
