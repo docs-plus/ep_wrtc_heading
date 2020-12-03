@@ -233,7 +233,7 @@ var videoChat = (function videoChat() {
       socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
         gateway_userLeave(_userData, roomInfo);
       });
-      WRTC.showUserMediaError(err);
+			WRTC.showUserMediaError(err, share.getUserId(), headerId);
     });
   }
 
@@ -342,7 +342,7 @@ var videoChat = (function videoChat() {
     padId = docId;
     VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
     share.wrtcPubsub.emit('component status', 'video', true);
-    mediaDevices();
+    // mediaDevices();
 
     socket.on('userLatancy', (data) => {
       if (share.getUserId() !== data.userId) {
@@ -393,6 +393,7 @@ var videoChat = (function videoChat() {
     gateway_userJoin,
     gateway_userLeave,
     bulkUpdateRooms,
-    reloadSession,
+		reloadSession,
+		mediaDevices,
   };
 })();

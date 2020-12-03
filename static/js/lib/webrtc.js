@@ -50,8 +50,9 @@ var WRTC = (function WRTC() {
       socket = webSocket;
 
       pcConfig.iceServers = clientVars.webrtc && clientVars.webrtc.iceServers ? clientVars.webrtc.iceServers : [{
-        url: 'stun:stun.l.google.com:19302',
-      }];
+        urls: 'stun:stun.l.google.com:19302',
+			}];
+			
       if (clientVars.webrtc.video.sizes.large) {
         videoSizes.large = `${clientVars.webrtc.video.sizes.large}px`;
       }
@@ -193,7 +194,8 @@ var WRTC = (function WRTC() {
     },
     // END OF API HOOKS
     show: function show() {
-      $('#pad_title').addClass('f_wrtcActive');
+			$('#pad_title').addClass('f_wrtcActive');
+			videoChat.mediaDevices();
     },
     showUserMediaError: function showUserMediaError(err, userId, headerId) {
       // show an error returned from getUserMedia
@@ -427,11 +429,22 @@ var WRTC = (function WRTC() {
         if (localStream) {
           if (pc[peer].getLocalStreams) {
             if (!pc[peer].getLocalStreams().length) {
-              pc[peer].addStream(localStream);
+
+							localStream.getTracks().forEach(function(track) {
+								pc[peer].addTrack(track, localStream);
+							});
+
+							// pc[peer].addStream(localStream);
+							
             }
           } else if (pc[peer].localStreams) {
             if (!pc[peer].localStreams.length) {
-              pc[peer].addStream(localStream);
+
+							localStream.getTracks().forEach(function(track) {
+								pc[peer].addTrack(track, localStream);
+							});
+							// pc[peer].addStream(localStream);
+							
             }
           }
         }
@@ -500,8 +513,14 @@ var WRTC = (function WRTC() {
 
       if (!pc[userId]) {
         self.createPeerConnection(userId, headerId);
-      }
-      pc[userId].addStream(localStream);
+			}
+			
+			// pc[userId].addStream(localStream);
+			
+			localStream.getTracks().forEach(function(track) {
+				pc[userId].addTrack(track, localStream);
+			});
+			
       pc[userId].createOffer((desc) => {
         desc.sdp = cleanupSdp(desc.sdp);
         pc[userId].setLocalDescription(desc, () => {
@@ -526,9 +545,9 @@ var WRTC = (function WRTC() {
           socket.emit('acceptNewCall', padId, window.headerId);
         }
       };
-      pc[userId].onaddstream = function (event) {
-        remoteStream[userId] = event.stream;
-        self.setStream(userId, event.stream);
+      pc[userId].ontrack = function (event) {
+        remoteStream[userId] = event.streams[0];
+        self.setStream(userId, event.streams[0]);
       };
       pc[userId].onremovestream = function () {
         self.setStream(userId, '');
@@ -555,7 +574,8 @@ var WRTC = (function WRTC() {
           audioOutputSelect.selectedIndex = 0;
         });
       } else {
-        console.warn('Browser does not support output device selection.');
+				console.warn('Browser does not support output device selection.');
+				$(document).find('#wrtc_settings .select.audioOutputSec').hide()
       }
     },
     changeAudioDestination: function changeAudioDestination() {
