@@ -147,6 +147,10 @@ function socketInit(hookName, args, cb) {
       socket.emit('pongol', {padId, headerId, userId, latency});
     });
 
+		socket.on('reloadVideoSession', (padId, headerId) => {
+			io.of("/heading_chat_room").to(padId).emit("reloadVideoSession", headerId);
+		});
+
     socket.on('disconnect', () => {
       // remove the user from text and video chat
       const userData = socket.ndHolder;

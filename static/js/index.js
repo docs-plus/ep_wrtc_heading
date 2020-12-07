@@ -94,7 +94,12 @@ var EPwrtcHeading = (function EPwrtcHeading() {
           WRTC_Room.adoptHeaderYRoom();
         }, 250);
       });
-    }
+		}
+		
+		window.onerror = function(message, source, lineno, colno, error) { 
+			console.error('[wrtc]: windows error, close stream')
+			if(window.headerId) WRTC.deactivate(clientVars.userId, window.headerId);
+		};
 
     return socket;
   }

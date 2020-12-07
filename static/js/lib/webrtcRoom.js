@@ -52,7 +52,7 @@ var WRTC_Room = (function WRTC_Room() {
 
   /**
   *
-  * @param {string} actions @enum (JOIN|LEAVE)
+  * @param {string} actions @enum (JOIN|LEAVE|RELOAD|SHARELINK)
   * @param {string} headerId
   * @param {string} target @enum (chatRoom|video|text)
   */
@@ -120,7 +120,7 @@ var WRTC_Room = (function WRTC_Room() {
           return false;
       }
     } else if (actions === 'RELOAD') {
-      videoChat.reloadSession(headerId, userInfo, target, actions);
+			videoChat.reloadSession(headerId, userInfo, target, actions);
     } else if (actions === 'SHARELINK') {
       shareRoomsLink(headerId, target);
     }
