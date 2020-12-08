@@ -216,13 +216,13 @@ var videoChat = (function videoChat() {
     share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
     $joinBtn = $joinButton;
     isUserMediaAvailable().then((stream) => {
-			// stop last stream 
-			share.stopStreaming(localStream);
+      // stop last stream
+      share.stopStreaming(localStream);
       localStream = stream;
 
       if (!currentRoom.userId) {
         return socket.emit('userJoin', padId, userInfo, 'video', gateway_userJoin);
-			}
+      }
       // If the user has already joined the video chat, make suer leave that room then join to the new chat room
       socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
         gateway_userLeave(_userData, roomInfo, () => {
@@ -235,7 +235,7 @@ var videoChat = (function videoChat() {
       socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
         gateway_userLeave(_userData, roomInfo);
       });
-			WRTC.showUserMediaError(err, share.getUserId(), headerId);
+      WRTC.showUserMediaError(err, share.getUserId(), headerId);
     });
   }
 
@@ -253,7 +253,7 @@ var videoChat = (function videoChat() {
 
     createSession(headerId, userInfo, $joinButton);
   }
-	// depricate
+  // depricate
   function reloadCurrentSession(headerId, userInfo, $joinButton) {
     if (!userInfo || !userInfo.userId) {
       share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
@@ -261,15 +261,15 @@ var videoChat = (function videoChat() {
     }
 
     createSession(headerId, userInfo, $joinButton, 'RELOAD');
-	}
-	
-	function reloadSession(headerId, userInfo, $joinButton) {
-		if (!userInfo || !userInfo.userId) {
+  }
+
+  function reloadSession(headerId, userInfo, $joinButton) {
+    if (!userInfo || !userInfo.userId) {
       share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
       return false;
     }
-		socket.emit('reloadVideoSession', padId, headerId)
-	}
+    socket.emit('reloadVideoSession', padId, headerId);
+  }
 
   function userLeave(headerId, data, $joinButton) {
     $joinBtn = $joinButton;
@@ -394,22 +394,21 @@ var videoChat = (function videoChat() {
 
       // share.wrtcPubsub.emit('update network information', pingos);
     });
-		socket.on('reloadVideoSession', function(headerId){
-			if(currentRoom.headerId !== headerId) return false;
-			const target = 'PLUS'
-			const userInfo = {
-				padId: clientVars.padId || window.pad.getPadId(),
-				userId: clientVars.userId || window.pad.getUserId(),
-				userName: clientVars.userName || 'anonymous',
-				headerId,
-				target: target,
-				action: 'JOIN',
-			};
-			share.wrtcPubsub.emit('disable room buttons', headerId, 'JOIN', target);
-			createSession(headerId, userInfo, target)
-		})
-		
-	}
+    socket.on('reloadVideoSession', (headerId) => {
+      if (currentRoom.headerId !== headerId) return false;
+      const target = 'PLUS';
+      const userInfo = {
+        padId: clientVars.padId || window.pad.getPadId(),
+        userId: clientVars.userId || window.pad.getUserId(),
+        userName: clientVars.userName || 'anonymous',
+        headerId,
+        target,
+        action: 'JOIN',
+      };
+      share.wrtcPubsub.emit('disable room buttons', headerId, 'JOIN', target);
+      createSession(headerId, userInfo, target);
+    });
+  }
 
   return {
     postAceInit,
@@ -418,8 +417,8 @@ var videoChat = (function videoChat() {
     gateway_userJoin,
     gateway_userLeave,
     bulkUpdateRooms,
-		reloadSession,
-		reloadCurrentSession,
-		mediaDevices,
+    reloadSession,
+    reloadCurrentSession,
+    mediaDevices,
   };
 })();

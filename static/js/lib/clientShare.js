@@ -2,6 +2,8 @@
 
 var share = (function share() {
   const avatarUrl = '../static/plugins/ep_profile_modal/static/img/user.png';
+  const hElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.h1', '.h2', '.h3', '.h4', '.h5', '.h6'];
+
   const getAvatarUrl = function getAvatarUrl(userId) {
     if (!userId) return avatarUrl;
     return `/p/getUserProfileImage/${userId}/${window.pad.getPadId()}?t=${new Date().getTime()}`;
@@ -342,6 +344,7 @@ var share = (function share() {
   });
 
   return {
+    hElements,
     scrollDownToLastChatText,
     getUserFromId,
     slugify,

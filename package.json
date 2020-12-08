@@ -1,7 +1,7 @@
 {
 	"name": "ep_wrtc_heading",
 	"description": "Video Headings Plugin for Etherpad",
-	"version": "0.29.25",
+	"version": "0.29.26",
 	"author": {
 		"name": "Hossein Marzban",
 		"email": "marzban98@gmail.com"
@@ -24,7 +24,7 @@
 		"build": "gulp js",
 		"build:prod": "gulp js --production",
 		"lint": "eslint --fix",
-		"lint:dry": "fix-dry-run"
+		"lint:dry": "eslint --fix-dry-run "
 	},
 	"dependencies": {
 		"better-queue": "^3.8.10",
@@ -60,7 +60,15 @@
 			"/static/js/lib/getUserMediaPolyfill.js",
 			"/static/js/lib/jquery.tmpl.min.js",
 			"/static/js/wrtc.heading.mini.js"
-		]
+		],
+		"globals": {
+			"clientVars": true,
+			"WRTC": true,
+			"WRTC_Room": true,
+			"io": true,
+			"browser": true,
+			"share": true
+		}
 	},
 	"husky": {
 		"pre-commit": "npm run lint"

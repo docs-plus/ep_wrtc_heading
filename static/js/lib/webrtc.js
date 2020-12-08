@@ -51,8 +51,8 @@ var WRTC = (function WRTC() {
 
       pcConfig.iceServers = clientVars.webrtc && clientVars.webrtc.iceServers ? clientVars.webrtc.iceServers : [{
         urls: 'stun:stun.l.google.com:19302',
-			}];
-			
+      }];
+
       if (clientVars.webrtc.video.sizes.large) {
         videoSizes.large = `${clientVars.webrtc.video.sizes.large}px`;
       }
@@ -194,8 +194,8 @@ var WRTC = (function WRTC() {
     },
     // END OF API HOOKS
     show: function show() {
-			$('#pad_title').addClass('f_wrtcActive');
-			videoChat.mediaDevices();
+      $('#pad_title').addClass('f_wrtcActive');
+      videoChat.mediaDevices();
     },
     showUserMediaError: function showUserMediaError(err, userId, headerId) {
       // show an error returned from getUserMedia
@@ -275,7 +275,7 @@ var WRTC = (function WRTC() {
       share.wrtcStore.userInRoom = false;
     },
     toggleMuted: function toggleMuted() {
-      var audioTrack = localStream.getAudioTracks()[0];
+      const audioTrack = localStream.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
         return !audioTrack.enabled; // returning "Muted" state, which is !enabled
@@ -336,13 +336,13 @@ var WRTC = (function WRTC() {
     },
     addInterface: function addInterface(userId) {
       if (!userId) return false;
-      var isLocal = userId === share.getUserId();
-      var videoId = `video_${userId.replace(/\./g, '_')}`;
-      var $video = $(`#${videoId}`);
+      const isLocal = userId === share.getUserId();
+      const videoId = `video_${userId.replace(/\./g, '_')}`;
+      const $video = $(`#${videoId}`);
 
       var $mute = $("<span class='interface-btn audio-btn buttonicon'>").attr('title', 'Mute').on({
         click: function click() {
-					var muted;
+          let muted;
           if (isLocal) {
             muted = self.toggleMuted();
           } else {
@@ -352,7 +352,7 @@ var WRTC = (function WRTC() {
           $mute.attr('title', muted ? 'Unmute' : 'Mute').toggleClass('muted', muted);
         },
       });
-      var videoEnabled = true;
+      let videoEnabled = true;
       var $disableVideo = isLocal ? $("<span class='interface-btn video-btn buttonicon'>").attr('title', 'Disable video').on({
         click: function click() {
           self.toggleVideo();
@@ -361,7 +361,7 @@ var WRTC = (function WRTC() {
         },
       }) : null;
 
-      var videoEnlarged = false;
+      let videoEnlarged = false;
       var $largeVideo = $("<span class='interface-btn enlarge-btn buttonicon'>").attr('title', 'Make video larger').on({
         click: function click() {
           videoEnlarged = !videoEnlarged;
@@ -430,22 +430,18 @@ var WRTC = (function WRTC() {
         if (localStream) {
           if (pc[peer].getLocalStreams) {
             if (!pc[peer].getLocalStreams().length) {
+              localStream.getTracks().forEach((track) => {
+                pc[peer].addTrack(track, localStream);
+              });
 
-							localStream.getTracks().forEach(function(track) {
-								pc[peer].addTrack(track, localStream);
-							});
-
-							// pc[peer].addStream(localStream);
-							
+              // pc[peer].addStream(localStream);
             }
           } else if (pc[peer].localStreams) {
             if (!pc[peer].localStreams.length) {
-
-							localStream.getTracks().forEach(function(track) {
-								pc[peer].addTrack(track, localStream);
-							});
-							// pc[peer].addStream(localStream);
-							
+              localStream.getTracks().forEach((track) => {
+                pc[peer].addTrack(track, localStream);
+              });
+              // pc[peer].addStream(localStream);
             }
           }
         }
@@ -514,14 +510,14 @@ var WRTC = (function WRTC() {
 
       if (!pc[userId]) {
         self.createPeerConnection(userId, headerId);
-			}
-			
-			// pc[userId].addStream(localStream);
-			
-			localStream.getTracks().forEach(function(track) {
-				pc[userId].addTrack(track, localStream);
-			});
-			
+      }
+
+      // pc[userId].addStream(localStream);
+
+      localStream.getTracks().forEach((track) => {
+        pc[userId].addTrack(track, localStream);
+      });
+
       pc[userId].createOffer((desc) => {
         desc.sdp = cleanupSdp(desc.sdp);
         pc[userId].setLocalDescription(desc, () => {
@@ -575,8 +571,8 @@ var WRTC = (function WRTC() {
           audioOutputSelect.selectedIndex = 0;
         });
       } else {
-				console.warn('Browser does not support output device selection.');
-				$(document).find('#wrtc_settings .select.audioOutputSec').hide()
+        console.warn('Browser does not support output device selection.');
+        $(document).find('#wrtc_settings .select.audioOutputSec').hide();
       }
     },
     changeAudioDestination: function changeAudioDestination() {

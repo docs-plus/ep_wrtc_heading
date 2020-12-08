@@ -94,12 +94,12 @@ var EPwrtcHeading = (function EPwrtcHeading() {
           WRTC_Room.adoptHeaderYRoom();
         }, 250);
       });
-		}
-		
-		window.onerror = function(message, source, lineno, colno, error) { 
-			console.error('[wrtc]: windows error, close stream')
-			if(window.headerId) WRTC.deactivate(clientVars.userId, window.headerId);
-		};
+    }
+
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.error('[wrtc]: windows error, close stream');
+      if (window.headerId) WRTC.deactivate(clientVars.userId, window.headerId);
+    };
 
     return socket;
   }
@@ -176,10 +176,8 @@ var hooks = {
   },
   aceEditEvent: function aceEditEvent(hook, context) {
     const eventType = context.callstack.editEvent.eventType;
-
     // ignore these types
     if ('handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps'.includes(eventType)) return;
-
     // some times init ep_wrtc_heading is not yet in the plugin list
     if (context.callstack.docTextChanged) WRTC_Room.adoptHeaderYRoom();
 
@@ -221,6 +219,27 @@ var hooks = {
     WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
   },
   aceSelectionChanged: function aceSelectionChanged(rep, context) {
+    if (context.callstack.type === 'handleKeyEvent') {
+      const editEvent = context.callstack.editEvent;
+      const attributs = context.documentAttributeManager.getAttributesOnCaret(editEvent.selStart);
+      const hasHeaderId = attributs.find((attr) => {
+        if (attr[0] === 'headingTagId') return true;
+      });
+      if (hasHeaderId && hasHeaderId.length > 1) {
+        const headerId = hasHeaderId[1];
+        const $header = share.$body_ace_outer()
+            .find('iframe').contents()
+            .find('#innerdocbody')
+            .find(`.headingTagId_${headerId}`);
+        const tagName = $header.parent().get(0).tagName.toLowerCase();
+        // if has no h and if has headerId remove that header id
+        if (tagName && !share.hElements.includes(tagName)) {
+          share.$body_ace_outer().find('#outerdocbody').find(`#wbrtc_chatBox #${headerId}`).remove();
+					// TODO: remove attribute "headingTagId"
+					// context.documentAttributeManager.removeAttributeOnLine(context.rep.selStart[0], 'headingTagId');
+        }
+      }
+    }
     if (context.callstack.type === 'insertheading') {
       rep = context.rep;
       const headingTagId = ['headingTagId', randomString(16)];
