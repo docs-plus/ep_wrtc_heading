@@ -15,7 +15,8 @@
 				"handleClientMessage_RTC_MESSAGE": "ep_wrtc_heading/static/js/index",
 				"aceSelectionChanged": "ep_wrtc_heading/static/js/index",
 				"aceInitialized": "ep_wrtc_heading/static/js/index",
-				"chatNewMessage": "ep_wrtc_heading/static/js/index"
+				"chatNewMessage": "ep_wrtc_heading/static/js/index",
+				"aceDomLineProcessLineAttributes": "ep_wrtc_heading/static/js/index"
 			},
 			"hooks": {
 				"socketio": "ep_wrtc_heading/index",

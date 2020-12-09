@@ -187,42 +187,6 @@ var hooks = {
         WRTC_Room.findTags();
       }, 250);
     }
-
-		console.log(eventType, "======>>>>>")
-		
-		if (eventType === 'handleKeyEvent') {
-      const editEvent = context.callstack.editEvent;
-      const attributs = context.documentAttributeManager.getAttributesOnCaret(editEvent.selStart);
-      const hasHeaderId = attributs.find((attr) => {
-        if (attr[0] === 'headingTagId') return true;
-			});
-			console.log(hasHeaderId)
-      // if (hasHeaderId && hasHeaderId.length > 1) {
-      //   const headerId = hasHeaderId[1];
-      //   const $header = share.$body_ace_outer()
-      //       .find('iframe').contents()
-      //       .find('#innerdocbody')
-      //       .find(`.headingTagId_${headerId}`);
-      //   const tagName = $header.parent().get(0).tagName.toLowerCase();
-      //   // if has no h and if has headerId remove that header id
-      //   if (tagName && !share.hElements.includes(tagName)) {
-      //     share.$body_ace_outer().find('#outerdocbody').find(`#wbrtc_chatBox #${headerId}`).remove();
-			// 		// TODO: remove attribute "headingTagId"
-			// 		// context.documentAttributeManager.removeAttributeOnLine(context.rep.selStart[0], 'headingTagId');
-      //   }
-      // }
-    }
-
-    // if user create a new heading, depend on ep_headings2
-    if (eventType === 'insertheading') {
-      // unfortunately "setAttributesRange" takes a little time to set attribute
-      // also ep_headings2 plugin has setTimeout about 250 ms to set and update H tag
-      // more info: https://github.com/ether/ep_headings2/blob/6827f1f0b64d99c3f3082bc0477d87187073a74f/static/js/index.js#L71
-      setTimeout(() => {
-				console.log("insert header")
-        WRTC_Room.findTags();
-      }, 500);
-    }
   },
   aceAttribsToClasses: function aceAttribsToClasses(hook, context) {
     if (context.key === 'headingTagId') {
@@ -243,12 +207,31 @@ var hooks = {
   },
   handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
     WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
-  },
+	},
+	aceDomLineProcessLineAttributes: function aceDomLineProcessLineAttributes(name, context){
+		const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
+		const result = [];
+		if(videoHEaderType){
+			console.log(cls, "=clsclsclscls")
+			
+			var modifier = {
+				preHtml: '<nd-video class="video">',
+				postHtml: '</nd-video>',
+				processedMarker: true
+			};
+			result.push(modifier);
+		}
+		return result;
+	},
   aceSelectionChanged: function aceSelectionChanged(rep, context) {
+
     if (context.callstack.type === 'insertheading') {
+      console.log("context.callstack.type ", context.callstack.type )
 			rep = context.rep;
-      const headingTagId = ['headingTagId', randomString(16)];
-      context.documentAttributeManager.setAttributesOnRange(rep.selStart, rep.selEnd, [headingTagId]);
+			context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
+			setTimeout(() => {
+        WRTC_Room.findTags();
+      }, 500);
     }
   },
   aceInitialized: function aceInitialized(hook, context) {
@@ -291,3 +274,18 @@ exports.handleClientMessage_RTC_MESSAGE = hooks.handleClientMessage_RTC_MESSAGE;
 exports.aceSelectionChanged = hooks.aceSelectionChanged;
 exports.aceInitialized = hooks.aceInitialized;
 exports.chatNewMessage = hooks.chatNewMessage;
+exports.aceDomLineProcessLineAttributes = function(name, context){
+  const cls = context.cls;
+	const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
+	// console.log(videoHEaderType, "yupppp")
+	const result = [];
+	if(videoHEaderType){
+		const modifier = {
+			preHtml: '<nd-video class="videoHeader ' + videoHEaderType[1]  + '">',
+			postHtml: '</nd-video>',
+			processedMarker: true
+		};
+		result.push(modifier);
+	}
+	return result;
+};

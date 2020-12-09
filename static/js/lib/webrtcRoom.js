@@ -349,11 +349,11 @@ var WRTC_Room = (function WRTC_Room() {
       const $padOuter = share.$body_ace_outer();
       if (!$padOuter) return;
 
-      $padOuter.find('.wbrtc_roomBox, .wrtc_roomInlineAvatar ').each(function adjustHeaderIconPosition() {
+      $padOuter.find('.wbrtc_roomBox, .wrtc_roomInlineAvatar').each(function adjustHeaderIconPosition() {
         const $el = $(this);
         const $boxId = $el.attr('id');
-        const hClassId = `headingTagId_${$boxId}`;
-        const $headingEl = $padOuter.find('iframe').contents().find('#innerdocbody').find(`.${hClassId}`);
+        const hClassId = `.videoHeader.${$boxId}`;
+        const $headingEl = $padOuter.find('iframe').contents().find('#innerdocbody').find(hClassId);
 
         // if the H tags does not find, remove chatBox
         // TODO: and kick out the user form the chatBox
@@ -371,18 +371,23 @@ var WRTC_Room = (function WRTC_Room() {
       if (!components.text.active && !components.video.active && !components.room.active) return false;
       const hTagList = [];
       const hTagElements = hElements.join(',');
-      const hTags = share.$body_ace_outer().find('iframe').contents().find('#innerdocbody').children('div').children(hTagElements);
+			const hTags = share.$body_ace_outer().find('iframe')
+				.contents()
+				.find('#innerdocbody')
+				.children('div')
+				.find('.videoHeader');
+
       const aceInnerOffset = share.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
       const target = share.$body_ace_outer().find('#outerdocbody');
-      let newHTagAdded = false;
+			let newHTagAdded = false;
       $(hTags).each(function createWrtcRoomBox() {
         const $el = $(this);
         // var lineNumber = $el.parent().prevAll().length;
         // var tag = $("#title")[0].tagName.toLowerCase();
         const newY = getHeaderRoomY($el);
         const newX = Math.ceil(aceInnerOffset.left);
-        let headingTagId = $el.find('span').attr('class');
-        headingTagId = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(headingTagId);
+				let headingTagId = $el.attr('class');
+        headingTagId = headingTagId.split(" ")[1];
 
         if (!headingTagId) {
           console.warn("[wrtc]: couldn't find headingTagId.");
@@ -390,7 +395,7 @@ var WRTC_Room = (function WRTC_Room() {
         }
 
         const data = {
-          headingTagId: headingTagId[1],
+          headingTagId: headingTagId,
           // tag: tag,
           positionTop: newY,
           positionLeft: newX,
@@ -403,7 +408,7 @@ var WRTC_Room = (function WRTC_Room() {
 
         // if the header does not exists then adde to list
         // otherwise update textHeader
-        // TODO: performance issue
+				// TODO: performance issue
         if (target.find(`#${data.headingTagId}`).length <= 0) {
           const box = $('#wertc_roomBox').tmpl(data);
           target.find('#wbrtc_chatBox').append(box);
