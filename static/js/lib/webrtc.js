@@ -245,12 +245,21 @@ var WRTC = (function WRTC() {
       }
       $.gritter.add({
         title: 'Error',
-        text: `${reason} ,try again!`,
+        text: `${reason}; try again!`,
         time: 4000,
         sticky: false,
         class_name: 'error',
-      });
-      self.deactivate(userId, headerId);
+			});
+			userId = userId || clientVars.userId;
+			headerId = headerId || window.headerId;
+			videoChat.userLeave(
+				headerId,
+				{
+					headerId: headerId,
+					padId: padId,
+					userId:userId
+				}
+			)
     },
     hide: function hide(userId) {
       if (!userId) return false;
@@ -593,8 +602,8 @@ var WRTC = (function WRTC() {
       const mediaConstraints = {
         audio: true,
         video: {
-          width: {exact: 320},
-          height: {exact: 240},
+          width: 320,
+          height: 240,
           frameRate: {ideal: 15, max: 30},
           facingMode: 'user',
         },

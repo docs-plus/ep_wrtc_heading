@@ -188,14 +188,40 @@ var hooks = {
       }, 250);
     }
 
+		console.log(eventType, "======>>>>>")
+		
+		if (eventType === 'handleKeyEvent') {
+      const editEvent = context.callstack.editEvent;
+      const attributs = context.documentAttributeManager.getAttributesOnCaret(editEvent.selStart);
+      const hasHeaderId = attributs.find((attr) => {
+        if (attr[0] === 'headingTagId') return true;
+			});
+			console.log(hasHeaderId)
+      // if (hasHeaderId && hasHeaderId.length > 1) {
+      //   const headerId = hasHeaderId[1];
+      //   const $header = share.$body_ace_outer()
+      //       .find('iframe').contents()
+      //       .find('#innerdocbody')
+      //       .find(`.headingTagId_${headerId}`);
+      //   const tagName = $header.parent().get(0).tagName.toLowerCase();
+      //   // if has no h and if has headerId remove that header id
+      //   if (tagName && !share.hElements.includes(tagName)) {
+      //     share.$body_ace_outer().find('#outerdocbody').find(`#wbrtc_chatBox #${headerId}`).remove();
+			// 		// TODO: remove attribute "headingTagId"
+			// 		// context.documentAttributeManager.removeAttributeOnLine(context.rep.selStart[0], 'headingTagId');
+      //   }
+      // }
+    }
+
     // if user create a new heading, depend on ep_headings2
     if (eventType === 'insertheading') {
       // unfortunately "setAttributesRange" takes a little time to set attribute
       // also ep_headings2 plugin has setTimeout about 250 ms to set and update H tag
       // more info: https://github.com/ether/ep_headings2/blob/6827f1f0b64d99c3f3082bc0477d87187073a74f/static/js/index.js#L71
       setTimeout(() => {
+				console.log("insert header")
         WRTC_Room.findTags();
-      }, 250);
+      }, 500);
     }
   },
   aceAttribsToClasses: function aceAttribsToClasses(hook, context) {
@@ -219,29 +245,8 @@ var hooks = {
     WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
   },
   aceSelectionChanged: function aceSelectionChanged(rep, context) {
-    if (context.callstack.type === 'handleKeyEvent') {
-      const editEvent = context.callstack.editEvent;
-      const attributs = context.documentAttributeManager.getAttributesOnCaret(editEvent.selStart);
-      const hasHeaderId = attributs.find((attr) => {
-        if (attr[0] === 'headingTagId') return true;
-      });
-      if (hasHeaderId && hasHeaderId.length > 1) {
-        const headerId = hasHeaderId[1];
-        const $header = share.$body_ace_outer()
-            .find('iframe').contents()
-            .find('#innerdocbody')
-            .find(`.headingTagId_${headerId}`);
-        const tagName = $header.parent().get(0).tagName.toLowerCase();
-        // if has no h and if has headerId remove that header id
-        if (tagName && !share.hElements.includes(tagName)) {
-          share.$body_ace_outer().find('#outerdocbody').find(`#wbrtc_chatBox #${headerId}`).remove();
-					// TODO: remove attribute "headingTagId"
-					// context.documentAttributeManager.removeAttributeOnLine(context.rep.selStart[0], 'headingTagId');
-        }
-      }
-    }
     if (context.callstack.type === 'insertheading') {
-      rep = context.rep;
+			rep = context.rep;
       const headingTagId = ['headingTagId', randomString(16)];
       context.documentAttributeManager.setAttributesOnRange(rep.selStart, rep.selEnd, [headingTagId]);
     }
