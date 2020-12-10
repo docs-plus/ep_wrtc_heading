@@ -249,17 +249,17 @@ var WRTC = (function WRTC() {
         time: 4000,
         sticky: false,
         class_name: 'error',
-			});
-			userId = userId || clientVars.userId;
-			headerId = headerId || window.headerId;
-			videoChat.userLeave(
-				headerId,
-				{
-					headerId: headerId,
-					padId: padId,
-					userId:userId
-				}
-			)
+      });
+      userId = userId || clientVars.userId;
+      headerId = headerId || window.headerId;
+      videoChat.userLeave(
+          headerId,
+          {
+            headerId,
+            padId,
+            userId,
+          }
+      );
     },
     hide: function hide(userId) {
       if (!userId) return false;

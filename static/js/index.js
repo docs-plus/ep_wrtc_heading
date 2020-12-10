@@ -207,31 +207,11 @@ var hooks = {
   },
   handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
     WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
-	},
-	aceDomLineProcessLineAttributes: function aceDomLineProcessLineAttributes(name, context){
-		const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
-		const result = [];
-		if(videoHEaderType){
-			console.log(cls, "=clsclsclscls")
-			
-			var modifier = {
-				preHtml: '<nd-video class="video">',
-				postHtml: '</nd-video>',
-				processedMarker: true
-			};
-			result.push(modifier);
-		}
-		return result;
-	},
+  },
   aceSelectionChanged: function aceSelectionChanged(rep, context) {
-
     if (context.callstack.type === 'insertheading') {
-      console.log("context.callstack.type ", context.callstack.type )
-			rep = context.rep;
-			context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
-			setTimeout(() => {
-        WRTC_Room.findTags();
-      }, 500);
+      rep = context.rep;
+      context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
     }
   },
   aceInitialized: function aceInitialized(hook, context) {
@@ -274,18 +254,21 @@ exports.handleClientMessage_RTC_MESSAGE = hooks.handleClientMessage_RTC_MESSAGE;
 exports.aceSelectionChanged = hooks.aceSelectionChanged;
 exports.aceInitialized = hooks.aceInitialized;
 exports.chatNewMessage = hooks.chatNewMessage;
-exports.aceDomLineProcessLineAttributes = function(name, context){
+exports.aceDomLineProcessLineAttributes = function (name, context) {
   const cls = context.cls;
-	const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
-	// console.log(videoHEaderType, "yupppp")
-	const result = [];
-	if(videoHEaderType){
-		const modifier = {
-			preHtml: '<nd-video class="videoHeader ' + videoHEaderType[1]  + '">',
-			postHtml: '</nd-video>',
-			processedMarker: true
-		};
-		result.push(modifier);
-	}
-	return result;
+  const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
+  const headingType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
+  const result = [];
+  if (videoHEaderType && headingType) {
+    const modifier = {
+      preHtml: `<nd-video class="videoHeader ${videoHEaderType[1]}">`,
+      postHtml: '</nd-video>',
+      processedMarker: true,
+    };
+    result.push(modifier);
+    setTimeout(() => {
+      WRTC_Room.findTags();
+    }, 500);
+  }
+  return result;
 };
