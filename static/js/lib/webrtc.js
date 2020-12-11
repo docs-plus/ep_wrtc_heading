@@ -70,6 +70,9 @@ var WRTC = (function WRTC() {
         console.info('[wrtc]: windos unloaded, now hangupAll');
         self.hangupAll();
       });
+      socket.on('RTC_MESSAGE', (context) => {
+        if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
+      });
     },
     appendInterfaceLayout: function appendInterfaceLayout() {
       // TODO: legacy code, move it to template
@@ -188,10 +191,11 @@ var WRTC = (function WRTC() {
       }
       share.wrtcStore.userInRoom = false;
       if (callback) callback();
-    },
-    handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
-      if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
-    },
+		},
+		// deprecated function
+    // handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
+    //   if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
+    // },
     // END OF API HOOKS
     show: function show() {
       $('#pad_title').addClass('f_wrtcActive');
@@ -410,10 +414,17 @@ var WRTC = (function WRTC() {
       self._pad.socket.json.send(msg);
     },
     sendMessage: function sendMessage(to, data) {
-      self._pad.collabClient.sendMessage({
+      socket.emit('RTC_MESSAGE', {
         type: 'RTC_MESSAGE',
         payload: {data, to},
-      });
+      }, (data) => {
+        console.log('coming data', data);
+			});
+			// deprecated function
+      // self._pad.collabClient.sendMessage({
+      // 	type: 'RTC_MESSAGE',
+      //   payload: {data, to},
+      // });
     },
     receiveMessage: function receiveMessage(msg) {
       const peer = msg.from;

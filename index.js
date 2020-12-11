@@ -2,26 +2,16 @@ const eejs = require('ep_etherpad-lite/node/eejs/');
 const _ = require('lodash');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 const log4js = require('ep_etherpad-lite/node_modules/log4js');
-
 const statsLogger = log4js.getLogger('stats');
 const stats = require('ep_etherpad-lite/node/stats');
 const packageJson = require('./package.json');
 const db = require('./server/dbRepository');
+const Config = require('./config');
+const {socketInit, socketIo} = require('./server/socket');
 // Make sure any updates to this are reflected in README
 const statErrorNames = ['Abort', 'Hardware', 'NotFound', 'NotSupported', 'Permission', 'SecureConnection', 'Unknown'];
 
-const Config = require('./config');
-
-const videoChat = require('./server/videoChat');
-const textChat = require('./server/textChat');
-
-let VIDEO_CHAT_LIMIT = Config.get('VIDEO_CHAT_LIMIT');
-
-const {socketInit, socketIo, handleRTCMessage} = require('./server/socket');
-
-
 exports.socketio = socketInit;
-
 
 exports.eejsBlock_mySettings = function (hookName, args, cb) {
   args.content += eejs.require('ep_wrtc_heading/templates/settings.ejs');
@@ -82,10 +72,8 @@ exports.clientVars = function (hook, context, callback) {
 
 exports.handleMessage = function (hook, context, callback) {
   const result = [null];
-  if (context.message.type === 'COLLABROOM' && context.message.data.type === 'RTC_MESSAGE') {
-    handleRTCMessage(context.client, context.message.data.payload);
-    callback(result);
-  } else if (context.message.type === 'STATS' && context.message.data.type === 'RTC_MESSAGE') {
+  console.log('exports.handleMessage', hook, context);
+  if (context.message.type === 'STATS' && context.message.data.type === 'RTC_MESSAGE') {
     handleErrorStatMessage(context.message.data.statName);
     callback(result);
   } else {
@@ -100,9 +88,3 @@ function handleErrorStatMessage(statName) {
     statsLogger.warn(`Invalid ep_wrtc_heading error stat: ${statName}`);
   }
 }
-
-/**
- * Handles an RTC Message
- * @param client the client that send this message
- * @param message the message from the client
- */

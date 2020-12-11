@@ -174,9 +174,21 @@ function socketInit(hookName, args, cb) {
         // socket.broadcast.to(room.padId).emit("userLeave", room.data, room.roomInfo, chatRoom)
       });
     });
+
+    socket.on('RTC_MESSAGE', (context) => {
+      if (context.type === 'RTC_MESSAGE') {
+        Object.assign(context, {client: {id: socket.id.split('#')[1]}});
+        handleRTCMessage(context.client, context.payload);
+      }
+    });
   });
 }
 
+/**
+ * Handles an RTC Message
+ * @param client the client that send this message
+ * @param message the message from the client
+ */
 function handleRTCMessage(client, payload) {
   // if(!socketIo) return false
   const userId = sessioninfos[client.id].author;

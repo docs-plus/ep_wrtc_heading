@@ -153,6 +153,7 @@ You can see metrics for various errors that users have when attempting to connec
 - Fix the page header when the cursor is at the end of the line (video icon is not displayed).
 ### [v0.30.0]
 - Refactor taging video rooms and `findTag` function. (fixed any issues that related with not displaying video icons and performance issues)
+- Separate Webrtc signaling from etherpad socket gateway (the `icecandidate` sends many messages per ms, so the "etherpad" displays the "rate limit" dialog).
 
 ## License
 
