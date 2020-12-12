@@ -217,7 +217,8 @@ function handleRTCMessage(client, payload) {
   for (let i = 0; i < clients.length; i++) {
     const session = sessioninfos[clients[i].id];
     if (session && session.author === to) {
-      clients[i].json.send(msg);
+			// clients[i].json.send(msg);
+			socketIo.of('/heading_chat_room').to(padId).emit('RTC_MESSAGE', msg);
       break;
     }
   }

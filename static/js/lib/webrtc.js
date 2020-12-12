@@ -71,7 +71,7 @@ var WRTC = (function WRTC() {
         self.hangupAll();
       });
       socket.on('RTC_MESSAGE', (context) => {
-        if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
+        if (context.data.payload.data.headerId === window.headerId) self.receiveMessage(context.data.payload);
       });
     },
     appendInterfaceLayout: function appendInterfaceLayout() {
@@ -415,8 +415,8 @@ var WRTC = (function WRTC() {
     },
     sendMessage: function sendMessage(to, data) {
       socket.emit('RTC_MESSAGE', {
-        type: 'RTC_MESSAGE',
-        payload: {data, to},
+				type: 'RTC_MESSAGE',
+        payload: {data, to, padId},
       }, (data) => {
         console.log('coming data', data);
 			});
