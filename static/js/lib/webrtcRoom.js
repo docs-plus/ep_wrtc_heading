@@ -27,7 +27,7 @@ var WRTC_Room = (function WRTC_Room() {
 
   function scroll2Header(headerId) {
     const padContainer = share.$body_ace_outer().find('iframe').contents().find('#innerdocbody');
-    padContainer.find(`.${prefixHeaderId}${headerId}`).each(function scrolling() {
+    padContainer.find('.videoHeader.'+headerId+'').each(function scrolling() {
       this.scrollIntoView({
         behavior: 'smooth',
       });
