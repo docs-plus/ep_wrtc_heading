@@ -76,7 +76,7 @@ var WRTC_Room = (function WRTC_Room() {
 			const url = new URL(hasHref);
 			if(url.pathname !== location.pathname) window.location = hasHref;
 		}
-		
+
     const userInfo = {
       padId: clientVars.padId || window.pad.getPadId(),
       userId: clientVars.userId || window.pad.getUserId(),
@@ -144,8 +144,8 @@ var WRTC_Room = (function WRTC_Room() {
 
     if (!headerId) return true;
 
-    const isHeading = share.$body_ace_outer().find(`.videoHeader.${headerId}`);
-    if (!isHeading.length) {
+		const hasThisHeader = share.wrtcStore[headerId];
+    if (!hasThisHeader) {
       $.gritter.add({
         title: 'Error',
         text: 'The header seems not to exist anymore!',
