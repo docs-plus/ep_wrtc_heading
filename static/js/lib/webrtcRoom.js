@@ -72,10 +72,11 @@ var WRTC_Room = (function WRTC_Room() {
 		// if the link belong to the other pad.
 		// navigate to the new pad
 		// TODO: URL should be sanitize and then decided to navigate
-    if (hasHref && hasHref.indexOf(location.pathname) < 0) {
-      window.location = hasHref;
-    }
-
+		if(hasHref){
+			const url = new URL(hasHref);
+			if(url.pathname !== location.pathname) window.location = hasHref;
+		}
+		
     const userInfo = {
       padId: clientVars.padId || window.pad.getPadId(),
       userId: clientVars.userId || window.pad.getUserId(),
