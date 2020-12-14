@@ -57,6 +57,7 @@ var WRTC_Room = (function WRTC_Room() {
   * @param {string} target @enum (chatRoom|video|text)
   */
   function roomBtnHandler(actions, headerId, target) {
+
     if (typeof actions !== 'string') {
       actions.preventDefault();
       // actions.stopPropagation();
@@ -68,7 +69,7 @@ var WRTC_Room = (function WRTC_Room() {
     if (!headerId || !target) return true;
 
     const hasHref = $(this).attr('href');
-
+		console.log(actions, hasHref, hasHref.indexOf(location.pathname))
 		// if the link belong to the other pad.
 		// navigate to the new pad
 		// TODO: URL should be sanitize and then decided to navigate
