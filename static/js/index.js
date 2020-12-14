@@ -206,7 +206,7 @@ var hooks = {
     WRTC.userLeave(null, context, callback);
   },
   handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
-    // WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
+    WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
   },
   aceSelectionChanged: function aceSelectionChanged(rep, context) {
     if (context.callstack.type === 'insertheading') {

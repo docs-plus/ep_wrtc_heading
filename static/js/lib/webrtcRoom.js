@@ -27,7 +27,7 @@ var WRTC_Room = (function WRTC_Room() {
 
   function scroll2Header(headerId) {
     const padContainer = share.$body_ace_outer().find('iframe').contents().find('#innerdocbody');
-    padContainer.find('.videoHeader.'+headerId+'').each(function scrolling() {
+    padContainer.find(`.videoHeader.${headerId}`).each(function scrolling() {
       this.scrollIntoView({
         behavior: 'smooth',
       });
@@ -67,6 +67,15 @@ var WRTC_Room = (function WRTC_Room() {
 
     if (!headerId || !target) return true;
 
+    const hasHref = $(this).attr('href');
+
+		// if the link belong to the other pad.
+		// navigate to the new pad
+		// TODO: URL should be sanitize and then decided to navigate
+    if (hasHref.indexOf(location.pathname) > 0) {
+      window.location = hasHref;
+    }
+
     const userInfo = {
       padId: clientVars.padId || window.pad.getPadId(),
       userId: clientVars.userId || window.pad.getUserId(),
@@ -89,7 +98,7 @@ var WRTC_Room = (function WRTC_Room() {
       return false;
     }
 
-    share.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
+    if (actions !== 'SHARELINK') { share.wrtcPubsub.emit('disable room buttons', headerId, actions, target); }
 
     if (actions === 'JOIN') {
       switch (target) {
@@ -134,8 +143,7 @@ var WRTC_Room = (function WRTC_Room() {
 
     if (!headerId) return true;
 
-    const isHeading = share.$body_ace_outer().find(`#${headerId}`);
-
+    const isHeading = share.$body_ace_outer().find(`.videoHeader.${headerId}`);
     if (!isHeading.length) {
       $.gritter.add({
         title: 'Error',
@@ -147,9 +155,8 @@ var WRTC_Room = (function WRTC_Room() {
       return false;
     }
 
-    if (headerId) {
-      scroll2Header(headerId);
-    }
+    if (headerId) scroll2Header(headerId);
+
     if (join === 'true') {
       target = target.toUpperCase();
       setTimeout(() => {
@@ -161,6 +168,7 @@ var WRTC_Room = (function WRTC_Room() {
   function shareRoomsLink(headId, target) {
     headId = $(this).attr('data-id') || headId;
     target = $(this).attr('data-join') || target;
+    target = target.toLowerCase();
     const title = share.$body_ace_outer().find(`.wbrtc_roomBox.${headId} .titleRoom`).text();
 
     const origin = window.location.origin;
@@ -210,9 +218,6 @@ var WRTC_Room = (function WRTC_Room() {
       target: '_blank',
     });
 
-    $('#ep_profile_users_profile_homepage').text(user.homepage);
-
-    // shared.showGeneralOverlay()
     $('#ep_profile_users_profile').addClass('ep_profile_formModal_show');
     $('#ep_profile_general_overlay').addClass('ep_profile_formModal_overlay_show');
     $('#ep_profile_general_overlay').css({display: 'block'});
@@ -221,7 +226,7 @@ var WRTC_Room = (function WRTC_Room() {
       'background-position': '50% 50%',
       'background-image': `url(${imageUrl})`,
       'background-repeat': 'no-repeat',
-      'background-size': '128px',
+      'background-size': '69px',
       'background-color': '#485365',
     });
   }
@@ -229,6 +234,7 @@ var WRTC_Room = (function WRTC_Room() {
   function activeEventListener() {
     const $wbrtc_roomBox = share.$body_ace_outer();
 
+    $wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_text', roomBtnHandler);
     $wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_text', roomBtnHandler);
     $wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_video', roomBtnHandler);
     $wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_chatRoom', roomBtnHandler);

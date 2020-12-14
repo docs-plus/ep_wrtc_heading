@@ -191,11 +191,11 @@ var WRTC = (function WRTC() {
       }
       share.wrtcStore.userInRoom = false;
       if (callback) callback();
-		},
-		// deprecated function
-    // handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
-    //   if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
-    // },
+    },
+    // deprecated function
+    handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
+      if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
+    },
     // END OF API HOOKS
     show: function show() {
       $('#pad_title').addClass('f_wrtcActive');
@@ -415,12 +415,12 @@ var WRTC = (function WRTC() {
     },
     sendMessage: function sendMessage(to, data) {
       socket.emit('RTC_MESSAGE', {
-				type: 'RTC_MESSAGE',
+        type: 'RTC_MESSAGE',
         payload: {data, to, padId},
       }, (data) => {
-        console.log('coming data', data);
-			});
-			// deprecated function
+        // console.log('coming data', data);
+      });
+      // deprecated function
       // self._pad.collabClient.sendMessage({
       // 	type: 'RTC_MESSAGE',
       //   payload: {data, to},

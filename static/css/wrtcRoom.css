@@ -298,16 +298,17 @@
 	top:3px;
 	cursor: pointer;
 }
-.wrtc_inlineAvatars  .avatar img{
-	float: left;
-}
 .wrtc_inlineAvatars:first-child{
 	margin: 0;
 }
-
+.wrtc_inlineAvatars .avatar{
+	align-items: center;
+	justify-content: center;
+}
 .wrtc_inlineAvatars .avatar img{
 	width: auto;
 	height: 100%;
+	border-radius: 50%;
 }
 
 .wrtc_inlineAvatars .avatarMore{
