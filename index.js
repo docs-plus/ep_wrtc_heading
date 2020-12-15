@@ -72,7 +72,7 @@ exports.clientVars = function (hook, context, callback) {
 
 exports.handleMessage = function (hook, context, callback) {
   const result = [null];
-  console.log('exports.handleMessage', hook, context);
+  // console.log('exports.handleMessage', hook, context);
   if (context.message.type === 'STATS' && context.message.data.type === 'RTC_MESSAGE') {
     handleErrorStatMessage(context.message.data.statName);
     callback(result);

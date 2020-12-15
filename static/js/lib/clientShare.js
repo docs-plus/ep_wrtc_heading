@@ -126,7 +126,7 @@ var share = (function share() {
     $element.empty();
     roomInfo.list.forEach((el) => {
       const userInList = getUserFromId(el.userId) || {colorId: '', name: 'anonymous', userId: '0000000'};
-      $element.append(`<li data-id=${el.userId} style='border-color: ${userInList.colorId}'><div class='avatar'><img title='${userInList.name}' src='${getAvatarUrl(el.userId)}'></div>${userInList.name}</li>`);
+      $element.append(`<li data-id=${el.userId} style='border-color: ${userInList.colorId}'><div class='avatar'><div title='${userInList.name}' style="background: url('${getAvatarUrl(el.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>${userInList.name}</li>`);
     });
   };
 
@@ -181,7 +181,7 @@ var share = (function share() {
         if (userInList.userId) {
           if (index < inlineAvatarLimit) {
             $element.find('.avatarMore').hide();
-            $element.append(`<div class="avatar" data-id="${userInList.userId}"><img title="${userInList.name}" src="${getAvatarUrl(userInList.userId)}"></div>`);
+            $element.append(`<div class="avatar" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
           } else {
             $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
           }
@@ -205,7 +205,7 @@ var share = (function share() {
         if (userInList.userId) {
           if (index < inlineAvatarLimit) {
             $element.find('.avatarMore').hide();
-            $element.append(`<div class="avatar" data-id="${userInList.userId}"><img title="${userInList.name}" src="${getAvatarUrl(userInList.userId)}"></div>`);
+            $element.append(`<div class="avatar" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
           } else {
             $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
           }
@@ -272,15 +272,17 @@ var share = (function share() {
     // remove all users
     users = {};
 
-    wrtcStore[headerId].TEXT.list.forEach((el) => {
-      if (!users[el.userId]) users[el.userId] = {};
-      users[el.userId] = el;
-    });
+		if(wrtcStore[headerId].TEXT.list)
+			wrtcStore[headerId].TEXT.list.forEach((el) => {
+				if (!users[el.userId]) users[el.userId] = {};
+				users[el.userId] = el;
+			});
 
-    wrtcStore[headerId].VIDEO.list.forEach((el) => {
-      if (!users[el.userId]) users[el.userId] = {};
-      users[el.userId] = el;
-    });
+		if(wrtcStore[headerId].VIDEO.list)
+			wrtcStore[headerId].VIDEO.list.forEach((el) => {
+				if (!users[el.userId]) users[el.userId] = {};
+				users[el.userId] = el;
+			});
 
     inlineAvatar[target](headerId, wrtcStore[headerId][target]);
     inlineAvatar.ROOM(headerId, users);

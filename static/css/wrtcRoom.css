@@ -305,11 +305,15 @@
 	align-items: center;
 	justify-content: center;
 }
-.wrtc_inlineAvatars .avatar img{
+.wrtc_inlineAvatars .avatar >div {
+	width: 100%;
+	height: 100%;
+}
+/* .wrtc_inlineAvatars .avatar img{
 	width: auto;
 	height: 100%;
 	border-radius: 50%;
-}
+} */
 
 .wrtc_inlineAvatars .avatarMore{
 	display: none;
