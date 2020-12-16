@@ -36,7 +36,7 @@ var events = (function () {
     let foundHeadOnLine = false;
     let headId = null;
     for (let column = firstColumn; column <= lastColumn && !foundHeadOnLine; column++) {
-      headId = _.object(attributeManager.getAttributesOnPosition(lineNumber, column)).headingTagId;
+      headId = _.object(attributeManager.getAttributesOnLine(lineNumber)).headingTagId;
       if (headId) {
         foundHeadOnLine = true;
       }
@@ -104,15 +104,26 @@ var events = (function () {
   function selectionMultipleLine() {
     let rawHtml = getSelectionHtml();
     rawHtml = $('<div></div>').append(rawHtml);
-    rawHtml.find(':header span').removeClass((index, css) => (css.match(/\headingTagId_\S+/g) || []).join(' ')).addClass((index, css) => `headingTagId_${randomString(16)} ${css}`);
+    rawHtml.find(':header nd-video').each(function () {
+      $(this).attr({class: `nd-video ${randomString(16)}`});
+    });
     return rawHtml.html();
   }
 
   function selectionOneLine(headerId) {
-    const hTag = padInner.contents().find(`.headingTagId_${headerId}`).closest(':header').eq(0).prop('tagName').toLowerCase();
-    const content = padInner.contents().find(`.headingTagId_${headerId}`).closest(':header span').removeClass((index, css) => (css.match(/\headingTagId_\S+/g) || []).join(' ')).html();
+    const hTag = padInner.contents()
+        .find(`.videoHeader.${headerId}`)
+        .closest(':header').eq(0)
+        .prop('tagName')
+        .toLowerCase();
+
+    const content = padInner.contents()
+        .find(`.videoHeader.${headerId}`)
+        .closest(':header nd-video')
+        .html();
+
     if (!hTag && !content) return false;
-    const rawHtml = $('<div></div>').append(`<${hTag}><span class='headingTagId_${randomString(16)}'>${content}</span></${hTag}>`);
+    const rawHtml = $('<div></div>').append(`<${hTag}><nd-video class="videoHeader ${randomString(16)}">${content}</nd-video></${hTag}>`);
     return rawHtml.html();
   }
 
@@ -140,10 +151,10 @@ var events = (function () {
         return false;
       }
 
-      // if it is a cut event we have to remove the selection
-      if (removeSelection) {
-        padInner.contents()[0].execCommand('delete');
-      }
+    //   // if it is a cut event we have to remove the selection
+    //   if (removeSelection) {
+    //     padInner.contents()[0].execCommand('delete');
+    //   }
     }
   };
 

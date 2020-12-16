@@ -272,17 +272,19 @@ var share = (function share() {
     // remove all users
     users = {};
 
-		if(wrtcStore[headerId].TEXT.list)
-			wrtcStore[headerId].TEXT.list.forEach((el) => {
-				if (!users[el.userId]) users[el.userId] = {};
-				users[el.userId] = el;
-			});
+    if (wrtcStore[headerId].TEXT.list) {
+      wrtcStore[headerId].TEXT.list.forEach((el) => {
+        if (!users[el.userId]) users[el.userId] = {};
+        users[el.userId] = el;
+      });
+    }
 
-		if(wrtcStore[headerId].VIDEO.list)
-			wrtcStore[headerId].VIDEO.list.forEach((el) => {
-				if (!users[el.userId]) users[el.userId] = {};
-				users[el.userId] = el;
-			});
+    if (wrtcStore[headerId].VIDEO.list) {
+      wrtcStore[headerId].VIDEO.list.forEach((el) => {
+        if (!users[el.userId]) users[el.userId] = {};
+        users[el.userId] = el;
+      });
+    }
 
     inlineAvatar[target](headerId, wrtcStore[headerId][target]);
     inlineAvatar.ROOM(headerId, users);

@@ -57,7 +57,6 @@ var WRTC_Room = (function WRTC_Room() {
   * @param {string} target @enum (chatRoom|video|text)
   */
   function roomBtnHandler(actions, headerId, target) {
-
     if (typeof actions !== 'string') {
       actions.preventDefault();
       // actions.stopPropagation();
@@ -69,13 +68,13 @@ var WRTC_Room = (function WRTC_Room() {
     if (!headerId || !target) return true;
 
     const hasHref = $(this).attr('href');
-		// if the link belong to the other pad.
-		// navigate to the new pad
-		// TODO: URL should be sanitize and then decided to navigate
-		if(hasHref){
-			const url = new URL(hasHref);
-			if(url.pathname !== location.pathname) window.location = hasHref;
-		}
+    // if the link belong to the other pad.
+    // navigate to the new pad
+    // TODO: URL should be sanitize and then decided to navigate
+    if (hasHref) {
+      const url = new URL(hasHref);
+      if (url.pathname !== location.pathname) window.location = hasHref;
+    }
 
     const userInfo = {
       padId: clientVars.padId || window.pad.getPadId(),
@@ -144,7 +143,7 @@ var WRTC_Room = (function WRTC_Room() {
 
     if (!headerId) return true;
 
-		const hasThisHeader = share.wrtcStore[headerId];
+    const hasThisHeader = share.wrtcStore[headerId];
     if (!hasThisHeader) {
       $.gritter.add({
         title: 'Error',

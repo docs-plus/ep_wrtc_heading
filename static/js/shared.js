@@ -7,6 +7,7 @@ var collectContentPre = function collectContentPre(hook, context) {
   const state = context.state;
   const lineAttributes = state.lineAttributes;
   const tagIndex = _.indexOf(tags, tname);
+  // console.log("what", context, tagIndex >= 0)
   if (tagIndex >= 0) {
     lineAttributes.headingTagId = context.cls.split(' ')[1];
     _.debounce(() => {

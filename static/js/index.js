@@ -89,7 +89,7 @@ var EPwrtcHeading = (function EPwrtcHeading() {
         events.addTextOnClipboard(e, ace, padInner, true);
       });
 
-      padInner.contents().on('paste', () => {
+      padInner.contents().on('paste', (e) => {
         setTimeout(() => {
           WRTC_Room.adoptHeaderYRoom();
         }, 250);
