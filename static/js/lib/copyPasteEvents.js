@@ -32,7 +32,7 @@ var events = (function () {
     return lastColumnOfSelection;
   };
 
-  const hasCommentOnLine = function hasCommentOnLine(lineNumber, firstColumn, lastColumn, attributeManager) {
+  const hasHeaderOnLine = function hasHeaderOnLine(lineNumber, firstColumn, lastColumn, attributeManager) {
     let foundHeadOnLine = false;
     let headId = null;
     for (let column = firstColumn; column <= lastColumn && !foundHeadOnLine; column++) {
@@ -44,17 +44,17 @@ var events = (function () {
     return {foundHeadOnLine, headId};
   };
 
-  const hasCommentOnMultipleLineSelection = function hasCommentOnMultipleLineSelection(firstLineOfSelection, lastLineOfSelection, rep, attributeManager) {
-    let foundLineWithComment = false;
-    for (let line = firstLineOfSelection; line <= lastLineOfSelection && !foundLineWithComment; line++) {
+  const hasHeaderOnMultipleLineSelection = function hasHeaderOnMultipleLineSelection(firstLineOfSelection, lastLineOfSelection, rep, attributeManager) {
+    let foundLineWithHeader = false;
+    for (let line = firstLineOfSelection; line <= lastLineOfSelection && !foundLineWithHeader; line++) {
       const firstColumn = getFirstColumnOfSelection(line, rep, firstLineOfSelection);
       const lastColumn = getLastColumnOfSelection(line, rep, lastLineOfSelection);
-      const hasComment = hasCommentOnLine(line, firstColumn, lastColumn, attributeManager);
-      if (hasComment) {
-        foundLineWithComment = true;
+      const hasHeader = hasHeaderOnLine(line, firstColumn, lastColumn, attributeManager);
+      if (hasHeader) {
+        foundLineWithHeader = true;
       }
     }
-    return foundLineWithComment;
+    return foundLineWithHeader;
   };
 
   const hasMultipleLineSelected = function hasMultipleLineSelected(firstLineOfSelection, lastLineOfSelection) {
@@ -71,9 +71,9 @@ var events = (function () {
     const lastLineOfSelection = rep.selEnd[0];
     const selectionOfMultipleLine = hasMultipleLineSelected(firstLineOfSelection, lastLineOfSelection);
     if (selectionOfMultipleLine) {
-      hasVideoHeader = hasCommentOnMultipleLineSelection(firstLineOfSelection, lastLineOfSelection, rep, attributeManager);
+      hasVideoHeader = hasHeaderOnMultipleLineSelection(firstLineOfSelection, lastLineOfSelection, rep, attributeManager);
     } else {
-      hasVideoHeader = hasCommentOnLine(firstLineOfSelection, firstColumn, lastColumn, attributeManager);
+      hasVideoHeader = hasHeaderOnLine(firstLineOfSelection, firstColumn, lastColumn, attributeManager);
     }
     return {
       hasVideoHeader: hasVideoHeader.foundHeadOnLine,
@@ -146,20 +146,46 @@ var events = (function () {
       }
 
       if (rawHtml) {
-        e.originalEvent.clipboardData.setData('text/html', rawHtml);
+        e.originalEvent.clipboardData.setData('text/wrtc', JSON.stringify({raw: rawHtml}));
         e.preventDefault();
         return false;
       }
 
-    //   // if it is a cut event we have to remove the selection
-    //   if (removeSelection) {
-    //     padInner.contents()[0].execCommand('delete');
-    //   }
+      // if it is a cut event we have to remove the selection
+      if (removeSelection) {
+        padInner.contents()[0].execCommand('delete');
+      }
     }
+  };
+
+
+  const pastOnSelection = (event, padInner) => {
+    const hasWrtcObject = event.originalEvent.clipboardData.getData('text/wrtc');
+
+    if (hasWrtcObject) {
+      let rawHtml = JSON.parse(hasWrtcObject);
+      rawHtml = $('<div></div>').append(rawHtml.raw);
+      console.log('first headerID', rawHtml.find(':header nd-video').attr('class'));
+      rawHtml.find(':header nd-video').each(function () {
+        $(this).attr({class: `nd-video ${randomString(16)}`});
+      });
+
+      const selection = padInner.contents()[0].getSelection();
+      if (!selection.rangeCount) return false;
+
+      selection.getRangeAt(0).insertNode(rawHtml[0]);
+    }
+
+    _.debounce(() => {
+      WRTC_Room.findTags();
+    }, 250)();
+
+    event.preventDefault();
   };
 
   return {
     hasHeaderOnSelection,
     addTextOnClipboard,
+    pastOnSelection,
   };
 })();

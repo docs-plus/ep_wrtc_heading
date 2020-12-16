@@ -7,12 +7,14 @@ var collectContentPre = function collectContentPre(hook, context) {
   const state = context.state;
   const lineAttributes = state.lineAttributes;
   const tagIndex = _.indexOf(tags, tname);
-  // console.log("what", context, tagIndex >= 0)
+  if (tname === 'div' || tname === 'p') {
+    delete lineAttributes.headingTagId;
+  }
   if (tagIndex >= 0) {
     lineAttributes.headingTagId = context.cls.split(' ')[1];
     _.debounce(() => {
       WRTC_Room.findTags(context);
-    }, 100)();
+    }, 250)();
   }
 };
 

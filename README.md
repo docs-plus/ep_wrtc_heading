@@ -151,9 +151,10 @@ You can see metrics for various errors that users have when attempting to connec
 - Fixed and replace depricated webrtc API.
 - Redesign the reload button, the button will be dispatch reloading action to all users.
 - Fix the page header when the cursor is at the end of the line (video icon is not displayed).
-### [v0.30.0]
+### [v0.30.13]
 - Refactor taging video rooms and `findTag` function. (fixed any issues that related with not displaying video icons and performance issues)
 - Separate Webrtc signaling from etherpad socket gateway (the `icecandidate` sends many messages per ms, so the "etherpad" displays the "rate limit" dialog).
+- Redesign copy/paste functionality.
 
 ## License
 
