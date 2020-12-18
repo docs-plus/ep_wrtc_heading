@@ -394,8 +394,10 @@ var WRTC_Room = (function WRTC_Room() {
         const newX = Math.ceil(aceInnerOffset.left);
         let headingTagId = $el.attr('class');
         headingTagId = headingTagId.split(' ')[1];
+        const content = $el.html();
 
-        if (!headingTagId) {
+        // if heading Id or the h tag has no contetn
+        if (!headingTagId || content.length <= 0) {
           console.warn("[wrtc]: couldn't find headingTagId.");
           return true;
         }
@@ -410,7 +412,9 @@ var WRTC_Room = (function WRTC_Room() {
           videoChatLimit: VIDEOCHATLIMIT,
         };
 
-        if (!share.wrtcStore[data.headingTagId]) share.wrtcStore[data.headingTagId] = {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}};
+        if (!share.wrtcStore[data.headingTagId]) {
+          share.wrtcStore[data.headingTagId] = {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0};
+        }
 
         // if the header does not exists then adde to list
         // otherwise update textHeader
@@ -420,6 +424,7 @@ var WRTC_Room = (function WRTC_Room() {
           target.find('#wbrtc_chatBox').append(box);
           const avatarBox = $('#wertc_inlineAvatar').tmpl(data);
           target.find('#wbrtc_avatarCol').append(avatarBox);
+          self.adoptHeaderYRoom();
           newHTagAdded = true;
         } else {
           $(document).find(`[data-headid=${data.headingTagId}].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-id=${data.headingTagId}]`).text(data.headTitle);

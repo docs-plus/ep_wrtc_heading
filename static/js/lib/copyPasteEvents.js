@@ -113,13 +113,10 @@ var events = (function () {
   function selectionOneLine(headerId) {
     const hTag = padInner.contents()
         .find(`.videoHeader.${headerId}`)
-        .closest(':header').eq(0)
-        .prop('tagName')
-        .toLowerCase();
+        .attr('data-htag');
 
     const content = padInner.contents()
         .find(`.videoHeader.${headerId}`)
-        .closest(':header nd-video')
         .html();
 
     if (!hTag && !content) return false;
@@ -146,7 +143,7 @@ var events = (function () {
       }
 
       if (rawHtml) {
-        e.originalEvent.clipboardData.setData('text/wrtc', JSON.stringify({raw: rawHtml}));
+        e.originalEvent.clipboardData.setData('text/wrtc', JSON.stringify({raw: rawHtml, multiLine: selection.hasMultipleLine}));
         e.preventDefault();
         return false;
       }
@@ -165,22 +162,33 @@ var events = (function () {
     if (hasWrtcObject) {
       let rawHtml = JSON.parse(hasWrtcObject);
       rawHtml = $('<div></div>').append(rawHtml.raw);
-      console.log('first headerID', rawHtml.find(':header nd-video').attr('class'));
-      rawHtml.find(':header nd-video').each(function () {
+      rawHtml.find('nd-video').each(function () {
         $(this).attr({class: `nd-video ${randomString(16)}`});
       });
 
       const selection = padInner.contents()[0].getSelection();
       if (!selection.rangeCount) return false;
 
-      selection.getRangeAt(0).insertNode(rawHtml[0]);
+      // console.log(rawHtml.html())
+      selection.deleteFromDocument();
+      // selection.getRangeAt(0).insertNode(rawHtml[0]);
+
+      $(selection.anchorNode).html(rawHtml);
+      // [optional] make sure focus is on the element
+      selection.anchorNode.focus();
+      // select all the content in the element
+      padInner.contents()[0].execCommand('selectAll', false, null);
+      // collapse selection to the end
+      padInner.contents()[0].getSelection().collapseToEnd();
+
+
+      setTimeout(() => {
+        WRTC_Room.findTags();
+      }, 250);
+
+
+      event.preventDefault();
     }
-
-    _.debounce(() => {
-      WRTC_Room.findTags();
-    }, 250)();
-
-    event.preventDefault();
   };
 
   return {

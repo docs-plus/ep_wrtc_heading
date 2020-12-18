@@ -185,6 +185,12 @@ var hooks = {
         WRTC_Room.findTags();
       }, 250);
     }
+
+    if (eventType === 'insertheading') {
+      setTimeout(() => {
+        WRTC_Room.findTags();
+      }, 250);
+    }
   },
   aceAttribsToClasses: function aceAttribsToClasses(hook, context) {
     if (context.key === 'headingTagId') {
@@ -259,14 +265,11 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
   const result = [];
   if (videoHEaderType && headingType) {
     const modifier = {
-      preHtml: `<nd-video class="videoHeader ${videoHEaderType[1]}">`,
+      preHtml: `<nd-video class="videoHeader ${videoHEaderType[1]}" data-htag="${headingType[1]}">`,
       postHtml: '</nd-video>',
       processedMarker: true,
     };
     result.push(modifier);
-    setTimeout(() => {
-      WRTC_Room.findTags();
-    }, 500);
   }
   return result;
 };

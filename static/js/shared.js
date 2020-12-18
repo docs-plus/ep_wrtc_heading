@@ -11,10 +11,11 @@ var collectContentPre = function collectContentPre(hook, context) {
     delete lineAttributes.headingTagId;
   }
   if (tagIndex >= 0) {
-    lineAttributes.headingTagId = context.cls.split(' ')[1];
-    _.debounce(() => {
+    const headerId = context.cls.split(' ')[1];
+    lineAttributes.headingTagId = headerId;
+    setTimeout(() => {
       WRTC_Room.findTags(context);
-    }, 250)();
+    }, 250);
   }
 };
 
