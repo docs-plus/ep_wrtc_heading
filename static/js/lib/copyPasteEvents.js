@@ -166,27 +166,16 @@ var events = (function () {
         $(this).attr({class: `nd-video ${randomString(16)}`});
       });
 
-      const selection = padInner.contents()[0].getSelection();
-      if (!selection.rangeCount) return false;
+      let selection = padInner.contents()[0].getSelection();
+			if (!selection.rangeCount) return false;
 
-      // console.log(rawHtml.html())
-      selection.deleteFromDocument();
-      // selection.getRangeAt(0).insertNode(rawHtml[0]);
+			let range = selection.getRangeAt(0);
+			range.insertNode(rawHtml[0]);
+			range.collapse(false);
+			selection.removeAllRanges();
+			selection.addRange(range);
 
-      $(selection.anchorNode).html(rawHtml);
-      // [optional] make sure focus is on the element
-      selection.anchorNode.focus();
-      // select all the content in the element
-      padInner.contents()[0].execCommand('selectAll', false, null);
-      // collapse selection to the end
-      padInner.contents()[0].getSelection().collapseToEnd();
-
-
-      setTimeout(() => {
-        WRTC_Room.findTags();
-      }, 250);
-
-
+			WRTC_Room.findTags();
       event.preventDefault();
     }
   };

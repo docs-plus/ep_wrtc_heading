@@ -163,14 +163,10 @@ var hooks = {
 
     $('#editorcontainer iframe').ready(() => {
       WRTC.appendInterfaceLayout();
-      setTimeout(() => {
-        WRTC_Room.findTags();
-      }, 250);
+      setTimeout(WRTC_Room.findTags, 250);
     });
 
-    $(window).resize(_.debounce(() => {
-      WRTC_Room.adoptHeaderYRoom();
-    }, 100));
+    $(window).resize(_.debounce(WRTC_Room.adoptHeaderYRoom, 100));
   },
   aceEditEvent: function aceEditEvent(hook, context) {
     const eventType = context.callstack.editEvent.eventType;
@@ -181,15 +177,11 @@ var hooks = {
 
     // apply changes to the other user
     if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
-      setTimeout(() => {
-        WRTC_Room.findTags();
-      }, 250);
+      setTimeout(WRTC_Room.findTags, 100);
     }
 
     if (eventType === 'insertheading') {
-      setTimeout(() => {
-        WRTC_Room.findTags();
-      }, 250);
+      setTimeout(WRTC_Room.findTags, 100);
     }
   },
   aceAttribsToClasses: function aceAttribsToClasses(hook, context) {
@@ -269,7 +261,16 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
       postHtml: '</nd-video>',
       processedMarker: true,
     };
-    result.push(modifier);
+		result.push(modifier);
+
+		// if( share.wrtcStore[videoHEaderType[1]] ){
+		// 	console.log("find that tag!")
+		// 	setTimeout(()=>{
+		// 		console.log()
+		// 		WRTC_Room.findTags()
+		// 	}, 500);
+		// }
+
   }
   return result;
 };
