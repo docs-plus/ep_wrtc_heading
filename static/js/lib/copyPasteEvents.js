@@ -36,11 +36,12 @@ var events = (function () {
     let foundHeadOnLine = false;
     let headId = null;
     for (let column = firstColumn; column <= lastColumn && !foundHeadOnLine; column++) {
-      headId = _.object(attributeManager.getAttributesOnLine(lineNumber)).headingTagId;
+			headId = _.object(attributeManager.getAttributesOnLine(lineNumber)).headingTagId;
+
       if (headId) {
         foundHeadOnLine = true;
       }
-    }
+		}
     return {foundHeadOnLine, headId};
   };
 
@@ -50,11 +51,11 @@ var events = (function () {
       const firstColumn = getFirstColumnOfSelection(line, rep, firstLineOfSelection);
       const lastColumn = getLastColumnOfSelection(line, rep, lastLineOfSelection);
       const hasHeader = hasHeaderOnLine(line, firstColumn, lastColumn, attributeManager);
-      if (hasHeader) {
+      if (hasHeader.foundHeadOnLine) {
         foundLineWithHeader = true;
       }
     }
-    return foundLineWithHeader;
+    return {foundHeadOnLine: foundLineWithHeader};
   };
 
   const hasMultipleLineSelected = function hasMultipleLineSelected(firstLineOfSelection, lastLineOfSelection) {
@@ -140,10 +141,10 @@ var events = (function () {
       } else {
         if (!selection.headId) return false;
         rawHtml = selectionOneLine(selection.headId);
-      }
+			}
 
-      if (rawHtml) {
-        e.originalEvent.clipboardData.setData('text/wrtc', JSON.stringify({raw: rawHtml, multiLine: selection.hasMultipleLine}));
+      if (rawHtml && selection.hasVideoHeader) {
+        e.originalEvent.clipboardData.setData('text/wrtc', JSON.stringify({type: "wrtcHeading",raw: rawHtml, multiLine: selection.hasMultipleLine}));
         e.preventDefault();
         return false;
       }
@@ -160,7 +161,9 @@ var events = (function () {
     const hasWrtcObject = event.originalEvent.clipboardData.getData('text/wrtc');
 
     if (hasWrtcObject) {
-      let rawHtml = JSON.parse(hasWrtcObject);
+			let rawHtml = JSON.parse(hasWrtcObject);
+			if(rawHtml.type !== 'wrtcHeading' && !rawHtml.raw) return false;
+
       rawHtml = $('<div></div>').append(rawHtml.raw);
       rawHtml.find('nd-video').each(function () {
         $(this).attr({class: `nd-video ${randomString(16)}`});
