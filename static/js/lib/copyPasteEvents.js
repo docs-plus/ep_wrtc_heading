@@ -159,8 +159,9 @@ var events = (function () {
 
   const pastOnSelection = (event, padInner) => {
     const hasWrtcObject = event.originalEvent.clipboardData.getData('text/wrtc');
+		var objectMediaData = event.originalEvent.clipboardData.getData('text/objectMediaData');
 
-    if (hasWrtcObject) {
+    if (hasWrtcObject && !objectMediaData) {
 			let rawHtml = JSON.parse(hasWrtcObject);
 			if(rawHtml.type !== 'wrtcHeading' && !rawHtml.raw) return false;
 
@@ -178,9 +179,8 @@ var events = (function () {
 			selection.removeAllRanges();
 			selection.addRange(range);
 
-			WRTC_Room.findTags();
-      event.preventDefault();
-    }
+			event.preventDefault();
+		}
   };
 
   return {
