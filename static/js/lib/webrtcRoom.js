@@ -3,7 +3,8 @@
 var WRTC_Room = (function WRTC_Room() {
   let socket = null;
   let padId = null;
-  let VIDEOCHATLIMIT = 0;
+	let VIDEOCHATLIMIT = 0;
+	const rooms= {}
   // var $lastJoinButton = null;
   const prefixHeaderId = 'headingTagId_';
   const hElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.h1', '.h2', '.h3', '.h4', '.h5', '.h6'];
@@ -355,6 +356,7 @@ var WRTC_Room = (function WRTC_Room() {
       const $padOuter = share.$body_ace_outer();
       if (!$padOuter) return;
 
+			// TODO: performance issue
       $padOuter.find('.wbrtc_roomBox, .wrtc_roomInlineAvatar').each(function adjustHeaderIconPosition() {
         const $el = $(this);
         const $boxId = $el.attr('id');
@@ -372,6 +374,40 @@ var WRTC_Room = (function WRTC_Room() {
         $el.css({top: `${getHeaderRoomY($headingEl)}px`});
       });
     },
+		appendVideoIcon: function appendVideoIcon (headerId, options = {createAgain: false}) {
+			if(!headerId) return false;
+			if(!options.createAgain && rooms[headerId]) return false;
+			rooms[headerId] = {};
+			
+			const $el = share.$body_ace_outer().find('iframe')
+			.contents()
+			.find('#innerdocbody')
+			.children('div')
+      .find(`.videoHeader.${headerId}`);
+
+			const aceInnerOffset = share.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
+      const target = share.$body_ace_outer().find('#outerdocbody');
+			const newY = getHeaderRoomY($el);
+			const newX = Math.ceil(aceInnerOffset.left);
+      const lineNumber = $el.parent().parent().prevAll().length;
+      
+			const data = {
+				headingTagId: headerId,
+				// tag: tag,
+				positionTop: newY,
+				positionLeft: newX,
+				headTitle: $el.text(),
+				lineNumber: lineNumber,
+				videoChatLimit: VIDEOCHATLIMIT,
+			};
+
+			const box = $('#wertc_roomBox').tmpl(data);
+			target.find('#wbrtc_chatBox').append(box);
+			const avatarBox = $('#wertc_inlineAvatar').tmpl(data);
+			target.find('#wbrtc_avatarCol').append(avatarBox);
+			self.adoptHeaderYRoom();
+
+		},
     findTags: function findTags() {
       const components = share.wrtcStore.components;
       if (!components.text.active && !components.video.active && !components.room.active) return false;
@@ -442,5 +478,5 @@ var WRTC_Room = (function WRTC_Room() {
     },
   };
 
-  return self;
+  return {...self, rooms};
 })();

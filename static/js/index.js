@@ -163,25 +163,28 @@ var hooks = {
 
     $('#editorcontainer iframe').ready(() => {
       WRTC.appendInterfaceLayout();
-      setTimeout(WRTC_Room.findTags, 250);
+      // setTimeout(WRTC_Room.findTags, 250);
     });
 
-    $(window).resize(_.debounce(WRTC_Room.adoptHeaderYRoom, 100));
+    $(window).resize(_.debounce(WRTC_Room.adoptHeaderYRoom, 250));
   },
   aceEditEvent: function aceEditEvent(hook, context) {
     const eventType = context.callstack.editEvent.eventType;
     // ignore these types
-    if ('handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps'.includes(eventType)) return;
+		if ('handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps'.includes(eventType)) return;
+		
+		if(context.callstack.domClean) WRTC_Room.adoptHeaderYRoom();
+
     // some times init ep_wrtc_heading is not yet in the plugin list
     if (context.callstack.docTextChanged) WRTC_Room.adoptHeaderYRoom();
 
     // apply changes to the other user
     if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
-      setTimeout(WRTC_Room.findTags, 100);
+			setTimeout(WRTC_Room.findTags, 250);
     }
 
     if (eventType === 'insertheading') {
-      setTimeout(WRTC_Room.findTags, 100);
+      // setTimeout(WRTC_Room.findTags, 250);
     }
   },
   aceAttribsToClasses: function aceAttribsToClasses(hook, context) {
@@ -250,26 +253,34 @@ exports.handleClientMessage_RTC_MESSAGE = hooks.handleClientMessage_RTC_MESSAGE;
 exports.aceSelectionChanged = hooks.aceSelectionChanged;
 exports.aceInitialized = hooks.aceInitialized;
 exports.chatNewMessage = hooks.chatNewMessage;
+
+exports.acePostWriteDomLineHTML = function (name, context) {
+	const hasHeader = $(context.node).find(":header");
+	if(hasHeader.length){
+		const headerId = hasHeader.find('.videoHeader').attr('data-id');
+		setTimeout(() => {
+			WRTC_Room.appendVideoIcon(headerId)
+		}, 250);
+	}
+}
+
 exports.aceDomLineProcessLineAttributes = function (name, context) {
   const cls = context.cls;
   const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
   const headingType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
-  const result = [];
+	const result = [];
   if (videoHEaderType && headingType) {
     const modifier = {
-      preHtml: `<nd-video class="videoHeader ${videoHEaderType[1]}" data-htag="${headingType[1]}">`,
+      preHtml: `<nd-video class="videoHeader ${videoHEaderType[1]}" data-id="${videoHEaderType[1]}" data-htag="${headingType[1]}">`,
       postHtml: '</nd-video>',
       processedMarker: true,
-    };
+		};
+		
 		result.push(modifier);
 
-		// if( share.wrtcStore[videoHEaderType[1]] ){
-		// 	console.log("find that tag!")
-		// 	setTimeout(()=>{
-		// 		console.log()
-		// 		WRTC_Room.findTags()
-		// 	}, 500);
-		// }
+		setTimeout(() => {
+			WRTC_Room.appendVideoIcon(videoHEaderType[1], {createAgain: true})
+		}, 100);
 
   }
   return result;
