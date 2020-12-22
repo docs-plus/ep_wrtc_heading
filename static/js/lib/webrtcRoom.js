@@ -401,12 +401,13 @@ var WRTC_Room = (function WRTC_Room() {
 				videoChatLimit: VIDEOCHATLIMIT,
 			};
 
-			const box = $('#wertc_roomBox').tmpl(data);
-			target.find('#wbrtc_chatBox').append(box);
-			const avatarBox = $('#wertc_inlineAvatar').tmpl(data);
-			target.find('#wbrtc_avatarCol').append(avatarBox);
+			if (target.find(`#${data.headingTagId}`).length <= 0) {
+				const box = $('#wertc_roomBox').tmpl(data);
+				target.find('#wbrtc_chatBox').append(box);
+				const avatarBox = $('#wertc_inlineAvatar').tmpl(data);
+				target.find('#wbrtc_avatarCol').append(avatarBox);
+			}
 			self.adoptHeaderYRoom();
-
 		},
     findTags: function findTags() {
       const components = share.wrtcStore.components;
