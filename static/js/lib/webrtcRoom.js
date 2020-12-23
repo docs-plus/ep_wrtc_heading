@@ -136,15 +136,16 @@ var WRTC_Room = (function WRTC_Room() {
     }
   }
 
-  function joinByQueryString() {
-    const urlParams = new URLSearchParams(window.location.search);
+  function joinByQueryString(url) {
+		url = url || window.location.search;
+    const urlParams = new URLSearchParams(url);
     const headerId = urlParams.get('id');
     let target = urlParams.get('target');
     const join = urlParams.get('join');
 
     if (!headerId) return true;
 
-    const hasThisHeader = share.wrtcStore[headerId];
+    const hasThisHeader = rooms[headerId];
     if (!hasThisHeader) {
       $.gritter.add({
         title: 'Error',
@@ -248,7 +249,14 @@ var WRTC_Room = (function WRTC_Room() {
     $(document).on('click', '#werc_toolbar .btn_roomHandler, .btn_controllers .btn_roomHandler', roomBtnHandler);
 
     // ep_full_hyperlinks link listner
-    $wbrtc_roomBox.on('click', 'a.btn_roomHandler', roomBtnHandler);
+    share.$body_ace_outer().find('iframe').contents().find('#innerdocbody')
+    	.children('div').on('click', 'a.btn_roomHandler', function (event) { 
+				const href = $(this).attr("href");
+				joinByQueryString(href);
+				event.stopImmediatePropagation();
+				event.preventDefault();
+			});
+
     $(document).on('click', 'a.btn_roomHandler', roomBtnHandler);
     // share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function mouseenter() {
     // 	$(this).parent().css({ overflow: 'initial' });
@@ -302,6 +310,7 @@ var WRTC_Room = (function WRTC_Room() {
   }
 
   var self = {
+		roomBtnHandler,
     getHeaderRoomX,
     aceSetAuthorStyle: function aceSetAuthorStyle(context) {
       if (context.author) {
@@ -378,6 +387,10 @@ var WRTC_Room = (function WRTC_Room() {
 			if(!headerId) return false;
 			if(!options.createAgain && rooms[headerId]) return false;
 			rooms[headerId] = {};
+
+			if (!share.wrtcStore[headerId]) {
+				share.wrtcStore[headerId] = {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0};
+			}
 			
 			const $el = share.$body_ace_outer().find('iframe')
 			.contents()
