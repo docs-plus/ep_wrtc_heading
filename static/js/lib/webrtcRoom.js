@@ -249,14 +249,17 @@ var WRTC_Room = (function WRTC_Room() {
     $(document).on('click', '#werc_toolbar .btn_roomHandler, .btn_controllers .btn_roomHandler', roomBtnHandler);
 
     // ep_full_hyperlinks link listner
-    share.$body_ace_outer().find('iframe').contents().find('#innerdocbody')
-    	.children('div').on('click', 'a.btn_roomHandler', function (event) { 
-				const href = $(this).attr("href");
-				joinByQueryString(href);
-				event.stopImmediatePropagation();
-				event.preventDefault();
-			});
+    // share.$body_ace_outer().find('iframe').contents().find('#innerdocbody')
+    // 	.children('div').on('click', 'span.btn_roomHandler', function (event) { 
+		// 		event.stopImmediatePropagation();
+		// 		event.preventDefault();
+		// 		// console.log($(this).attr())
+		// 		const href = $(this).attr("data-href");
+		// 		console.log(href, "=-=-=--=-==-=-")
+		// 		// joinByQueryString(href);
+		// 	});
 
+		$wbrtc_roomBox.on('click', 'a.btn_roomHandler', roomBtnHandler);
     $(document).on('click', 'a.btn_roomHandler', roomBtnHandler);
     // share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function mouseenter() {
     // 	$(this).parent().css({ overflow: 'initial' });
@@ -310,6 +313,7 @@ var WRTC_Room = (function WRTC_Room() {
   }
 
   var self = {
+		joinByQueryString,
 		roomBtnHandler,
     getHeaderRoomX,
     aceSetAuthorStyle: function aceSetAuthorStyle(context) {
