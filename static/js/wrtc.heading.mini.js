@@ -5438,7 +5438,7 @@ var share = (function share() {
         if (userInList.userId) {
           if (index < inlineAvatarLimit) {
             $element.find('.avatarMore').hide();
-            $element.append(`<div class="avatar" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
+            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
           } else {
             $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
           }
@@ -5462,7 +5462,7 @@ var share = (function share() {
         if (userInList.userId) {
           if (index < inlineAvatarLimit) {
             $element.find('.avatarMore').hide();
-            $element.append(`<div class="avatar" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
+            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
           } else {
             $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
           }
@@ -5604,7 +5604,30 @@ var share = (function share() {
       $btnVideo.attr({'data-action': newAction}).prop('disabled', false);
       $btnPlus.attr({'data-action': newAction}).prop('disabled', false);
     }
-  });
+	});
+	
+	wrtcPubsub.on("updateWrtcToolbarModal", (headerId, roomInfo) => {
+		// find toolbar attribute and update all of thems.
+		// update toolbar title
+		// update inlineAvatar
+
+		const $header = findAceHeaderElement(headerId);
+		const headerTile = $header.text();
+
+		$('#wrtc_modal #werc_toolbar .nd_title .title').html(headerTile);
+		$(document).find('#wrtc_textChatWrapper .textChatToolbar b').text(headerTile);
+
+		$(document).find('#wrtc_textChatWrapper  [data-id], #wrtc_modal [data-id]')
+		.each(function(){
+			$(this).attr({'data-id': headerId})
+		});
+		
+	})
+
+	function findAceHeaderElement (headerId) {
+		return $body_ace_outer().find('iframe').contents()
+			.find('#innerdocbody').find(`.videoHeader.${headerId}`);
+	}
 
   return {
     hElements,
@@ -5620,7 +5643,8 @@ var share = (function share() {
     wrtcPubsub,
     getUserId,
     stopStreaming,
-    getValidUrl,
+		getValidUrl,
+		findAceHeaderElement
 
   };
 })();
@@ -6290,15 +6314,11 @@ var textChat = (function textChat() {
     if (!headerId) return false;
     const existTextChat = $(document).find('#wrtc_textChatWrapper');
     if (!existTextChat.length) {
-      const textChatBox = $('#wrtc_textChatBox').tmpl({
-        headerId,
-        headTitle,
-      });
-      $('body').append(textChatBox);
+
     } else {
       // TODO: change this to template
-      existTextChat.attr({'data-id': headerId}).find('.textChatToolbar b, .btn_leave').attr({'data-id': headerId});
-      existTextChat.find('.nd_title b').text(headTitle);
+      // existTextChat.attr({'data-id': headerId}).find('.textChatToolbar b, .btn_leave').attr({'data-id': headerId});
+      // existTextChat.find('.nd_title b').text(headTitle);
     }
 
     // for animation pop up
@@ -6475,7 +6495,12 @@ var textChat = (function textChat() {
     padId = docId;
     share.wrtcPubsub.emit('component status', 'text', true);
     eventListers();
-  }
+	}
+	
+	function appendTextChatModalToBody () {
+		const textChatModal = $('#wrtcTextChatModal').tmpl({});
+		$('body').append(textChatModal);
+	}
 
   return {
     postAceInit,
@@ -6484,7 +6509,9 @@ var textChat = (function textChat() {
     userJoin,
     userLeave,
     removeUserFromRoom,
-    addUserToRoom,
+		addUserToRoom,
+		appendTextChatModalToBody,
+
   };
 })();
 
@@ -6674,8 +6701,8 @@ var videoChat = (function videoChat() {
       share.roomBoxIconActive();
       startWatchNetwork();
 
-      $('#werc_toolbar p').attr({'data-id': data.headerId}).text(headerTitle);
-      $('#werc_toolbar .btn_roomHandler').attr({'data-id': data.headerId});
+      // $('#werc_toolbar p').attr({'data-id': data.headerId}).text(headerTitle);
+      // $('#werc_toolbar .btn_roomHandler').attr({'data-id': data.headerId});
 
       window.headerId = data.headerId;
       // WRTC.activate(data.headerId, user.userId);
@@ -6892,7 +6919,7 @@ var videoChat = (function videoChat() {
 
 'use strict';
 
-var WRTC_Room = (function WRTC_Room() {
+var WrtcRoom = (function WrtcRoom() {
   let socket = null;
   let padId = null;
 	let VIDEOCHATLIMIT = 0;
@@ -6932,13 +6959,17 @@ var WRTC_Room = (function WRTC_Room() {
   */
   function roomBtnHandler(actions, headerId, target) {
     if (typeof actions !== 'string') {
-      actions.preventDefault();
-      // actions.stopPropagation();
+			actions.preventDefault();
+
+			// no idea! but in somecases! this function fire twice! 
+			// the first one has selector, but the second one has not any selector
+			if(!actions.handleObj.selector) return false;
     }
     headerId = $(this).attr('data-id') || headerId;
     actions = $(this).attr('data-action') || actions;
-    target = $(this).attr('data-join') || target;
-
+		target = $(this).attr('data-join') || target;
+		
+		
     if (!headerId || !target) return true;
 
     const hasHref = $(this).attr('href');
@@ -6972,9 +7003,15 @@ var WRTC_Room = (function WRTC_Room() {
       return false;
     }
 
-    if (actions !== 'SHARELINK') { share.wrtcPubsub.emit('disable room buttons', headerId, actions, target); }
+    if (actions !== 'SHARELINK' &&  actions !== 'USERPROFILEMODAL') { share.wrtcPubsub.emit('disable room buttons', headerId, actions, target); }
+
+
+
 
     if (actions === 'JOIN') {
+			// update modal title, attributes and inline avatart
+			share.wrtcPubsub.emit('updateWrtcToolbarModal', headerId, userInfo);
+
       switch (target) {
         case 'PLUS':
           joinChatRoom(headerId, userInfo, target);
@@ -7006,7 +7043,9 @@ var WRTC_Room = (function WRTC_Room() {
       videoChat.reloadSession(headerId, userInfo, target, actions);
     } else if (actions === 'SHARELINK') {
       shareRoomsLink(headerId, target);
-    }
+    } else if (actions === 'USERPROFILEMODAL'){
+			showUserProfileModal(headerId)
+		}
   }
 
   function joinByQueryString(url) {
@@ -7072,8 +7111,8 @@ var WRTC_Room = (function WRTC_Room() {
     return offsetTop + height / 2 - 25;
   }
 
-  function showUserProfileModal() {
-    const userId = $(this).attr('data-id');
+  function showUserProfileModal(headerId) {
+    const userId = $(this).attr('data-id') || headerId;
 		const user = window.clientVars.ep_profile_list[userId];
 		if(!user) return false;
     const imageUrl = user.imageUrl || `/p/getUserProfileImage/${userId}/${padId}?t=${new Date().getTime()}`;
@@ -7100,14 +7139,9 @@ var WRTC_Room = (function WRTC_Room() {
   function activeEventListener() {
     const $AceOuter = share.$body_ace_outer();
 
-		$AceOuter.on('click', 'a.btn_roomHandler, button.btn_roomHandler', roomBtnHandler);
-    $AceOuter.on('click', '.wrtcIconLine .wrtc_inlineAvatars .avatar', showUserProfileModal);
-
-    $(document).on('click', '.wrtc_inlineAvatars > .avatar, .wrtc_inlineAvatars > .avatarMore', showUserProfileModal);
-    $(document).on('click', '#chattext .wrtc_roomLink', roomBtnHandler);
-    $(document).on('click', '#werc_toolbar .btn_roomHandler, .btn_controllers .btn_roomHandler', roomBtnHandler);
-    $(document).on('click', 'a.btn_roomHandler', roomBtnHandler);
-
+		$AceOuter.on('click', '.btn_roomHandler', roomBtnHandler);
+		
+		$(document).on('click', '.btn_roomHandler', roomBtnHandler);
 
     $(document).on('mouseenter', '.video-container.local-user', () => {
       $(document).find('#wrtc_modal #networkStatus').addClass('active');
@@ -7326,15 +7360,15 @@ var WRTC = (function WRTC() {
         if (context.data.payload.data.headerId === window.headerId) self.receiveMessage(context.data.payload);
       });
     },
-    appendInterfaceLayout: function appendInterfaceLayout() {
-      // TODO: legacy code, move it to template
-      const werc_toolbar = $('#wertc_modal_toolbar').tmpl({
+    appendVideoModalToBody: function appendVideoModalToBody() {
+
+      const $wrtcVideoModal = $('#wrtcVideoModal').tmpl({
         videoChatLimit: clientVars.webrtc.videoChatLimit,
         headerId: '',
-      });
-      const $wrtc_modal = $('<div id="wrtc_modal"><div id="networkStatus"></div><div class="videoWrapper" class="thin-scrollbar"></div><div id="networkError"></div></div');
-      $wrtc_modal.append(werc_toolbar);
-      $('body').prepend($wrtc_modal);
+			});
+			
+			$('body').prepend($wrtcVideoModal);
+			
       $(document).on('click', '#wrtc_modal .btn_toggle_modal', function () {
         const $parent = $(this).parent().parent();
         const action = $(this).attr('data-action');
@@ -7356,7 +7390,8 @@ var WRTC = (function WRTC() {
             transform: 'translate(-50%, 0)',
           });
         }
-      });
+			});
+			
       $(document).on('click', '#wrtc_settings .btn_info', function click() {
         const userID = Object.keys(pc);
         const $this = $(this);
@@ -7417,12 +7452,14 @@ var WRTC = (function WRTC() {
             }, 1000);
           })();
         }
-      });
+			});
+			
       $(document).on('click', '#wrtc_settings .btn_close', () => {
         $('#wrtc_settings').toggleClass('active');
         const $btnInfo = $('#wrtc_settings .btn_info');
         if ($btnInfo.attr('data-active')) $btnInfo.trigger('click');
-      });
+			});
+			
     },
     aceSetAuthorStyle: function aceSetAuthorStyle(context) {
       if (context.author) {

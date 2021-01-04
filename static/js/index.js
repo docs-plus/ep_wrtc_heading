@@ -22,7 +22,7 @@ var EPwrtcHeading = (function EPwrtcHeading() {
     padOuter.find('#wrtcVideoIcons').removeClass('active');
     $('#rtcbox').removeClass('active');
     // TODO: fully disable plugin
-    // WRTC_Room.hangupAll();
+    // WrtcRoom.hangupAll();
   }
 
   function init(ace, padId, userId) {
@@ -159,32 +159,34 @@ var hooks = {
     WRTC.postAceInit(hook, context, socket, padId);
     videoChat.postAceInit(hook, context, socket, padId);
     textChat.postAceInit(hook, context, socket, padId);
-    WRTC_Room.postAceInit(hook, context, socket, padId);
+    WrtcRoom.postAceInit(hook, context, socket, padId);
 
+		// When Editor is ready, append video and textChat modal to body
     $('#editorcontainer iframe').ready(() => {
-      WRTC.appendInterfaceLayout();
-      // setTimeout(WRTC_Room.findTags, 250);
+			WRTC.appendVideoModalToBody();
+			textChat.appendTextChatModalToBody();
+      // setTimeout(WrtcRoom.findTags, 250);
     });
 
-    $(window).resize(_.debounce(WRTC_Room.adoptHeaderYRoom, 250));
+    $(window).resize(_.debounce(WrtcRoom.adoptHeaderYRoom, 250));
   },
   aceEditEvent: function aceEditEvent(hook, context) {
     const eventType = context.callstack.editEvent.eventType;
     // ignore these types
 		if ('handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps'.includes(eventType)) return;
 		
-		if(context.callstack.domClean) WRTC_Room.adoptHeaderYRoom();
+		if(context.callstack.domClean) WrtcRoom.adoptHeaderYRoom();
 
     // some times init ep_wrtc_heading is not yet in the plugin list
-    if (context.callstack.docTextChanged) WRTC_Room.adoptHeaderYRoom();
+    if (context.callstack.docTextChanged) WrtcRoom.adoptHeaderYRoom();
 
     // apply changes to the other user
     if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
-			// setTimeout(WRTC_Room.findTags, 250);
+			// setTimeout(WrtcRoom.findTags, 250);
     }
 
     if (eventType === 'insertheading') {
-      // setTimeout(WRTC_Room.findTags, 250);
+      // setTimeout(WrtcRoom.findTags, 250);
     }
   },
   aceAttribsToClasses: function aceAttribsToClasses(hook, context) {
@@ -197,11 +199,11 @@ var hooks = {
     return [`ep_wrtc_heading/static/css/wrtcRoom.css?v=${version}`];
   },
   aceSetAuthorStyle: function aceSetAuthorStyle(hook, context) {
-    WRTC_Room.aceSetAuthorStyle(context);
+    WrtcRoom.aceSetAuthorStyle(context);
     WRTC.aceSetAuthorStyle(context);
   },
   userLeave: function userLeave(hook, context, callback) {
-    WRTC_Room.userLeave(context, callback);
+    WrtcRoom.userLeave(context, callback);
     WRTC.userLeave(null, context, callback);
   },
   handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
@@ -259,7 +261,7 @@ exports.acePostWriteDomLineHTML = function (name, context) {
 	if(hasHeader.length){
 		const headerId = hasHeader.find('.videoHeader').attr('data-id');
 		setTimeout(() => {
-			WRTC_Room.appendVideoIcon(headerId)
+			WrtcRoom.appendVideoIcon(headerId)
 		}, 250);
 	}
 }
@@ -281,7 +283,7 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
 		setTimeout(() => {
 			flagme++
 			console.log("countme", flagme)
-			WRTC_Room.appendVideoIcon(videoHEaderType[1], {createAgain: true})
+			WrtcRoom.appendVideoIcon(videoHEaderType[1], {createAgain: true})
 		}, 100);
 
   }

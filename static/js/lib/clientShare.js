@@ -181,7 +181,7 @@ var share = (function share() {
         if (userInList.userId) {
           if (index < inlineAvatarLimit) {
             $element.find('.avatarMore').hide();
-            $element.append(`<div class="avatar" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
+            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
           } else {
             $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
           }
@@ -205,7 +205,7 @@ var share = (function share() {
         if (userInList.userId) {
           if (index < inlineAvatarLimit) {
             $element.find('.avatarMore').hide();
-            $element.append(`<div class="avatar" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
+            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
           } else {
             $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
           }
@@ -347,7 +347,30 @@ var share = (function share() {
       $btnVideo.attr({'data-action': newAction}).prop('disabled', false);
       $btnPlus.attr({'data-action': newAction}).prop('disabled', false);
     }
-  });
+	});
+	
+	wrtcPubsub.on("updateWrtcToolbarModal", (headerId, roomInfo) => {
+		// find toolbar attribute and update all of thems.
+		// update toolbar title
+		// update inlineAvatar
+
+		const $header = findAceHeaderElement(headerId);
+		const headerTile = $header.text();
+
+		$('#wrtc_modal #werc_toolbar .nd_title .title').html(headerTile);
+		$(document).find('#wrtc_textChatWrapper .textChatToolbar b').text(headerTile);
+
+		$(document).find('#wrtc_textChatWrapper  [data-id], #wrtc_modal [data-id]')
+		.each(function(){
+			$(this).attr({'data-id': headerId})
+		});
+		
+	})
+
+	function findAceHeaderElement (headerId) {
+		return $body_ace_outer().find('iframe').contents()
+			.find('#innerdocbody').find(`.videoHeader.${headerId}`);
+	}
 
   return {
     hElements,
@@ -363,7 +386,8 @@ var share = (function share() {
     wrtcPubsub,
     getUserId,
     stopStreaming,
-    getValidUrl,
+		getValidUrl,
+		findAceHeaderElement
 
   };
 })();

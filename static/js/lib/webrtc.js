@@ -74,15 +74,15 @@ var WRTC = (function WRTC() {
         if (context.data.payload.data.headerId === window.headerId) self.receiveMessage(context.data.payload);
       });
     },
-    appendInterfaceLayout: function appendInterfaceLayout() {
-      // TODO: legacy code, move it to template
-      const werc_toolbar = $('#wertc_modal_toolbar').tmpl({
+    appendVideoModalToBody: function appendVideoModalToBody() {
+
+      const $wrtcVideoModal = $('#wrtcVideoModal').tmpl({
         videoChatLimit: clientVars.webrtc.videoChatLimit,
         headerId: '',
-      });
-      const $wrtc_modal = $('<div id="wrtc_modal"><div id="networkStatus"></div><div class="videoWrapper" class="thin-scrollbar"></div><div id="networkError"></div></div');
-      $wrtc_modal.append(werc_toolbar);
-      $('body').prepend($wrtc_modal);
+			});
+			
+			$('body').prepend($wrtcVideoModal);
+			
       $(document).on('click', '#wrtc_modal .btn_toggle_modal', function () {
         const $parent = $(this).parent().parent();
         const action = $(this).attr('data-action');
@@ -104,7 +104,8 @@ var WRTC = (function WRTC() {
             transform: 'translate(-50%, 0)',
           });
         }
-      });
+			});
+			
       $(document).on('click', '#wrtc_settings .btn_info', function click() {
         const userID = Object.keys(pc);
         const $this = $(this);
@@ -165,12 +166,14 @@ var WRTC = (function WRTC() {
             }, 1000);
           })();
         }
-      });
+			});
+			
       $(document).on('click', '#wrtc_settings .btn_close', () => {
         $('#wrtc_settings').toggleClass('active');
         const $btnInfo = $('#wrtc_settings .btn_info');
         if ($btnInfo.attr('data-active')) $btnInfo.trigger('click');
-      });
+			});
+			
     },
     aceSetAuthorStyle: function aceSetAuthorStyle(context) {
       if (context.author) {

@@ -1,6 +1,6 @@
 'use strict';
 
-var WRTC_Room = (function WRTC_Room() {
+var WrtcRoom = (function WrtcRoom() {
   let socket = null;
   let padId = null;
 	let VIDEOCHATLIMIT = 0;
@@ -40,13 +40,17 @@ var WRTC_Room = (function WRTC_Room() {
   */
   function roomBtnHandler(actions, headerId, target) {
     if (typeof actions !== 'string') {
-      actions.preventDefault();
-      // actions.stopPropagation();
+			actions.preventDefault();
+
+			// no idea! but in somecases! this function fire twice! 
+			// the first one has selector, but the second one has not any selector
+			if(!actions.handleObj.selector) return false;
     }
     headerId = $(this).attr('data-id') || headerId;
     actions = $(this).attr('data-action') || actions;
-    target = $(this).attr('data-join') || target;
-
+		target = $(this).attr('data-join') || target;
+		
+		
     if (!headerId || !target) return true;
 
     const hasHref = $(this).attr('href');
@@ -80,9 +84,15 @@ var WRTC_Room = (function WRTC_Room() {
       return false;
     }
 
-    if (actions !== 'SHARELINK') { share.wrtcPubsub.emit('disable room buttons', headerId, actions, target); }
+    if (actions !== 'SHARELINK' &&  actions !== 'USERPROFILEMODAL') { share.wrtcPubsub.emit('disable room buttons', headerId, actions, target); }
+
+
+
 
     if (actions === 'JOIN') {
+			// update modal title, attributes and inline avatart
+			share.wrtcPubsub.emit('updateWrtcToolbarModal', headerId, userInfo);
+
       switch (target) {
         case 'PLUS':
           joinChatRoom(headerId, userInfo, target);
@@ -114,7 +124,9 @@ var WRTC_Room = (function WRTC_Room() {
       videoChat.reloadSession(headerId, userInfo, target, actions);
     } else if (actions === 'SHARELINK') {
       shareRoomsLink(headerId, target);
-    }
+    } else if (actions === 'USERPROFILEMODAL'){
+			showUserProfileModal(headerId)
+		}
   }
 
   function joinByQueryString(url) {
@@ -180,8 +192,8 @@ var WRTC_Room = (function WRTC_Room() {
     return offsetTop + height / 2 - 25;
   }
 
-  function showUserProfileModal() {
-    const userId = $(this).attr('data-id');
+  function showUserProfileModal(headerId) {
+    const userId = $(this).attr('data-id') || headerId;
 		const user = window.clientVars.ep_profile_list[userId];
 		if(!user) return false;
     const imageUrl = user.imageUrl || `/p/getUserProfileImage/${userId}/${padId}?t=${new Date().getTime()}`;
@@ -208,14 +220,9 @@ var WRTC_Room = (function WRTC_Room() {
   function activeEventListener() {
     const $AceOuter = share.$body_ace_outer();
 
-		$AceOuter.on('click', 'a.btn_roomHandler, button.btn_roomHandler', roomBtnHandler);
-    $AceOuter.on('click', '.wrtcIconLine .wrtc_inlineAvatars .avatar', showUserProfileModal);
-
-    $(document).on('click', '.wrtc_inlineAvatars > .avatar, .wrtc_inlineAvatars > .avatarMore', showUserProfileModal);
-    $(document).on('click', '#chattext .wrtc_roomLink', roomBtnHandler);
-    $(document).on('click', '#werc_toolbar .btn_roomHandler, .btn_controllers .btn_roomHandler', roomBtnHandler);
-    $(document).on('click', 'a.btn_roomHandler', roomBtnHandler);
-
+		$AceOuter.on('click', '.btn_roomHandler', roomBtnHandler);
+		
+		$(document).on('click', '.btn_roomHandler', roomBtnHandler);
 
     $(document).on('mouseenter', '.video-container.local-user', () => {
       $(document).find('#wrtc_modal #networkStatus').addClass('active');

@@ -115,15 +115,11 @@ var textChat = (function textChat() {
     if (!headerId) return false;
     const existTextChat = $(document).find('#wrtc_textChatWrapper');
     if (!existTextChat.length) {
-      const textChatBox = $('#wrtc_textChatBox').tmpl({
-        headerId,
-        headTitle,
-      });
-      $('body').append(textChatBox);
+
     } else {
       // TODO: change this to template
-      existTextChat.attr({'data-id': headerId}).find('.textChatToolbar b, .btn_leave').attr({'data-id': headerId});
-      existTextChat.find('.nd_title b').text(headTitle);
+      // existTextChat.attr({'data-id': headerId}).find('.textChatToolbar b, .btn_leave').attr({'data-id': headerId});
+      // existTextChat.find('.nd_title b').text(headTitle);
     }
 
     // for animation pop up
@@ -300,7 +296,12 @@ var textChat = (function textChat() {
     padId = docId;
     share.wrtcPubsub.emit('component status', 'text', true);
     eventListers();
-  }
+	}
+	
+	function appendTextChatModalToBody () {
+		const textChatModal = $('#wrtcTextChatModal').tmpl({});
+		$('body').append(textChatModal);
+	}
 
   return {
     postAceInit,
@@ -309,6 +310,8 @@ var textChat = (function textChat() {
     userJoin,
     userLeave,
     removeUserFromRoom,
-    addUserToRoom,
+		addUserToRoom,
+		appendTextChatModalToBody,
+
   };
 })();

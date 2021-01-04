@@ -487,7 +487,7 @@
 	background-color: white;
 	box-shadow: -1px 0px 2px rgb(87, 98, 115, .1), 1px 7px 2px rgb(87, 98, 115, .1);
 	border: 1px solid #e6e7e7;
-	z-index: 100000;
+	z-index: 900;
 	border-radius: 6px 6px 0 0;
 	border-bottom: none;
 	display: flex;
@@ -695,6 +695,7 @@
 	display: flex;
 	flex-direction: row;
 	cursor: pointer;
+	outline: none;
 }
 .wrtc_inlineAvatars > .avatar img{
 	float: left;
