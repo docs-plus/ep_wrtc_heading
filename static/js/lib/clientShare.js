@@ -109,7 +109,7 @@ var share = (function share() {
   };
 
   const roomBoxIconActive = function roomBoxIconActive() {
-    $body_ace_outer().find('.wbrtc_roomBox').each((index, val) => {
+    $body_ace_outer().find('.wrtcIconLine').each((index, val) => {
       const textActive = $(val).attr('data-text');
       const videoActive = $(val).attr('data-video');
       if (textActive || videoActive) {
@@ -138,7 +138,8 @@ var share = (function share() {
       text: {active: false},
       video: {active: false},
       room: {active: false},
-    },
+		},
+		rooms: new Map()
   };
 
   const wrtcPubsub = {
@@ -175,7 +176,6 @@ var share = (function share() {
       const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
       const $element = $body_ace_outer().find(`#wbrtc_avatarCol .${headerId} .wrtc_inlineAvatars`);
       $element.find('.avatar').remove();
-      $element.parent().css({left: `${WRTC_Room.getHeaderRoomX($element.parent())}px`});
       Object.keys(room).forEach((key, index) => {
         const userInList = getUserFromId(room[key].userId) || {colorId: '', name: 'anonymous'};
         if (userInList.userId) {
@@ -262,34 +262,36 @@ var share = (function share() {
   wrtcPubsub.on('update store', (requestUser, headerId, action, target, roomInfo, callback) => {
     if (!requestUser || !headerId || !action || !roomInfo || !target) return false;
 
-    if (!wrtcStore[headerId]) wrtcStore[headerId] = {};
-    if (!wrtcStore[headerId].USERS) wrtcStore[headerId].USERS = {};
+		if (!wrtcStore.rooms.has(headerId)) 
+			wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
 
-    let users = wrtcStore[headerId].USERS;
-    wrtcStore[headerId][target] = roomInfo;
-    // if(action === "JOIN"){}
-    // if(action === "LEAVE"){}
+
+		const room = wrtcStore.rooms.get(headerId)
+		let users = room.USERS;
+		
+    room[target] = roomInfo;
+
     // remove all users
     users = {};
 
-    if (wrtcStore[headerId].TEXT.list) {
-      wrtcStore[headerId].TEXT.list.forEach((el) => {
+    if (room.TEXT.list) {
+      room.TEXT.list.forEach((el) => {
         if (!users[el.userId]) users[el.userId] = {};
         users[el.userId] = el;
       });
     }
 
-    if (wrtcStore[headerId].VIDEO.list) {
-      wrtcStore[headerId].VIDEO.list.forEach((el) => {
+    if (room.VIDEO.list) {
+      room.VIDEO.list.forEach((el) => {
         if (!users[el.userId]) users[el.userId] = {};
         users[el.userId] = el;
       });
     }
 
-    inlineAvatar[target](headerId, wrtcStore[headerId][target]);
+    inlineAvatar[target](headerId, room[target]);
     inlineAvatar.ROOM(headerId, users);
 
-    if (callback) callback(wrtcStore[headerId]);
+    if (callback) callback(room);
   });
 
   wrtcPubsub.on('disable room buttons', (headerId, actions, target) => {

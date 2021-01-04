@@ -188,7 +188,7 @@ var videoChat = (function videoChat() {
       $('#werc_toolbar .btn_roomHandler').attr({'data-id': data.headerId});
 
       window.headerId = data.headerId;
-      WRTC.activate(data.headerId, user.userId);
+      // WRTC.activate(data.headerId, user.userId);
       currentRoom = data;
 
       $('#rtcbox').prepend(`<h4 class="chatTitle">${headerTitle}</h4>`);
@@ -293,28 +293,6 @@ var videoChat = (function videoChat() {
     return false;
   }
 
-  function socketBulkUpdateRooms(rooms, info, target) {
-    const roomsInfo = {};
-    // create a roomInfo for each individual room
-    Object.keys(rooms).forEach((headerId) => {
-      const roomInfo = {
-        present: rooms[headerId].length,
-        list: rooms[headerId],
-      };
-      roomsInfo[headerId] = roomInfo;
-    });
-
-    // bind roomInfo and send user to gateway_userJoin
-    Object.keys(rooms).forEach((headerId) => {
-      rooms[headerId].forEach((user) => {
-        gateway_userJoin(user, roomsInfo[headerId], true);
-      });
-    });
-  }
-
-  function bulkUpdateRooms(hTagList) {
-    socket.emit('bulkUpdateRooms', padId, hTagList, 'video', socketBulkUpdateRooms);
-  }
 
   /**
   *
@@ -416,7 +394,6 @@ var videoChat = (function videoChat() {
     userLeave,
     gateway_userJoin,
     gateway_userLeave,
-    bulkUpdateRooms,
     reloadSession,
     reloadCurrentSession,
     mediaDevices,

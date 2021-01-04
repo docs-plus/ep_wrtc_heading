@@ -125,20 +125,6 @@ function socketInit(hookName, args, cb) {
       callback(message, messageId);
     });
 
-    socket.on('bulkUpdateRooms', (padId, hTagList, target, callback) => {
-      let room = null;
-
-      if (target === 'video') {
-        room = videoChat.socketBulkUpdateRooms(padId, hTagList);
-      } else {
-        room = textChat.socketBulkUpdateRooms(padId, hTagList);
-      }
-
-      if (!room.collection || !room.info) return false;
-
-      // socket.broadcast.to(padId).emit(`bulkUpdateRooms:${target}`, room.collection, room.info, target)
-      callback(room.collection, room.info, target);
-    });
 
     socket.on('pingil', (padId, headerId, userId, latency) => {
       socket.broadcast

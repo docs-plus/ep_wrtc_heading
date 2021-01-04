@@ -58,39 +58,6 @@ exports.socketUserLeave = (data) => {
   return result;
 };
 
-exports.socketBulkUpdateRooms = (padId, hTagList) => {
-  const result = {
-    roomCollection: null,
-    roomInfo: null,
-  };
-
-  // remove the room that not available and excrete user from room
-  // hTagList: [ headingTagId ]
-  // remove a pad:headerId, if there is not anymore user in that room
-  hTagList.forEach((el) => {
-    const roomKey = `${padId}:${el.headerId}`;
-    if (rooms[roomKey] && rooms[roomKey].length === 0) { delete rooms[roomKey]; }
-  });
-
-  const roomKeys = Object.keys(rooms).filter((x) => x.includes(padId));
-
-  if (!roomKeys) return result;
-
-  const roomCollection = {};
-
-  roomKeys.forEach((roomKey) => {
-    if (!roomCollection[roomKey]) { roomCollection[roomKey] = rooms[roomKey]; }
-  });
-
-  result.collection = roomCollection;
-  result.info = {
-    present: 0,
-    list: [],
-  };
-
-  return result;
-};
-
 exports.socketDisconnect = (data) => {
   const padId = data.padId;
   const headerId = data.headerId;

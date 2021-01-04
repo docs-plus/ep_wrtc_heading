@@ -294,28 +294,6 @@ var textChat = (function textChat() {
     socket.emit('userLeave', padId, userData, 'text', removeUserFromRoom);
   }
 
-  function socketBulkUpdateRooms(rooms, info, target) {
-    const roomsInfo = {};
-    // create a roomInfo for each individual room
-    Object.keys(rooms).forEach((headerId) => {
-      const roomInfo = {
-        present: rooms[headerId].length,
-        list: rooms[headerId],
-      };
-      roomsInfo[headerId] = roomInfo;
-    });
-
-    // bind roomInfo and send user to gateway_userJoin
-    Object.keys(rooms).forEach((headerId) => {
-      rooms[headerId].forEach((user) => {
-        addUserToRoom(user, roomsInfo[headerId], 'text');
-      });
-    });
-  }
-
-  function bulkUpdateRooms(hTagList) {
-    socket.emit('bulkUpdateRooms', padId, hTagList, 'text', socketBulkUpdateRooms);
-  }
 
   function postAceInit(hook, context, webSocket, docId) {
     socket = webSocket;
@@ -332,6 +310,5 @@ var textChat = (function textChat() {
     userLeave,
     removeUserFromRoom,
     addUserToRoom,
-    bulkUpdateRooms,
   };
 })();

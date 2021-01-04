@@ -4,27 +4,8 @@ var WRTC_Room = (function WRTC_Room() {
   let socket = null;
   let padId = null;
 	let VIDEOCHATLIMIT = 0;
-	const rooms= {}
-  // var $lastJoinButton = null;
-  const prefixHeaderId = 'headingTagId_';
-  const hElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.h1', '.h2', '.h3', '.h4', '.h5', '.h6'];
 
   /** --------- Helper --------- */
-
-  function link2Clipboard(text) {
-    const $temp = $('<input>');
-    $('body').append($temp);
-    $temp.val(text).select();
-    document.execCommand('copy');
-    $temp.remove();
-    $.gritter.add({
-      title: 'Copied',
-      text: 'Join link copied to clip board',
-      sticky: false,
-      class_name: 'copyLinkToClipboard',
-      time: '3000',
-    });
-  }
 
   function scroll2Header(headerId) {
     const padContainer = share.$body_ace_outer().find('iframe').contents().find('#innerdocbody');
@@ -145,8 +126,7 @@ var WRTC_Room = (function WRTC_Room() {
 
     if (!headerId) return true;
 
-    const hasThisHeader = rooms[headerId];
-    if (!hasThisHeader) {
+    if (!share.wrtcStore.rooms.get(headerId)) {
       $.gritter.add({
         title: 'Error',
         text: 'The header seems not to exist anymore!',
@@ -197,22 +177,14 @@ var WRTC_Room = (function WRTC_Room() {
     const paddingTop = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
     const aceOuterPadding = parseInt(paddingTop, 10);
     const offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
-    return offsetTop + height / 2 - 31;
-  }
-
-  function getHeaderRoomX($element) {
-    const width = $element.outerWidth();
-    const paddingLeft = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-left');
-    const aceOuterPadding = parseInt(paddingLeft, 10);
-    const offsetLeft = Math.ceil(share.$body_ace_outer().find('iframe[name="ace_inner"]').offset().left - aceOuterPadding);
-    return offsetLeft - width - 10;
+    return offsetTop + height / 2 - 25;
   }
 
   function showUserProfileModal() {
     const userId = $(this).attr('data-id');
-    const user = window.clientVars.ep_profile_list[userId];
+		const user = window.clientVars.ep_profile_list[userId];
+		if(!user) return false;
     const imageUrl = user.imageUrl || `/p/getUserProfileImage/${userId}/${padId}?t=${new Date().getTime()}`;
-    if (!user) return false;
     $('#ep_profile_users_profile_name').text(user.userName);
     $('#ep_profile_users_profile_desc').text(user.about);
     $('#ep_profile_users_profile_homepage').attr({
@@ -234,59 +206,22 @@ var WRTC_Room = (function WRTC_Room() {
   }
 
   function activeEventListener() {
-    const $wbrtc_roomBox = share.$body_ace_outer();
+    const $AceOuter = share.$body_ace_outer();
 
-    $wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_text', roomBtnHandler);
-    $wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_text', roomBtnHandler);
-    $wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_video', roomBtnHandler);
-    $wbrtc_roomBox.on('click', '.wbrtc_roomBox .btn_joinChat_chatRoom', roomBtnHandler);
+		$AceOuter.on('click', 'a.btn_roomHandler, button.btn_roomHandler', roomBtnHandler);
+    $AceOuter.on('click', '.wrtcIconLine .wrtc_inlineAvatars .avatar', showUserProfileModal);
 
-    $wbrtc_roomBox.on('click', '#wbrtc_avatarCol .wrtc_roomInlineAvatar .avatar', showUserProfileModal);
     $(document).on('click', '.wrtc_inlineAvatars > .avatar, .wrtc_inlineAvatars > .avatarMore', showUserProfileModal);
-
     $(document).on('click', '#chattext .wrtc_roomLink', roomBtnHandler);
-
     $(document).on('click', '#werc_toolbar .btn_roomHandler, .btn_controllers .btn_roomHandler', roomBtnHandler);
-
-    // ep_full_hyperlinks link listner
-    // share.$body_ace_outer().find('iframe').contents().find('#innerdocbody')
-    // 	.children('div').on('click', 'span.btn_roomHandler', function (event) { 
-		// 		event.stopImmediatePropagation();
-		// 		event.preventDefault();
-		// 		// console.log($(this).attr())
-		// 		const href = $(this).attr("data-href");
-		// 		console.log(href, "=-=-=--=-==-=-")
-		// 		// joinByQueryString(href);
-		// 	});
-
-		$wbrtc_roomBox.on('click', 'a.btn_roomHandler', roomBtnHandler);
     $(document).on('click', 'a.btn_roomHandler', roomBtnHandler);
-    // share.$body_ace_outer().on('mouseenter', '.wbrtc_roomBox', function mouseenter() {
-    // 	$(this).parent().css({ overflow: 'initial' });
-    // 	$(this).addClass('active').find('.wrtc_contentBody').css({ display: 'block' });
-    // }).on('mouseleave', '.wbrtc_roomBox', function mouseleave() {
-    // 	$(this).parent().css({ overflow: 'hidden' });
-    // 	$(this).removeClass('active').find('.wrtc_contentBody').css({ display: 'none' });
-    // });
+
 
     $(document).on('mouseenter', '.video-container.local-user', () => {
       $(document).find('#wrtc_modal #networkStatus').addClass('active');
     }).on('mouseleave', '.video-container.local-user', () => {
       $(document).find('#wrtc_modal #networkStatus').removeClass('active');
     });
-
-    share.$body_ace_outer().on('click', '.wbrtc_roomBoxFooter > button.btn_share', function click() {
-      const headerURI = $(this).find('input').val();
-      link2Clipboard(headerURI);
-    });
-
-    // share.$body_ace_outer().on('mouseenter', '.wrtc_roomInlineAvatar .avatar', function mouseenter() {
-    // 	var id = $(this).parent().parent().attr('id');
-    // 	share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseenter');
-    // }).on('mouseleave', '.wrtc_roomInlineAvatar .avatar', function mouseleave() {
-    // 	var id = $(this).parent().parent().attr('id');
-    // 	share.$body_ace_outer().find('#' + id + '.wbrtc_roomBox').trigger('mouseleave');
-    // });
 
     $(document).on('click', '#werc_toolbar p, .textChatToolbar b', function click() {
       const headerId = $(this).attr('data-id');
@@ -315,7 +250,6 @@ var WRTC_Room = (function WRTC_Room() {
   var self = {
 		joinByQueryString,
 		roomBtnHandler,
-    getHeaderRoomX,
     aceSetAuthorStyle: function aceSetAuthorStyle(context) {
       if (context.author) {
         const user = share.getUserFromId(context.author);
@@ -330,10 +264,6 @@ var WRTC_Room = (function WRTC_Room() {
       // Deprecated, we use socket disconnect
 
       callback();
-    },
-    bulkUpdateRooms: function bulkUpdateRooms(hTagList) {
-      videoChat.bulkUpdateRooms(hTagList);
-      textChat.bulkUpdateRooms(hTagList);
     },
     postAceInit: function postAceInit(hook, context, webSocket, docId) {
       socket = webSocket;
@@ -370,7 +300,7 @@ var WRTC_Room = (function WRTC_Room() {
       if (!$padOuter) return;
 
 			// TODO: performance issue
-      $padOuter.find('.wbrtc_roomBox, .wrtc_roomInlineAvatar').each(function adjustHeaderIconPosition() {
+      $padOuter.find('.wrtcIconLine').each(function adjustHeaderIconPosition() {
         const $el = $(this);
         const $boxId = $el.attr('id');
         const hClassId = `.videoHeader.${$boxId}`;
@@ -383,118 +313,47 @@ var WRTC_Room = (function WRTC_Room() {
           return false;
         }
 
-        if ($el.attr('data-box') === 'avatar') $el.css({left: `${getHeaderRoomX($el)}px`});
         $el.css({top: `${getHeaderRoomY($headingEl)}px`});
       });
     },
 		appendVideoIcon: function appendVideoIcon (headerId, options = {createAgain: false}) {
 			if(!headerId) return false;
-			if(!options.createAgain && rooms[headerId]) return false;
-			rooms[headerId] = {};
 
-			if (!share.wrtcStore[headerId]) {
-				share.wrtcStore[headerId] = {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0};
+			const roomExist = share.wrtcStore.rooms.has(headerId)
+			if(!options.createAgain && roomExist) return false;
+
+			if (!roomExist) {
+
+				const $el = share.$body_ace_outer().find('iframe')
+				.contents()
+				.find('#innerdocbody')
+				.children('div')
+				.find(`.videoHeader.${headerId}`);
+
+				const aceInnerOffset = share.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
+				const target = share.$body_ace_outer().find('#outerdocbody');
+				const newY = getHeaderRoomY($el);
+				const newX = Math.ceil(aceInnerOffset.left);
+				const lineNumber = $el.parent().parent().prevAll().length;
+
+				const data = {
+					headingTagId: headerId,
+					positionTop: newY,
+					positionLeft: newX,
+					headTitle: $el.text(),
+					lineNumber: lineNumber,
+					videoChatLimit: VIDEOCHATLIMIT,
+				};
+
+				share.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0})
+
+				const box = $('#wrtcLinesIcons').tmpl(data);
+				target.find('#wrtcVideoIcons').append(box);
 			}
-			
-			const $el = share.$body_ace_outer().find('iframe')
-			.contents()
-			.find('#innerdocbody')
-			.children('div')
-      .find(`.videoHeader.${headerId}`);
 
-			const aceInnerOffset = share.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
-      const target = share.$body_ace_outer().find('#outerdocbody');
-			const newY = getHeaderRoomY($el);
-			const newX = Math.ceil(aceInnerOffset.left);
-      const lineNumber = $el.parent().parent().prevAll().length;
-      
-			const data = {
-				headingTagId: headerId,
-				// tag: tag,
-				positionTop: newY,
-				positionLeft: newX,
-				headTitle: $el.text(),
-				lineNumber: lineNumber,
-				videoChatLimit: VIDEOCHATLIMIT,
-			};
-
-			if (target.find(`#${data.headingTagId}`).length <= 0) {
-				const box = $('#wertc_roomBox').tmpl(data);
-				target.find('#wbrtc_chatBox').append(box);
-				const avatarBox = $('#wertc_inlineAvatar').tmpl(data);
-				target.find('#wbrtc_avatarCol').append(avatarBox);
-			}
 			self.adoptHeaderYRoom();
 		},
-    findTags: function findTags() {
-      const components = share.wrtcStore.components;
-      if (!components.text.active && !components.video.active && !components.room.active) return false;
-      const hTagList = [];
-      const hTagElements = hElements.join(',');
-      const hTags = share.$body_ace_outer().find('iframe')
-          .contents()
-          .find('#innerdocbody')
-          .children('div')
-          .find('.videoHeader');
-
-      const aceInnerOffset = share.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
-      const target = share.$body_ace_outer().find('#outerdocbody');
-      let newHTagAdded = false;
-      $(hTags).each(function createWrtcRoomBox() {
-        const $el = $(this);
-        // var lineNumber = $el.parent().prevAll().length;
-        // var tag = $("#title")[0].tagName.toLowerCase();
-        const newY = getHeaderRoomY($el);
-        const newX = Math.ceil(aceInnerOffset.left);
-        let headingTagId = $el.attr('class');
-        headingTagId = headingTagId.split(' ')[1];
-        const content = $el.html();
-
-        // if heading Id or the h tag has no contetn
-        if (!headingTagId || content.length <= 0) {
-          console.warn("[wrtc]: couldn't find headingTagId.");
-          return true;
-        }
-
-        const data = {
-          headingTagId,
-          // tag: tag,
-          positionTop: newY,
-          positionLeft: newX,
-          headTitle: $el.text(),
-          // lineNumber: lineNumber,
-          videoChatLimit: VIDEOCHATLIMIT,
-        };
-
-        if (!share.wrtcStore[data.headingTagId]) {
-          share.wrtcStore[data.headingTagId] = {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0};
-        }
-
-        // if the header does not exists then adde to list
-        // otherwise update textHeader
-        // TODO: performance issue
-        if (target.find(`#${data.headingTagId}`).length <= 0) {
-          const box = $('#wertc_roomBox').tmpl(data);
-          target.find('#wbrtc_chatBox').append(box);
-          const avatarBox = $('#wertc_inlineAvatar').tmpl(data);
-          target.find('#wbrtc_avatarCol').append(avatarBox);
-          self.adoptHeaderYRoom();
-          newHTagAdded = true;
-        } else {
-          $(document).find(`[data-headid=${data.headingTagId}].wrtc_text .wrtc_roomLink, #werc_toolbar p[data-id=${data.headingTagId}]`).text(data.headTitle);
-          target.find(`.wbrtc_roomBox[id=${data.headingTagId}] .titleRoom`).text(data.headTitle);
-          $(document).find(`#wrtc_textChatWrapper[data-id=${data.headingTagId}] .nd_title b`).text(data.headTitle);
-        }
-
-        hTagList.push(data);
-      });
-      // if a new h tag addedd check all heading again!
-      if (newHTagAdded) {
-        self.bulkUpdateRooms(hTagList);
-        newHTagAdded = false;
-      }
-    },
   };
 
-  return {...self, rooms};
+  return {...self};
 })();

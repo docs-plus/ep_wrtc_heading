@@ -14,12 +14,12 @@ var EPwrtcHeading = (function EPwrtcHeading() {
   let outerBody = null;
 
   function enableWrtcHeading() {
-    padOuter.find('#wbrtc_chatBox').addClass('active');
+    padOuter.find('#wrtcVideoIcons').addClass('active');
     $('#rtcbox').addClass('active');
   }
 
   function disableWrtcHeading() {
-    padOuter.find('#wbrtc_chatBox').removeClass('active');
+    padOuter.find('#wrtcVideoIcons').removeClass('active');
     $('#rtcbox').removeClass('active');
     // TODO: fully disable plugin
     // WRTC_Room.hangupAll();
@@ -70,8 +70,8 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 
     // insert wbrtc containers
     const $target = outerBody;
-    if ($target.find('#wbrtc_chatBox').length) return false;
-    $target.prepend('<div id="wbrtc_chatBox"></div><div id="wbrtc_avatarCol"></div>');
+    if ($target.find('#wrtcVideoIcons').length) return false;
+    $target.prepend('<div id="wrtcVideoIcons"></div><div id="wbrtc_avatarCol"></div>');
 
     // module settings
     $('#options-wrtc-heading').on('change', () => {
@@ -180,7 +180,7 @@ var hooks = {
 
     // apply changes to the other user
     if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
-			setTimeout(WRTC_Room.findTags, 250);
+			// setTimeout(WRTC_Room.findTags, 250);
     }
 
     if (eventType === 'insertheading') {
@@ -263,7 +263,7 @@ exports.acePostWriteDomLineHTML = function (name, context) {
 		}, 250);
 	}
 }
-
+let flagme = 0
 exports.aceDomLineProcessLineAttributes = function (name, context) {
   const cls = context.cls;
   const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
@@ -279,6 +279,8 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
 		result.push(modifier);
 
 		setTimeout(() => {
+			flagme++
+			console.log("countme", flagme)
 			WRTC_Room.appendVideoIcon(videoHEaderType[1], {createAgain: true})
 		}, 100);
 
