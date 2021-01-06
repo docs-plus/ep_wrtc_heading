@@ -93,8 +93,8 @@
 	overflow: hidden;
 	width: 95%;
 	float: left;
-	/* margin-left: 6px; */
 	cursor: pointer;
+	user-select: none;
 }
 
 .btn_controllers{
@@ -533,6 +533,7 @@
 	overflow: hidden;
 	max-width: 80%;
 	cursor: pointer;
+	user-select: none;
 }
 
 #wrtc_textChat{

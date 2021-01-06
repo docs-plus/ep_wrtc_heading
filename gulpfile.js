@@ -32,6 +32,11 @@ const gulpifyJs = function () {
 
 gulp.task('js', gulpifyJs);
 
+gulp.task('html', () => gulp.src('templates/components/*.html')
+    .pipe(htmlmin({collapseWhitespace: true, removeComments: true, minifyJS: true}))
+    .pipe(concat('webrtcComponent.mini.html'))
+    .pipe(gulp.dest('templates')));
+
 gulp.task('watch', () => {
-  gulp.watch(jsfiles, gulp.series(['js']));
+  gulp.watch(jsfiles, gulp.series(['js', 'html']));
 });

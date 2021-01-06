@@ -51,6 +51,10 @@
 	justify-content: center;
 }
 
+.wrtcIconLine.active .wrtcIcon > button svg{
+	color: #2678ff;
+}
+
 .wrtcIconLine .wrtcIcon > button:hover{
 	background-color: #2678ff;
 	color: #fff;
