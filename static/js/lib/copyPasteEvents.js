@@ -1,10 +1,10 @@
 // inspired by ep_comments_page plugin, used and modified copyPasteEvents.js
 
 'use strict';
-var _ = require('ep_etherpad-lite/static/js/underscore');
-var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
+const _ = require('ep_etherpad-lite/static/js/underscore');
+const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 
-var events = (function () {
+const events = (function () {
   let padInner = null;
 
   const getFirstColumnOfSelection = function getFirstColumnOfSelection(line, rep, firstLineOfSelection) {
@@ -36,12 +36,12 @@ var events = (function () {
     let foundHeadOnLine = false;
     let headId = null;
     for (let column = firstColumn; column <= lastColumn && !foundHeadOnLine; column++) {
-			headId = _.object(attributeManager.getAttributesOnLine(lineNumber)).headingTagId;
+      headId = _.object(attributeManager.getAttributesOnLine(lineNumber)).headingTagId;
 
       if (headId) {
         foundHeadOnLine = true;
       }
-		}
+    }
     return {foundHeadOnLine, headId};
   };
 
@@ -141,10 +141,10 @@ var events = (function () {
       } else {
         if (!selection.headId) return false;
         rawHtml = selectionOneLine(selection.headId);
-			}
+      }
 
       if (rawHtml && selection.hasVideoHeader) {
-        e.originalEvent.clipboardData.setData('text/wrtc', JSON.stringify({type: "wrtcHeading",raw: rawHtml, multiLine: selection.hasMultipleLine}));
+        e.originalEvent.clipboardData.setData('text/wrtc', JSON.stringify({type: 'wrtcHeading', raw: rawHtml, multiLine: selection.hasMultipleLine}));
         e.preventDefault();
         return false;
       }
@@ -159,28 +159,28 @@ var events = (function () {
 
   const pastOnSelection = (event, padInner) => {
     const hasWrtcObject = event.originalEvent.clipboardData.getData('text/wrtc');
-		var objectMediaData = event.originalEvent.clipboardData.getData('text/objectMediaData');
+    const objectMediaData = event.originalEvent.clipboardData.getData('text/objectMediaData');
 
     if (hasWrtcObject && !objectMediaData) {
-			let rawHtml = JSON.parse(hasWrtcObject);
-			if(rawHtml.type !== 'wrtcHeading' && !rawHtml.raw) return false;
+      let rawHtml = JSON.parse(hasWrtcObject);
+      if (rawHtml.type !== 'wrtcHeading' && !rawHtml.raw) return false;
 
       rawHtml = $('<div></div>').append(rawHtml.raw);
       rawHtml.find('nd-video').each(function () {
         $(this).attr({class: `nd-video ${randomString(16)}`});
       });
 
-      let selection = padInner.contents()[0].getSelection();
-			if (!selection.rangeCount) return false;
+      const selection = padInner.contents()[0].getSelection();
+      if (!selection.rangeCount) return false;
 
-			let range = selection.getRangeAt(0);
-			range.insertNode(rawHtml[0]);
-			range.collapse(false);
-			selection.removeAllRanges();
-			selection.addRange(range);
+      const range = selection.getRangeAt(0);
+      range.insertNode(rawHtml[0]);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
 
-			event.preventDefault();
-		}
+      event.preventDefault();
+    }
   };
 
   return {

@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var WRTC = (function WRTC() {
+const WRTC = (() => {
   const attemptRonnect = 60;
   let reconnected = 0;
   const videoSizes = {large: '260px', small: '160px'};
@@ -34,7 +34,7 @@ var WRTC = (function WRTC() {
       OfferToReceiveVideo: true,
     },
   };
-  let localStream = null;
+
   const remoteStream = {};
   const pc = {};
   const callQueue = [];
@@ -75,14 +75,13 @@ var WRTC = (function WRTC() {
       });
     },
     appendVideoModalToBody: function appendVideoModalToBody() {
-
       const $wrtcVideoModal = $('#wrtcVideoModal').tmpl({
         videoChatLimit: clientVars.webrtc.videoChatLimit,
         headerId: '',
-			});
-			
-			$('body').prepend($wrtcVideoModal);
-			
+      });
+
+      $('body').prepend($wrtcVideoModal);
+
       $(document).on('click', '#wrtc_modal .btn_toggle_modal', function () {
         const $parent = $(this).parent().parent();
         const action = $(this).attr('data-action');
@@ -104,8 +103,8 @@ var WRTC = (function WRTC() {
             transform: 'translate(-50%, 0)',
           });
         }
-			});
-			
+      });
+
       $(document).on('click', '#wrtc_settings .btn_info', function click() {
         const userID = Object.keys(pc);
         const $this = $(this);
@@ -166,14 +165,13 @@ var WRTC = (function WRTC() {
             }, 1000);
           })();
         }
-			});
-			
+      });
+
       $(document).on('click', '#wrtc_settings .btn_close', () => {
         $('#wrtc_settings').toggleClass('active');
         const $btnInfo = $('#wrtc_settings .btn_info');
         if ($btnInfo.attr('data-active')) $btnInfo.trigger('click');
-			});
-			
+      });
     },
     aceSetAuthorStyle: function aceSetAuthorStyle(context) {
       if (context.author) {
@@ -284,14 +282,11 @@ var WRTC = (function WRTC() {
       self.hide(userId);
       self.hangupAll(headerId);
       self.hangup(userId, true, headerId);
-      if (localStream) {
-        share.stopStreaming(localStream);
-        localStream = null;
-      }
+      if (share.wrtcStore.localstream) share.stopStreaming();
       share.wrtcStore.userInRoom = false;
     },
     toggleMuted: function toggleMuted() {
-      const audioTrack = localStream.getAudioTracks()[0];
+      const audioTrack = share.wrtcStore.localstream.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
         return !audioTrack.enabled; // returning "Muted" state, which is !enabled
@@ -299,7 +294,7 @@ var WRTC = (function WRTC() {
       return true; // if there's no audio track, it's muted
     },
     toggleVideo: function toggleVideo() {
-      const videoTrack = localStream.getVideoTracks()[0];
+      const videoTrack = share.wrtcStore.localstream.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         return !videoTrack.enabled;
@@ -450,19 +445,19 @@ var WRTC = (function WRTC() {
         } else {
           self.createPeerConnection(peer, data.headerId);
         }
-        if (localStream) {
+        if (share.wrtcStore.localstream) {
           if (pc[peer].getLocalStreams) {
             if (!pc[peer].getLocalStreams().length) {
-              localStream.getTracks().forEach((track) => {
-                pc[peer].addTrack(track, localStream);
+              share.wrtcStore.localstream.getTracks().forEach((track) => {
+                pc[peer].addTrack(track, share.wrtcStore.localstream);
               });
 
               // pc[peer].addStream(localStream);
             }
           } else if (pc[peer].localStreams) {
             if (!pc[peer].localStreams.length) {
-              localStream.getTracks().forEach((track) => {
-                pc[peer].addTrack(track, localStream);
+              share.wrtcStore.localstream.getTracks().forEach((track) => {
+                pc[peer].addTrack(track, share.wrtcStore.localstream);
               });
               // pc[peer].addStream(localStream);
             }
@@ -480,7 +475,9 @@ var WRTC = (function WRTC() {
       } else if (type === 'answer') {
         if (pc[peer]) {
           const answer = new RTCSessionDescription(data.answer);
-          pc[peer].setRemoteDescription(answer, () => {}, logError);
+          pc[peer].setRemoteDescription(answer, () => {
+						// console.log("call setRemoteDescription", new Date().getSeconds())
+					}, logError);
         }
       } else if (type === 'icecandidate') {
         if (pc[peer]) {
@@ -516,10 +513,10 @@ var WRTC = (function WRTC() {
       }
     },
     call: function call(userId, headerId) {
-      if (!localStream) {
-        callQueue.push(userId);
-        return;
-      }
+      // if (!localStream) {
+      //   callQueue.push(userId);
+      //   return;
+      // }
       let constraints = {optional: [], mandatory: {}};
       // temporary measure to remove Moz* constraints in Chrome
       if (webrtcDetectedBrowser === 'chrome') {
@@ -531,14 +528,13 @@ var WRTC = (function WRTC() {
       }
       constraints = mergeConstraints(constraints, sdpConstraints);
 
-      if (!pc[userId]) {
-        self.createPeerConnection(userId, headerId);
-      }
+      if (!pc[userId]) self.createPeerConnection(userId, headerId);
+      
 
       // pc[userId].addStream(localStream);
 
-      localStream.getTracks().forEach((track) => {
-        pc[userId].addTrack(track, localStream);
+      share.wrtcStore.localstream.getTracks().forEach((track) => {
+        pc[userId].addTrack(track, share.wrtcStore.localstream);
       });
 
       pc[userId].createOffer((desc) => {
@@ -561,7 +557,7 @@ var WRTC = (function WRTC() {
             candidate: event.candidate,
           });
         } else {
-          reconnected = 0;
+					reconnected = 0;
           socket.emit('acceptNewCall', padId, window.headerId);
         }
       };
@@ -574,10 +570,9 @@ var WRTC = (function WRTC() {
       };
     },
     audioVideoInputChange: function audioVideoInputChange() {
-      share.stopStreaming(localStream);
-      localStream = null;
-
-      self.getUserMedia(window.headerId);
+      share.stopStreaming(() => {
+				self.getUserMedia(window.headerId);
+			});
     },
     attachSinkId: function attachSinkId(element, sinkId) {
       // Attach audio output device to video element using device/sink ID.
@@ -631,13 +626,12 @@ var WRTC = (function WRTC() {
       }
 
       localStorage.setItem('videoSettings', JSON.stringify({microphone: audioSource, speaker: audioOutput, camera: videoSource}));
-      // console.log("joining data: videoSettings", { microphone: audioSource, speaker: audioOutput, camera: videoSource })
       $('#wrtc_modal #networkError').removeClass('active').hide();
 
       window.navigator.mediaDevices
           .getUserMedia(mediaConstraints)
           .then((stream) => {
-            localStream = stream;
+            share.wrtcStore.localstream = stream;
             self.setStream(share.getUserId(), stream);
             self._pad.collabClient.getConnectedUsers().forEach((user) => {
               if (user.userId !== share.getUserId()) {
@@ -676,7 +670,7 @@ var WRTC = (function WRTC() {
       element.src = URL.createObjectURL(stream);
     } else {
       console.error('Error attaching stream to element.', element);
-    }
+		}
   };
   var webrtcDetectedBrowser = 'chrome';
 

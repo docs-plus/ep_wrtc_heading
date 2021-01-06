@@ -136,7 +136,7 @@ var CodecsHandler = (function () {
     peer.getSenders().forEach((sender) => {
       const params = sender.getParameters();
       for (let i = 0; i < params.codecs.length; i++) {
-        if (params.codecs[i].mimeType == codecMimeType) {
+        if (params.codecs[i].mimeType === codecMimeType) {
           params.codecs.unshift(params.codecs.splice(i, 1));
           break;
         }
@@ -268,7 +268,7 @@ var CodecsHandler = (function () {
     }
 
     const opusFmtpLineIndex = findLine(sdpLines, `a=fmtp:${opusPayload.toString()}`);
-    if (opusFmtpLineIndex === null) {
+    if (opusFmtpLineIndex == null) {
       return sdp;
     }
 
@@ -326,7 +326,7 @@ var CodecsHandler = (function () {
         }
       }
     }
-    if (fmtpLineIndex === null) return sdp;
+    if (fmtpLineIndex == null) return sdp;
     sdpLines[fmtpLineIndex] = sdpLines[fmtpLineIndex].concat('; stereo=1; sprop-stereo=1');
     sdp = sdpLines.join('\r\n');
     return sdp;
