@@ -1,31 +1,30 @@
 'use strict';
 
-var $ = require('ep_etherpad-lite/static/js/rjquery').$;
-var _ = require('ep_etherpad-lite/static/js/underscore');
-var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
+const _ = require('ep_etherpad-lite/static/js/underscore');
+const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 
 /** **********************************************************************/
 /*                              Plugin                                  */
 /** **********************************************************************/
 
-var EPwrtcHeading = (function EPwrtcHeading() {
+const EPwrtcHeading = (() => {
   let padOuter = null;
   let padInner = null;
   let outerBody = null;
 
-  function enableWrtcHeading() {
+  const enableWrtcHeading = () => {
     padOuter.find('#wrtcVideoIcons').addClass('active');
     $('#rtcbox').addClass('active');
-  }
+  };
 
-  function disableWrtcHeading() {
+  const disableWrtcHeading = () => {
     padOuter.find('#wrtcVideoIcons').removeClass('active');
     $('#rtcbox').removeClass('active');
     // TODO: fully disable plugin
     // WrtcRoom.hangupAll();
-  }
+  };
 
-  function init(ace, padId, userId) {
+  const init = (ace, padId, userId) => {
     const loc = document.location;
     const port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
     const url = `${loc.protocol}//${loc.hostname}:${port}/` + 'heading_chat_room';
@@ -40,13 +39,6 @@ var EPwrtcHeading = (function EPwrtcHeading() {
     socket.on('disconnect', (reason) => {
       console.error('[wrtc]: socket disconnection, reason:', reason);
       share.wrtcPubsub.emit('socket state', 'DISCONNECTED');
-      // $.gritter.add({
-      // 	title: 'Video socket connection has been disconnected',
-      // 	text: 'Plase use stable internet connection, open up your console for more information; reason:' + reason,
-      // 	sticky: false,
-      // 	class_name: 'error',
-      // 	time: '300'
-      // });
     });
 
     // unfortunately when reconnection happen, etherpad break down totally
@@ -94,13 +86,13 @@ var EPwrtcHeading = (function EPwrtcHeading() {
       });
     }
 
-    window.onerror = function (message, source, lineno, colno, error) {
+    window.onerror = (message, source, lineno, colno, error) => {
       console.error('[wrtc]: windows error, close stream');
       if (window.headerId) WRTC.deactivate(clientVars.userId, window.headerId);
     };
 
     return socket;
-  }
+  };
 
   return Object.freeze({
     init,
@@ -111,11 +103,9 @@ var EPwrtcHeading = (function EPwrtcHeading() {
 /*                           Etherpad Hooks                             */
 /** **********************************************************************/
 
-function getSocket() {
-  return window.pad && window.pad.socket;
-}
+const getSocket = () => window.pad && window.pad.socket;
 
-var hooks = {
+const hooks = {
   postAceInit: function postAceInit(hook, context) {
     if (!$('#editorcontainerbox').hasClass('flex-layout')) {
       $.gritter.add({
@@ -161,10 +151,10 @@ var hooks = {
     textChat.postAceInit(hook, context, socket, padId);
     WrtcRoom.postAceInit(hook, context, socket, padId);
 
-		// When Editor is ready, append video and textChat modal to body
+    // When Editor is ready, append video and textChat modal to body
     $('#editorcontainer iframe').ready(() => {
-			WRTC.appendVideoModalToBody();
-			textChat.appendTextChatModalToBody();
+      WRTC.appendVideoModalToBody();
+      textChat.appendTextChatModalToBody();
       // setTimeout(WrtcRoom.findTags, 250);
     });
 
@@ -173,16 +163,16 @@ var hooks = {
   aceEditEvent: function aceEditEvent(hook, context) {
     const eventType = context.callstack.editEvent.eventType;
     // ignore these types
-		if ('handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps'.includes(eventType)) return;
-		
-		if(context.callstack.domClean) WrtcRoom.adoptHeaderYRoom();
+    if ('handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps'.includes(eventType)) return;
+
+    if (context.callstack.domClean) WrtcRoom.adoptHeaderYRoom();
 
     // some times init ep_wrtc_heading is not yet in the plugin list
     if (context.callstack.docTextChanged) WrtcRoom.adoptHeaderYRoom();
 
     // apply changes to the other user
     if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
-			// setTimeout(WrtcRoom.findTags, 250);
+      // setTimeout(WrtcRoom.findTags, 250);
     }
 
     if (eventType === 'insertheading') {
@@ -257,35 +247,34 @@ exports.aceInitialized = hooks.aceInitialized;
 exports.chatNewMessage = hooks.chatNewMessage;
 
 exports.acePostWriteDomLineHTML = function (name, context) {
-	const hasHeader = $(context.node).find(":header");
-	if(hasHeader.length){
-		const headerId = hasHeader.find('.videoHeader').attr('data-id');
-		setTimeout(() => {
-			WrtcRoom.appendVideoIcon(headerId)
-		}, 250);
-	}
-}
-let flagme = 0
+  const hasHeader = $(context.node).find(':header');
+  if (hasHeader.length) {
+    const headerId = hasHeader.find('.videoHeader').attr('data-id');
+    setTimeout(() => {
+      WrtcRoom.appendVideoIcon(headerId);
+    }, 250);
+  }
+};
+// let flagme = 0;
 exports.aceDomLineProcessLineAttributes = function (name, context) {
   const cls = context.cls;
   const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
   const headingType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
-	const result = [];
+  const result = [];
   if (videoHEaderType && headingType) {
     const modifier = {
       preHtml: `<nd-video class="videoHeader ${videoHEaderType[1]}" data-id="${videoHEaderType[1]}" data-htag="${headingType[1]}">`,
       postHtml: '</nd-video>',
       processedMarker: true,
-		};
-		
-		result.push(modifier);
+    };
 
-		setTimeout(() => {
-			flagme++
-			console.log("countme", flagme)
-			WrtcRoom.appendVideoIcon(videoHEaderType[1], {createAgain: true})
-		}, 100);
+    result.push(modifier);
 
+    setTimeout(() => {
+      // flagme++;
+      // console.log('countme', flagme);
+      WrtcRoom.appendVideoIcon(videoHEaderType[1], {createAgain: true});
+    }, 250);
   }
   return result;
 };

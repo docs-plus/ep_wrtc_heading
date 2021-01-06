@@ -5,7 +5,12 @@ const Config = require('../config');
 const rooms = {};
 const roomsQueue = {};
 
-const socketUserJoin = (data) => {
+const getRoom = (padId, headerId) => {
+  const roomKey = `${padId}:${headerId}`;
+  return rooms[roomKey];
+};
+
+const socketUserJoin = (data, padparticipators) => {
   const padId = data.padId;
   const headerId = data.headerId;
   const roomKey = `${padId}:${headerId}`;
@@ -18,8 +23,8 @@ const socketUserJoin = (data) => {
 
   // does user already joined the room?
   const isUserInRoom = rooms[roomKey].find((x) => x.userId === data.userId);
-  if (isUserInRoom) return false;
-
+	if (isUserInRoom) return false;
+	
   const info = {
     present: rooms[roomKey].length,
     list: rooms[roomKey],
@@ -31,7 +36,10 @@ const socketUserJoin = (data) => {
     info.present++;
   } else {
     canUserJoin = false;
-  }
+	}
+
+	// clear participator, check if the current users are sync with room object
+	rooms[roomKey] = rooms[roomKey].filter(x => padparticipators.includes(x.userId))
 
   return {
     canUserJoin,
@@ -100,6 +108,7 @@ const socketDisconnect = (data) => {
 };
 
 module.exports = {
+  getRoom,
   socketUserJoin,
   socketUserLeave,
   socketDisconnect,

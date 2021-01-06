@@ -1,7 +1,7 @@
 'use strict';
-var padutils = require('ep_etherpad-lite/static/js/pad_utils').padutils;
+const padutils = require('ep_etherpad-lite/static/js/pad_utils').padutils;
 
-var textChat = (function textChat() {
+const textChat = ( () => {
   let socket = null;
   let padId = null;
   let currentRoom = {};
@@ -24,19 +24,6 @@ var textChat = (function textChat() {
 
     const text = padutils.escapeHtmlWithClickableLinks(msg.text, '_blank');
 
-    // var urlParams = new URLSearchParams(msg.text.split("?")[1]);
-
-    // if(urlParams.get('id')) {
-    // 	var headerId = urlParams.get('id');
-    // 	var target = urlParams.get('target');
-    // 	var join = urlParams.get('join');
-    // 	text = $(text).attr({
-    // 		"data-join": join,
-    // 		"data-action":"JOIN",
-    // 		"data-id": headerId
-    // 	}).addClass('btn_roomHandler')
-    // }
-
     const message = $('<p>').attr({
       'data-authorid': msg.author,
     }).append(userName).append(tim).append(text);
@@ -44,19 +31,6 @@ var textChat = (function textChat() {
     $('#wrtc_textChat').append(message);
     share.scrollDownToLastChatText('#wrtc_textChat');
   }
-
-  // function privateNotifyNewUserJoined(target, msg, action) {
-  // 	var textIcon = '<span class="textIcon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M416 224V64c0-35.3-28.7-64-64-64H64C28.7 0 0 28.7 0 64v160c0 35.3 28.7 64 64 64v54.2c0 8 9.1 12.6 15.5 7.8l82.8-62.1H352c35.3.1 64-28.6 64-63.9zm96-64h-64v64c0 52.9-43.1 96-96 96H192v64c0 35.3 28.7 64 64 64h125.7l82.8 62.1c6.4 4.8 15.5.2 15.5-7.8V448h32c35.3 0 64-28.7 64-64V224c0-35.3-28.7-64-64-64z"></path></svg></span>';
-  // 	var btnJoin = "<span class='wrtc_roomLink' data-join='" + target + "' data-action='JOIN' data-id='" + msg.headerId + "' title='Join'>" + msg.headerTitle + '</span>';
-
-  // 	var text = action === 'JOIN' ? 'joins' : 'leaves';
-
-  // 	msg.text = '<span>' + text + '</span>' + textIcon + btnJoin;
-
-  // 	msg.target = target;
-
-  // 	createAndAppendMessage(msg);
-  // }
 
   function eventTextChatInput() {
     const keycode = event.keyCode || event.which;
@@ -199,6 +173,7 @@ var textChat = (function textChat() {
       share.roomBoxIconActive();
       activateModal(headerId, headTitle, userCount, roomInfo);
       share.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
+      share.wrtcPubsub.emit('componentsFlow', 'text', 'open', true);
     }
 
     share.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'TEXT', roomInfo, () => {});
@@ -222,35 +197,13 @@ var textChat = (function textChat() {
       $textChatUserList.append(`<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="${headerId}" data-join="TEXT"><b>text-chat</b></button></li>`);
     }
 
-    // var user = share.getUserFromId(data.userId);
-
-    // notify, a user join the text-chat room
-    // var msg = {
-    // 	time: new Date(),
-    // 	userId: user.userId || data.userId,
-    // 	userName: user.name || data.name || 'anonymous',
-    // 	headerId: data.headerId,
-    // 	userCount: userCount,
-    // 	headerTitle: headTitle
-    // };
-    // share.notifyNewUserJoined('TEXT', msg, 'LEAVE');
-
-    // if (data.headerId === currentRoom.headerId) {
-    // 	var privateMsg = {
-    // 		userName: user.name,
-    // 		author: user.userId,
-    // 		headerTitle: headTitle,
-    // 		time: new Date().getTime()
-    // 	};
-    // 	privateNotifyNewUserJoined('TEXT', privateMsg, 'LEAVE');
-    // }
-
     if (data.userId === clientVars.userId) {
       $headingRoom.removeAttr('data-text');
       share.roomBoxIconActive();
       currentRoom = {};
       deactivateModal(data.headerId, roomInfo);
       share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+      share.wrtcPubsub.emit('componentsFlow', 'text', 'open', false);
     }
 
     share.wrtcPubsub.emit('update store', data, headerId, 'LEAVE', 'TEXT', roomInfo, () => {});
@@ -272,14 +225,16 @@ var textChat = (function textChat() {
 
     $joinBtn = $joinButton;
 
-    share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
+		share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
+		
+		const padparticipators = window.pad.collabClient.getConnectedUsers().map(x=>x.userId)
 
     if (!currentRoom.userId) {
-      socket.emit('userJoin', padId, userData, 'text', addUserToRoom);
+      socket.emit('userJoin', padId, padparticipators, userData, 'text', addUserToRoom);
     } else {
       socket.emit('userLeave', padId, currentRoom, 'text', (data, roomInfo, target) => {
         removeUserFromRoom(data, roomInfo, 'text', () => {
-          socket.emit('userJoin', padId, userData, 'text', addUserToRoom);
+          socket.emit('userJoin', padId, padparticipators, userData, 'text', addUserToRoom);
         });
       });
     }
@@ -294,14 +249,14 @@ var textChat = (function textChat() {
   function postAceInit(hook, context, webSocket, docId) {
     socket = webSocket;
     padId = docId;
-    share.wrtcPubsub.emit('component status', 'text', true);
+    share.wrtcPubsub.emit('componentsFlow', 'text', 'init', true);
     eventListers();
-	}
-	
-	function appendTextChatModalToBody () {
-		const textChatModal = $('#wrtcTextChatModal').tmpl({});
-		$('body').append(textChatModal);
-	}
+  }
+
+  function appendTextChatModalToBody() {
+    const textChatModal = $('#wrtcTextChatModal').tmpl({});
+    $('body').append(textChatModal);
+  }
 
   return {
     postAceInit,
@@ -310,8 +265,8 @@ var textChat = (function textChat() {
     userJoin,
     userLeave,
     removeUserFromRoom,
-		addUserToRoom,
-		appendTextChatModalToBody,
+    addUserToRoom,
+    appendTextChatModalToBody,
 
   };
 })();

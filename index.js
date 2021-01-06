@@ -19,7 +19,7 @@ exports.eejsBlock_mySettings = function (hookName, args, cb) {
 };
 
 exports.eejsBlock_scripts = function (hookName, args, cb) {
-  args.content += eejs.require('ep_wrtc_heading/templates/webrtcComponent.html', {}, module);
+  args.content += eejs.require('ep_wrtc_heading/templates/webrtcComponent.mini.html', {}, module);
   args.content += `<script src='../static/plugins/ep_wrtc_heading/static/js/wrtc.heading.mini.js?v=${packageJson.version}' defer></script>`;
   return cb();
 };

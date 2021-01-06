@@ -1,10 +1,9 @@
 'use strict';
 
-var videoChat = (function videoChat() {
+const videoChat = (() => {
   let socket = null;
   let padId = null;
   let currentRoom = {};
-  let localStream = null;
   let VIDEOCHATLIMIT = 0;
   let $joinBtn = null;
   let networkInterval = null;
@@ -74,18 +73,9 @@ var videoChat = (function videoChat() {
   function removeUserFromRoom(data, roomInfo, cb) {
     if (!data || !roomInfo || !data.userId) return false;
     const headerId = data.headerId;
-    const $headingRoom = share.$body_ace_outer().find(`#${headerId}`);
-    const headerTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
-    const $videoChatUserList = $headingRoom.find('.wrtc_content.videoChat ul');
-
-    share.appendUserList(roomInfo, $videoChatUserList);
+    const headerTitle =  share.findAceHeaderElement(headerId).text;;
 
     const userCount = roomInfo.present;
-    $headingRoom.find('.videoChatCount').text(userCount);
-
-    if (userCount === 0) {
-      $videoChatUserList.append(`<li class="empty">Be the first to join the <button class="btn_joinChat_video" data-action="JOIN" data-id="${headerId}" data-join="VIDEO"><b>video-chat</b></button></li>`);
-    }
 
     const user = share.getUserFromId(data.userId);
 
@@ -100,11 +90,11 @@ var videoChat = (function videoChat() {
         headerTitle,
         VIDEOCHATLIMIT,
       };
-      share.notifyNewUserJoined('VIDEO', msg, 'LEAVE');
+      share.notifyNewUserJoined('PLUS', msg, 'LEAVE');
     }
 
     if (data.userId === clientVars.userId) {
-      $headingRoom.removeAttr('data-video');
+      share.$body_ace_outer().find(`#wrtcVideoIcons #${headerId}`).removeClass('active');
       share.roomBoxIconActive();
       WRTC.deactivate(data.userId, data.headerId);
       stopWatchNetwork();
@@ -117,9 +107,11 @@ var videoChat = (function videoChat() {
         opacity: 0,
       }).attr({'data-active': false});
 
-      // WRTC.deactivate(data.userId, data.headerId);
-      share.stopStreaming(localStream);
-      localStream = null;
+      WRTC.deactivate(data.userId, data.headerId);
+
+      share.wrtcPubsub.emit('componentsFlow', 'video', 'open', false);
+
+      share.stopStreaming();
       socket.removeListener(`receiveTextMessage:${data.headerId}`);
     }
 
@@ -135,8 +127,7 @@ var videoChat = (function videoChat() {
   function addUserToRoom(data, roomInfo) {
     if (!data || !data.userId) return false;
     const headerId = data.headerId;
-    const $headingRoom = share.$body_ace_outer().find(`#${headerId}`);
-    const headerTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
+    const headerTitle = share.findAceHeaderElement(headerId).text;
 
     const user = share.getUserFromId(data.userId);
     // some user may session does exist but the user info does not available in all over the current pad
@@ -144,54 +135,34 @@ var videoChat = (function videoChat() {
 
     // TODO: this is not good idea, use global state
     // if incoming user has already in the room don't persuade the request
-    const IsUserInRooms = $headingRoom.find(`.wrtc_content.videoChat ul li[data-id='${user.userId}']`).text();
-    if (IsUserInRooms) return false;
-
+    // if (IsUserInRooms) return false;
     const userCount = roomInfo.present;
-    $headingRoom.find('.videoChatCount').text(userCount);
 
-    $(document).find('#wrtc_textChatWrapper .textChatToolbar .userCount').text(userCount);
 
-    share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.videoChat ul'));
-
-    if (data.action == 'JOIN') {
+    if (data.action === 'JOIN') {
       // notify, a user join the video-chat room
       const msg = {
         time: new Date(),
         userId: data.userId,
         userName: user.name || data.name || 'anonymous',
-        headerId: data.headerId,
+        headerId,
         userCount,
         headerTitle,
         VIDEOCHATLIMIT,
       };
 
-      share.notifyNewUserJoined('VIDEO', msg, 'JOIN');
-
-      // if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
-      // 	$.gritter.add({
-      // 		text: '<span class="author-name">' + user.name + '</span>' + 'has joined the video-chat, <b><i> "' + headerTitle + '"</b></i>',
-      // 		sticky: false,
-      // 		time: 3000,
-      // 		position: 'center',
-      // 		class_name: 'chat-gritter-msg'
-      // 	});
-      // }
+      share.notifyNewUserJoined('PLUS', msg, 'JOIN');
     }
 
     if (data.userId === clientVars.userId) {
-      $headingRoom.attr({'data-video': true});
+      window.headerId = data.headerId;
+
       share.roomBoxIconActive();
       startWatchNetwork();
 
-      // $('#werc_toolbar p').attr({'data-id': data.headerId}).text(headerTitle);
-      // $('#werc_toolbar .btn_roomHandler').attr({'data-id': data.headerId});
+      share.$body_ace_outer().find(`#wrtcVideoIcons #${headerId}`).addClass('active');
 
-      window.headerId = data.headerId;
-      // WRTC.activate(data.headerId, user.userId);
-      currentRoom = data;
-
-      $('#rtcbox').prepend(`<h4 class="chatTitle">${headerTitle}</h4>`);
+      WRTC.activate(data.headerId, user.userId);
 
       $('#wrtc_modal').css({
         transform: 'translate(-50%, 0)',
@@ -199,8 +170,19 @@ var videoChat = (function videoChat() {
       }).attr({'data-active': true});
 
       share.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
-      socket.emit('acceptNewCall', padId, window.headerId);
+			share.wrtcPubsub.emit('componentsFlow', 'video', 'open', true);
+			
+			// this request send once! and must be fire when the room is empty
+			if(!currentRoom.userId&& roomInfo.present === 1){
+				socket.emit('acceptNewCall', padId, window.headerId);
+			}
 
+			currentRoom = data;
+			
+			// update modal title, attributes and inline avatart
+			share.wrtcPubsub.emit('updateWrtcToolbarModal', headerId, roomInfo);
+
+      // if videochat active and new message send to chat! open header textchat modal
       socket.on(`receiveTextMessage:${headerId}`, (headingId, msg) => {
         const active = $(document).find('#wrtc_textChatWrapper').hasClass('active');
         if (headingId === headerId && !active) {
@@ -217,21 +199,26 @@ var videoChat = (function videoChat() {
     $joinBtn = $joinButton;
     isUserMediaAvailable().then((stream) => {
       // stop last stream
-      share.stopStreaming(localStream);
-      localStream = stream;
+			share.stopStreaming(function () {
+				share.wrtcStore.localstream = stream
+			});
+
+			const padparticipators = window.pad.collabClient.getConnectedUsers().map(x=>x.userId)
 
       if (!currentRoom.userId) {
-        return socket.emit('userJoin', padId, userInfo, 'video', gateway_userJoin);
+        return socket.emit('userJoin', padId, padparticipators, userInfo, 'video', gateway_userJoin);
       }
       // If the user has already joined the video chat, make suer leave that room then join to the new chat room
       socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
         gateway_userLeave(_userData, roomInfo, () => {
-          socket.emit('userJoin', padId, userInfo, 'video', gateway_userJoin);
+          socket.emit('userJoin', padId, padparticipators, userInfo, 'video', gateway_userJoin);
         });
       });
     }).catch((err) => {
       console.error(err);
       share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+      share.wrtcPubsub.emit('componentsFlow', 'video', 'open', false);
+      share.stopStreaming();
       socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
         gateway_userLeave(_userData, roomInfo);
       });
@@ -245,7 +232,7 @@ var videoChat = (function videoChat() {
       return false;
     }
 
-    // check if has user already in that room
+    // check if has user already in the room
     if (currentRoom && currentRoom.headerId === headerId) {
       share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
       return false;
@@ -293,7 +280,6 @@ var videoChat = (function videoChat() {
     return false;
   }
 
-
   /**
   *
   * @param {Object} data @requires
@@ -309,15 +295,14 @@ var videoChat = (function videoChat() {
  *	@returns
   */
   function gateway_userJoin(data, roomInfo, showAlert, bulkUpdate) {
-    if (!data) return reachedVideoRoomSize(null, true, false);
+		if (!data) return reachedVideoRoomSize(null, true, false);
 
     if (data && reachedVideoRoomSize(roomInfo, showAlert, bulkUpdate)) {
       return addUserToRoom(data, roomInfo);
     } else if (bulkUpdate) {
       return addUserToRoom(data, roomInfo);
     }
-    share.stopStreaming(localStream);
-    localStream = null;
+    share.stopStreaming();
     return false;
   }
 
@@ -329,7 +314,7 @@ var videoChat = (function videoChat() {
     socket = webSocket;
     padId = docId;
     VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
-    share.wrtcPubsub.emit('component status', 'video', true);
+    share.wrtcPubsub.emit('componentsFlow', 'video', 'init', true);
     // mediaDevices();
 
     socket.on('userLatancy', (data) => {

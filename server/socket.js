@@ -5,16 +5,18 @@ const Queue = require('better-queue');
 const sessioninfos = require('ep_etherpad-lite/node/handler/PadMessageHandler').sessioninfos;
 let socketIo = null;
 
-const roomStatus = {};
-const maxTryToWaitAcceptNewCall = 10;
 
-const acceptNewConnection = ({socket, padId, userData, target, callback}) => {
-  let room = null;
+const roomStatus = {};
+const maxTryToWaitAcceptNewCall = 13;
+
+const acceptNewConnection = ({socket, padId, padparticipators, userData, target, callback}) => {
+	let room = null;
+	console.info(`process webrtc connection`)
   if (target === 'video') {
-    room = videoChat.socketUserJoin(userData);
+    room = videoChat.socketUserJoin(userData, padparticipators);
     _.set(socket, 'ndHolder.video', room.data);
   } else {
-    room = textChat.socketUserJoin(userData);
+    room = textChat.socketUserJoin(userData, padparticipators);
     _.set(socket, 'ndHolder.text', room.data);
   }
 
@@ -27,28 +29,38 @@ const acceptNewConnection = ({socket, padId, userData, target, callback}) => {
 };
 
 const q = new Queue(
-    (({socket, padId, userData, target, callback, retry}, cb) => {
+    (({socket, padId,  padparticipators, userData, target, callback, retry}, cb) => {
       // Some processing here ...
 
       // Firt check if the room has accept call Prop
       if (!_.has(roomStatus, `${padId}.${userData.headerId}.acceptCall`)) {
         // if the Header does not exist create and set 'acceptCall' to false, for next request are comming throw
-        _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
+				_.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
+				console.info(`Create room, accept call Prop. ${padId}.${userData.headerId}.acceptCall`)
         // in this case we have to process the request for the first time
-        acceptNewConnection({socket, padId, userData, target, callback, retry});
+        acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
         return cb();
-      }
+			}
 
 
-      // second check the room that can accept new call
+      // otherwise check the room that can accept new call
       // if it is, then `acceptNewConnection` otherwise push the request at the end of queue
       if (_.get(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false)) {
-        acceptNewConnection({socket, padId, userData, target, callback, retry});
+				console.info(`room ready to accept new call. ${padId}.${userData.headerId}.acceptCal`)
+				_.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
+        acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
       } else {
-        if (retry < maxTryToWaitAcceptNewCall) { q.push({socket, padId, userData, target, callback, retry: retry += 1}); } else { callback(null, null, target); }// acceptNewConnection({socket, padId, userData, target, callback, retry})
+				console.info(`room not ready to accept new call. ${padId}.${userData.headerId}.acceptCal`)
+        if (retry < maxTryToWaitAcceptNewCall) { 
+					q.push({socket, padparticipators, padId, userData, target, callback, retry: retry += 1});
+					console.info(`put the request in queue for next call. [retry]: ${retry}, [maxTryToWaitAcceptNewCall]: ${maxTryToWaitAcceptNewCall}`)
+				} else { 
+					callback(null, null, target);
+					console.info(`unfortunately after ${retry} try, request must be terminate!`)
+				}// acceptNewConnection({socket, padId, userData, target, callback, retry})
       }
 
-      cb(null, true);
+      return cb(null, true);
     }),
     {afterProcessDelay: 3000}
 );
@@ -68,13 +80,17 @@ function socketInit(hookName, args, cb) {
 
     socket.on('acceptNewCall', (padId, headerId, callback) => {
       // console.log("new acceptCall ", padId, headerId)
-      _.set(roomStatus, `${padId}.${headerId}.acceptCall`, true);
+		
+			if(!_.get(roomStatus, `${padId}.${headerId}.acceptCall`, false)){
+				_.set(roomStatus, `${padId}.${headerId}.acceptCall`, true);
+				console.info(`yup, avilable the room to accept new call. ${padId}.${headerId}.acceptCall`)
+			}
       // console.log("new acceptCall ", padId, headerId, _.get(roomStatus, `${padId}.${headerId}.acceptCall`))
     });
 
-    socket.on('userJoin', (padId, userData, target, callback) => {
+    socket.on('userJoin', (padId, padparticipators, userData, target, callback) => {
       // console.log("USERJOINING", padId, userData, target)
-      q.push({socket, padId, userData, target, callback, retry: 0});
+      q.push({socket, padId, padparticipators, userData, target, callback, retry: 0});
     });
 
     socket.on('userLeave', (padId, userData, target, callback) => {
@@ -91,20 +107,18 @@ function socketInit(hookName, args, cb) {
       callback(room.data, room.info, target);
     });
 
-    socket.on(
-        'getTextMessages',
-        async (padId, headId, pagination, callback) => {
-          // get last message id, then get last newest message, then send to client
-          const messages = await textChat
-              .getMessages(padId, headId, pagination)
-              .catch((error) => {
-                throw new Error(
-                    `[socket]: get text messages has an error, ${error.message}`
-                );
-              });
+    socket.on('getTextMessages', async (padId, headId, pagination, callback) => {
+      // get last message id, then get last newest message, then send to client
+      const messages = await textChat
+          .getMessages(padId, headId, pagination)
+          .catch((error) => {
+            throw new Error(
+                `[socket]: get text messages has an error, ${error.message}`
+            );
+          });
 
-          callback(messages);
-        }
+      callback(messages);
+    }
     );
 
     socket.on('sendTextMessage', async (padId, headId, message, callback) => {
@@ -166,6 +180,11 @@ function socketInit(hookName, args, cb) {
         Object.assign(context, {client: {id: socket.id.split('#')[1]}});
         handleRTCMessage(context.client, context.payload);
       }
+    });
+
+    socket.on('getVideoRoomInfo', (padId, headerId, callback) => {
+      const result = videoChat.getRoom(padId, headerId);
+      callback(result);
     });
   });
 }
