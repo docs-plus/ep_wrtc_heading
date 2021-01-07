@@ -7,7 +7,7 @@ let socketIo = null;
 
 
 const roomStatus = {};
-const maxTryToWaitAcceptNewCall = 13;
+const maxTryToWaitAcceptNewCall = 11;
 
 const acceptNewConnection = ({socket, padId, padparticipators, userData, target, callback}) => {
 	let room = null;
@@ -55,14 +55,16 @@ const q = new Queue(
 					q.push({socket, padparticipators, padId, userData, target, callback, retry: retry += 1});
 					console.info(`put the request in queue for next call. [retry]: ${retry}, [maxTryToWaitAcceptNewCall]: ${maxTryToWaitAcceptNewCall}`)
 				} else { 
-					callback(null, null, target);
+					_.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, true);
 					console.info(`unfortunately after ${retry} try, request must be terminate!`)
-				}// acceptNewConnection({socket, padId, userData, target, callback, retry})
+					acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
+					callback(null, null, target);
+				}
       }
 
       return cb(null, true);
     }),
-    {afterProcessDelay: 3000}
+    {afterProcessDelay: 2000}
 );
 
 function socketInit(hookName, args, cb) {
