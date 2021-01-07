@@ -361,7 +361,14 @@ const share = (() => {
         .each(function () {
           $(this).attr({'data-id': headerId});
         });
-  });
+	});
+	
+	wrtcPubsub.on('updateWrtcToolbarTitleModal',(headerTile, headerId) => {
+    $('#wrtc_modal #werc_toolbar .nd_title .title').html(headerTile);
+		$(document).find('#wrtc_textChatWrapper .textChatToolbar b').text(headerTile);
+		if(headerId)
+			$(document).find(`.wrtc_roomLink[data-id='${headerId}']`).text(headerTile);
+	});
 
   function findAceHeaderElement(headerId) {
     const $el = $body_ace_outer().find('iframe').contents()

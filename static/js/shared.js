@@ -13,16 +13,12 @@ const collectContentPre = (hook, context) => {
   }
   if (tagIndex >= 0) {
     const headerId = context.cls.split(' ')[1];
-    const $header = share.$body_ace_outer().find('iframe')
-        .contents()
-        .find('#innerdocbody')
-        .children('div')
-        .find(`.videoHeader.${headerId}`);
-
+		const $header = share.findAceHeaderElement(headerId)
     // If there is a header, just move the headerId, otherwise create a new headerId
-    if ($header.length === 0) {
-      lineAttributes.headingTagId = headerId;
+    if ($header.$el.length === 1) {
+			lineAttributes.headingTagId = headerId;
     } else {
+			console.error("[wrtc]: Detect duplicate headerId!")
       lineAttributes.headingTagId = randomString(16);
     }
   }

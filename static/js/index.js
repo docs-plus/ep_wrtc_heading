@@ -277,18 +277,22 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
   const headingType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
   const result = [];
   if (videoHEaderType && headingType) {
+		const headerId = videoHEaderType[1];
+		// if video or textChat modal is open! update modal title
+		if(share.wrtcStore.components.video.open || share.wrtcStore.components.text.open) {
+			const $header = share.findAceHeaderElement(headerId)
+			share.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId)
+		}
     const modifier = {
-      preHtml: `<nd-video class="videoHeader ${videoHEaderType[1]}" data-id="${videoHEaderType[1]}" data-htag="${headingType[1]}">`,
+      preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}">`,
       postHtml: '</nd-video>',
       processedMarker: true,
-    };
-
-    result.push(modifier);
+		};
+		
+		result.push(modifier);
 
     setTimeout(() => {
-      // flagme++;
-      // console.log('countme', flagme);
-      WrtcRoom.appendVideoIcon(videoHEaderType[1], {createAgain: true});
+      WrtcRoom.appendVideoIcon(headerId, {createAgain: true});
     }, 250);
   }
   return result;
