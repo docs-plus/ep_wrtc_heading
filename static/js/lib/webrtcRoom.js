@@ -33,12 +33,12 @@ const WrtcRoom = (() => {
   }
 
   /**
-  *
-  * @param {string} actions @enum (JOIN|LEAVE|RELOAD|SHARELINK|USERPROFILEMODAL)
-  * @param {string} headerId
-  * @param {string} target @enum (chatRoom|video|text)
-  */
-  function roomBtnHandler(actions, headerId, target) {
+	 *
+	 * @param {string} actions @enum (JOIN|LEAVE|RELOAD|SHARELINK|USERPROFILEMODAL|JOINBYQUERY)
+	 * @param {string} headerId
+	 * @param {string} target @enum (chatRoom|video|text)
+	 */
+	function roomBtnHandler(actions, headerId, target) {
     if (typeof actions !== 'string') {
       actions.preventDefault();
       // no idea! but in somecases! this function fire twice!
@@ -119,7 +119,10 @@ const WrtcRoom = (() => {
       shareRoomsLink(headerId, target);
     } else if (actions === 'USERPROFILEMODAL') {
       showUserProfileModal(headerId);
-    }
+    } else if (actions === 'JOINBYQUERY') {
+			const href = $(this).attr("href");
+			joinByQueryString(href);
+		}
   }
 
   function joinByQueryString(url) {
