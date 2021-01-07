@@ -126,15 +126,22 @@ const WrtcRoom = (() => {
   }
 
   function joinByQueryString(url) {
-    url = url || window.location.search;
+    url = url || window.location.href;
     const urlParams = new URLSearchParams(url);
     const headerId = urlParams.get('id');
     let target = urlParams.get('target');
     const join = urlParams.get('join');
 
-    if (!headerId) return true;
+		if (!headerId) return true;
+		
+		const inComeURL = new URL(url);
+		const inComePadName = inComeURL.pathname.split('/').pop()
+		const currentPadName = location.pathname.split('/').pop()
 
+		// check if header id belong to this pad
+		// then if it's not check padName
     if (!share.wrtcStore.rooms.get(headerId)) {
+			if(inComePadName !== currentPadName) return window.location.href = url
       $.gritter.add({
         title: 'Error',
         text: 'The header seems not to exist anymore!',
