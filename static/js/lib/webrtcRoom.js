@@ -83,7 +83,7 @@ const WrtcRoom = (() => {
       return false;
     }
 
-    if (actions !== 'SHARELINK' && actions !== 'USERPROFILEMODAL') { share.wrtcPubsub.emit('disable room buttons', headerId, actions, target); }
+    if (actions !== 'SHARELINK' && actions !== 'USERPROFILEMODAL' && actions !== 'JOINBYQUERY') { share.wrtcPubsub.emit('disable room buttons', headerId, actions, target); }
 
     if (actions === 'JOIN') {
       switch (target) {
