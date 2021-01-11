@@ -2,6 +2,10 @@
 	position: relative;
 }
 
+nd-video{
+	display: block;
+}
+
 /*video icon line*/
 #wrtcVideoIcons{
 	order: -1;

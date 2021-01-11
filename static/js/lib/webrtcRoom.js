@@ -192,7 +192,7 @@ const WrtcRoom = (() => {
     const paddingTop = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
     const aceOuterPadding = parseInt(paddingTop, 10);
     const offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
-    return offsetTop + height / 2 - 25;
+    return offsetTop + height / 2 - 22;
   }
 
   function showUserProfileModal(headerId) {

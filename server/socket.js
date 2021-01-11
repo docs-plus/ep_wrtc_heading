@@ -67,7 +67,7 @@ const q = new Queue(
     {afterProcessDelay: 2000}
 );
 
-function socketInit(hookName, args, cb) {
+const socketInit = (hookName, args,) => {
   socketIo = args.io;
   const io = args.io;
 
@@ -188,7 +188,9 @@ function socketInit(hookName, args, cb) {
       const result = videoChat.getRoom(padId, headerId);
       callback(result);
     });
-  });
+	});
+
+	return args;
 }
 
 /**

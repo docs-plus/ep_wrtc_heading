@@ -1,35 +1,33 @@
 const eejs = require('ep_etherpad-lite/node/eejs/');
-const _ = require('lodash');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 const log4js = require('ep_etherpad-lite/node_modules/log4js');
 const statsLogger = log4js.getLogger('stats');
 const stats = require('ep_etherpad-lite/node/stats');
 const packageJson = require('./package.json');
-const db = require('./server/dbRepository');
 const Config = require('./config');
-const {socketInit, socketIo} = require('./server/socket');
+const {socketInit} = require('./server/socket');
 // Make sure any updates to this are reflected in README
 const statErrorNames = ['Abort', 'Hardware', 'NotFound', 'NotSupported', 'Permission', 'SecureConnection', 'Unknown'];
 
 exports.socketio = socketInit;
 
-exports.eejsBlock_mySettings = function (hookName, args, cb) {
+exports.eejsBlock_mySettings = (hookName, args, cb) => {
   args.content += eejs.require('ep_wrtc_heading/templates/settings.ejs');
   return cb();
 };
 
-exports.eejsBlock_scripts = function (hookName, args, cb) {
+exports.eejsBlock_scripts = (hookName, args, cb) => {
   args.content += eejs.require('ep_wrtc_heading/templates/webrtcComponent.mini.html', {}, module);
   args.content += `<script src='../static/plugins/ep_wrtc_heading/static/js/wrtc.heading.mini.js?v=${packageJson.version}' defer></script>`;
   return cb();
 };
 
-exports.eejsBlock_styles = function (hookName, args, cb) {
+exports.eejsBlock_styles = (hookName, args, cb) => {
   args.content += `<link rel="stylesheet" href="../static/plugins/ep_wrtc_heading/static/css/rtcbox.css?v=${packageJson.version}" type="text/css" />`;
   return cb();
 };
 
-exports.clientVars = function (hook, context, callback) {
+exports.clientVars = (hook, context, callback) => {
   let enabled = true;
   if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.enabled === false) {
     enabled = settings.ep_wrtc_heading.enabled;
@@ -70,7 +68,7 @@ exports.clientVars = function (hook, context, callback) {
   return callback(result);
 };
 
-exports.handleMessage = function (hook, context, callback) {
+exports.handleMessage = (hook, context, callback) => {
   const result = [null];
   // console.log('exports.handleMessage', hook, context);
   if (context.message.type === 'STATS' && context.message.data.type === 'RTC_MESSAGE') {
