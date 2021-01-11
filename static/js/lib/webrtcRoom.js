@@ -332,7 +332,9 @@ const WrtcRoom = (() => {
       const roomExist = share.wrtcStore.rooms.has(headerId);
       if (!options.createAgain && roomExist) return false;
 
-      if (!roomExist) {
+			const $elRoomExist = share.findAceHeaderElement(headerId)
+
+      if (!roomExist && $elRoomExist.exist) {
         const $el = share.$body_ace_outer().find('iframe')
             .contents()
             .find('#innerdocbody')

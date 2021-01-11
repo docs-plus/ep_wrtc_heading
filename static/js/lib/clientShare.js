@@ -364,16 +364,18 @@ const share = (() => {
 	});
 	
 	wrtcPubsub.on('updateWrtcToolbarTitleModal',(headerTile, headerId) => {
-    $('#wrtc_modal #werc_toolbar .nd_title .title').html(headerTile);
-		$(document).find('#wrtc_textChatWrapper .textChatToolbar b').text(headerTile);
-		if(headerId)
+		if(headerId === window.headerId){
+			$(`#wrtc_modal #werc_toolbar .nd_title .titleb[data-id='${headerId}'`).html(headerTile);
+			$(document).find(`#wrtc_textChatWrapper .textChatToolbar b[data-id='${headerId}']`).text(headerTile);
 			$(document).find(`.wrtc_roomLink[data-id='${headerId}']`).text(headerTile);
+		}
 	});
 
   function findAceHeaderElement(headerId) {
     const $el = $body_ace_outer().find('iframe').contents()
         .find('#innerdocbody').find(`.videoHeader.${headerId}`);
     return {
+			exist: $el.length,
       $el,
       text: $el.text(),
       tag: $el.attr('data-htag'),

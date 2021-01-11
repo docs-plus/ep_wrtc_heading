@@ -281,7 +281,7 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
 		// if video or textChat modal is open! update modal title
 		if(share.wrtcStore.components.video.open || share.wrtcStore.components.text.open) {
 			const $header = share.findAceHeaderElement(headerId)
-			share.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId)
+			share.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
 		}
     const modifier = {
       preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}">`,
