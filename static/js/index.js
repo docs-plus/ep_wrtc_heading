@@ -252,7 +252,7 @@ exports.acePostWriteDomLineHTML = function (name, context) {
   if (hasHeader.length) {
     const headerId = hasHeader.find('.videoHeader').attr('data-id');
     setTimeout(() => {
-      WrtcRoom.appendVideoIcon(headerId);
+      // WrtcRoom.appendVideoIcon(headerId);
     }, 250);
 	}
 	
@@ -284,8 +284,20 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
 			const $header = share.findAceHeaderElement(headerId)
 			share.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
 		}
+
+		const data = {
+			headingTagId: headerId,
+			// positionTop: newY,
+			// positionLeft: newX,
+			// headTitle: $el.text(),
+			// lineNumber,
+			// videoChatLimit: VIDEOCHATLIMIT,
+		};
+
+		const box = $('#wrtcLinesIcons').tmpl(data);
+		const nedInlineIcon = $(`<div>`).append(box).html()
     const modifier = {
-      preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}">`,
+      preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}"><div class="nedInlineIcon">${nedInlineIcon}</div>`,
       postHtml: '</nd-video>',
       processedMarker: true,
 		};
@@ -293,7 +305,7 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
 		result.push(modifier);
 
     setTimeout(() => {
-      WrtcRoom.appendVideoIcon(headerId, {createAgain: true});
+      // WrtcRoom.appendVideoIcon(headerId, {createAgain: true});
     }, 250);
   }
   return result;

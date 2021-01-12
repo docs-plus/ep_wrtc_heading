@@ -1,3 +1,7 @@
+#outerdocbody iframe, #outerdocbody > #innerdocbody{
+	padding: 40px 55px!important;
+}
+
 #wrtc_modal{
 	position: absolute;
 	top: 0;

@@ -2,8 +2,25 @@
 	position: relative;
 }
 
+#outerdocbody iframe{
+	padding: 0!important;
+}
+
+#innerdocbody{
+	padding: 40px 55px!important;
+}
+
 nd-video{
-	display: block;
+	display: flex;
+	position: relative;
+	align-items: center;
+}
+
+
+.nedInlineIcon{
+	position: absolute;
+	left: -70px;
+	/* top: -14px; */
 }
 
 /*video icon line*/
@@ -40,7 +57,7 @@ nd-video{
 
 .wrtcIconLine .wrtcIcon > button {
 	border: 1px solid #e6e8e9;
-	border-radius: 50%;
+	border-radius: 0 14px 14px 0;
 	background: #fff;
 	box-shadow: 1px 1px 8px #e6e8e9;
 	margin: 5px;
