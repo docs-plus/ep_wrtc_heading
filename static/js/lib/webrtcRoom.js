@@ -223,7 +223,10 @@ const WrtcRoom = (() => {
   function activeEventListener() {
     const $AceOuter = share.$body_ace_outer();
 
-    $AceOuter.on('click', '.btn_roomHandler', roomBtnHandler);
+		$AceOuter.on('click', '.btn_roomHandler', roomBtnHandler);
+		
+		$AceOuter.find('iframe').contents()
+        .find('#innerdocbody').on('click', '.btn_roomHandler ', roomBtnHandler)
 
     $(document).on('click', '.btn_roomHandler', roomBtnHandler);
 

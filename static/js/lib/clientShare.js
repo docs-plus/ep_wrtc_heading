@@ -327,23 +327,23 @@ const share = (() => {
   });
 
   wrtcPubsub.on('disable room buttons', (headerId, actions, target) => {
-    const $inlineIconButton = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine.'+headerId);
-    const $btnPlus = $inlineIconButton.find('button[data-join="PLUS"]');
-    $btnPlus.find('.loader').remove();
-    $btnPlus.append('<div class="loader"></div>');
-    $btnPlus.prop('disabled', true);
+    // const $inlineIconButton = findAceHeaderElement(headerId).$el;
+    // const $btnPlus = $inlineIconButton.find('button[data-join="PLUS"]');
+    // $btnPlus.find('.loader').remove();
+    // $btnPlus.append('<div class="loader"></div>');
+    // $btnPlus.prop('disabled', true);
   });
 
   wrtcPubsub.on('enable room buttons', (headerId, action, target) => {
-		const $inlineIconButton = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine.'+headerId);
-    const newAction = action === 'JOIN' ? 'LEAVE' : 'JOIN';
-		const $btnPlus = $inlineIconButton.find('button[data-join="PLUS"]');
-		$btnPlus.find('.loader').remove();
-		setTimeout(() => {
-			$btnPlus.find('.loader').remove();
-			$btnPlus.removeAttr('disabled');
-			$btnPlus.attr({'data-action': newAction});
-		}, 250);
+		// const $inlineIconButton = $body_ace_outer().find('iframe').contents().find('#innerdocbody .nedInlineIcon').find('.wrtcIconLine.'+headerId);
+    // const newAction = action === 'JOIN' ? 'LEAVE' : 'JOIN';
+		// const $btnPlus = $inlineIconButton.find('button[data-join="PLUS"]');
+		// $btnPlus.find('.loader').remove();
+		// setTimeout(() => {
+		// 	$btnPlus.find('.loader').remove();
+		// 	$btnPlus.removeAttr('disabled');
+		// 	$btnPlus.attr({'data-action': newAction});
+		// }, 250);
 
   });
 

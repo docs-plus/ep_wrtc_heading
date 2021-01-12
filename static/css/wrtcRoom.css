@@ -79,7 +79,8 @@ nd-video{
 .wrtcIconLine .wrtcIcon > button:hover{
 	background-color: #2678ff;
 	color: #fff;
-	border-radius: 100%;
+	width: 50px;
+	padding-left: 10px;
 }
 
 .wrtcIconLine .wrtcIcon > button > svg {
