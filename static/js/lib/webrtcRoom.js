@@ -272,8 +272,6 @@ const WrtcRoom = (() => {
     },
     userLeave: function userLeave(context, callback) {
       // Deprecated, we use socket disconnect
-
-      callback();
     },
     postAceInit: function postAceInit(hook, context, webSocket, docId) {
       socket = webSocket;

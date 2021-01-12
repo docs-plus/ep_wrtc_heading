@@ -192,9 +192,10 @@ const hooks = {
     WrtcRoom.aceSetAuthorStyle(context);
     WRTC.aceSetAuthorStyle(context);
   },
-  userLeave: function userLeave(hook, context, callback) {
-    WrtcRoom.userLeave(context, callback);
-    WRTC.userLeave(null, context, callback);
+  userLeave: function userLeave(hook, context) {
+    WrtcRoom.userLeave(context);
+		WRTC.userLeave(null, context);
+		return;
   },
   handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
     WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
