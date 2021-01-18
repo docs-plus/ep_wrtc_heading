@@ -138,7 +138,13 @@ const hooks = {
 
     const ace = context.ace;
     const userId = window.pad.getUserId() || clientVars.padId;
-    const padId = window.pad.getPadId() || clientVars.userId;
+		const padId = window.pad.getPadId() || clientVars.userId;
+		
+		// init ui native component
+		ace.callWithAce(innerAce => {
+			const customElements = innerAce.frame.contentWindow.customElements;
+			new Components(customElements);
+		});
 
     // TODO: make sure the priority of these components are in line
     // TODO: make sure clientVars contain all data that's necessary
@@ -146,7 +152,8 @@ const hooks = {
     if (!clientVars.userId || !clientVars.padId) throw new Error("[wrtc]: clientVars doesn't exists");
 
     const socket = EPwrtcHeading.init(ace, padId, userId);
-    WRTC.postAceInit(hook, context, socket, padId);
+		WRTC.postAceInit(hook, context, socket, padId);
+		share.init(context)
     videoChat.postAceInit(hook, context, socket, padId);
     textChat.postAceInit(hook, context, socket, padId);
     WrtcRoom.postAceInit(hook, context, socket, padId);
@@ -158,17 +165,17 @@ const hooks = {
       // setTimeout(WrtcRoom.findTags, 250);
     });
 
-    $(window).resize(_.debounce(WrtcRoom.adoptHeaderYRoom, 250));
+    // $(window).resize(_.debounce(WrtcRoom.adoptHeaderYRoom, 250));
   },
   aceEditEvent: function aceEditEvent(hook, context) {
     const eventType = context.callstack.editEvent.eventType;
     // ignore these types
     if ('handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps'.includes(eventType)) return;
 
-    if (context.callstack.domClean) WrtcRoom.adoptHeaderYRoom();
+    // if (context.callstack.domClean) WrtcRoom.adoptHeaderYRoom();
 
     // some times init ep_wrtc_heading is not yet in the plugin list
-    if (context.callstack.docTextChanged) WrtcRoom.adoptHeaderYRoom();
+    // if (context.callstack.docTextChanged) WrtcRoom.adoptHeaderYRoom();
 
     // apply changes to the other user
     if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
@@ -186,7 +193,7 @@ const hooks = {
   },
   aceEditorCSS: function aceEditorCSS() {
     const version = clientVars.webrtc.version || 1;
-    return [`ep_wrtc_heading/static/css/wrtcRoom.css?v=${version}`];
+    return [`ep_wrtc_heading/static/css/innerLayer.css?v=${version}`];
   },
   aceSetAuthorStyle: function aceSetAuthorStyle(hook, context) {
     WrtcRoom.aceSetAuthorStyle(context);
@@ -202,14 +209,14 @@ const hooks = {
   },
   aceSelectionChanged: function aceSelectionChanged(rep, context) {
     if (context.callstack.type === 'insertheading') {
-      rep = context.rep;
+			rep = context.rep;
       context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
     }
   },
   aceInitialized: function aceInitialized(hook, context) {
-    const editorInfo = context.editorInfo;
+		const editorInfo = context.editorInfo;
     editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
-  },
+	},
   chatNewMessage: function chatNewMessage(hook, context, callback) {
     let text = context.text;
     // If the incoming message is a link and the link has the title attribute wrtc
@@ -248,14 +255,6 @@ exports.aceInitialized = hooks.aceInitialized;
 exports.chatNewMessage = hooks.chatNewMessage;
 
 exports.acePostWriteDomLineHTML = function (name, context) {
-  const hasHeader = $(context.node).find(':header');
-  if (hasHeader.length) {
-    const headerId = hasHeader.find('.videoHeader').attr('data-id');
-    setTimeout(() => {
-      // WrtcRoom.appendVideoIcon(headerId);
-    }, 250);
-	}
-	
 	const hasHyperlink = $(context.node).find("a");
   if(hasHyperlink.length>0){
     hasHyperlink.each(function(){
@@ -271,12 +270,11 @@ exports.acePostWriteDomLineHTML = function (name, context) {
     })
   }
 };
-// let flagme = 0;
 exports.aceDomLineProcessLineAttributes = function (name, context) {
   const cls = context.cls;
   const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
   const headingType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
-  const result = [];
+	const result = [];
   if (videoHEaderType && headingType) {
 		const headerId = videoHEaderType[1];
 		// if video or textChat modal is open! update modal title
@@ -285,28 +283,13 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
 			share.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
 		}
 
-		const data = {
-			headingTagId: headerId,
-			// positionTop: newY,
-			// positionLeft: newX,
-			// headTitle: $el.text(),
-			// lineNumber,
-			// videoChatLimit: VIDEOCHATLIMIT,
-		};
-
-		const box = $('#wrtcLinesIcons').tmpl(data);
-		const nedInlineIcon = $(`<div>`).append(box).html()
     const modifier = {
-      preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}"><div class="nedInlineIcon">${nedInlineIcon}</div>`,
+      preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}"><wrt-inline-icon headerid="${headerId}"></wrt-inline-icon>`,
       postHtml: '</nd-video>',
       processedMarker: true,
 		};
 		
 		result.push(modifier);
-
-    setTimeout(() => {
-      // WrtcRoom.appendVideoIcon(headerId, {createAgain: true});
-    }, 250);
   }
   return result;
 };

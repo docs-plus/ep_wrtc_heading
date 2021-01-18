@@ -18,6 +18,7 @@
 				"chatNewMessage": "ep_wrtc_heading/static/js/index",
 				"aceDomLineProcessLineAttributes": "ep_wrtc_heading/static/js/index",
 				"acePostWriteDomLineHTML": "ep_wrtc_heading/static/js/index"
+
 			},
 			"hooks": {
 				"socketio": "ep_wrtc_heading/index",

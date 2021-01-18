@@ -3,6 +3,11 @@
 const share = (() => {
   const avatarUrl = '../static/plugins/ep_profile_modal/static/img/user.png';
   const hElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.h1', '.h2', '.h3', '.h4', '.h5', '.h6'];
+	let ace = null
+
+	const init = (context) => {
+		ace = context.ace
+	}
 
   const getAvatarUrl = function getAvatarUrl(userId) {
     if (!userId) return avatarUrl;
@@ -119,18 +124,6 @@ const share = (() => {
     addTextChatMessage(msg);
   };
 
-  const roomBoxIconActive = function roomBoxIconActive() {
-    $body_ace_outer().find('.wrtcIconLine').each((index, val) => {
-      const textActive = $(val).attr('data-text');
-      const videoActive = $(val).attr('data-video');
-      if (textActive || videoActive) {
-        $(val).find('.btn_joinChat_chatRoom').addClass('active');
-      } else {
-        $(val).find('.btn_joinChat_chatRoom').removeClass('active');
-      }
-    });
-  };
-
   const appendUserList = function appendUserList(roomInfo, selector) {
     if (!roomInfo.list) return true;
     const $element = typeof selector === 'string' ? $(document).find(selector) : selector;
@@ -195,35 +188,35 @@ const share = (() => {
 	 */
   const inlineAvatar = {
     ROOM: function ROOM(headerId, room) {
-      const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
-      const $element = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine.'+headerId+' .wrtc_inlineAvatars');
-      const $videoInlineAvatarIcons = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
+      // const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
+      // const $element = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine.'+headerId+' .wrtc_inlineAvatars');
+      // const $videoInlineAvatarIcons = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
 
-      $element.find('.avatar').remove();
-      Object.keys(room).forEach((key, index) => {
-        const userInList = getUserFromId(room[key].userId) || {colorId: '', name: 'anonymous'};
-        if (userInList.userId) {
-          // if user avatar find in other room remove it
-          $videoInlineAvatarIcons.find(`.avatar[data-id="${userInList.userId}"]`).remove();
+      // $element.find('.avatar').remove();
+      // Object.keys(room).forEach((key, index) => {
+      //   const userInList = getUserFromId(room[key].userId) || {colorId: '', name: 'anonymous'};
+      //   if (userInList.userId) {
+      //     // if user avatar find in other room remove it
+      //     $videoInlineAvatarIcons.find(`.avatar[data-id="${userInList.userId}"]`).remove();
 
-          if (index < inlineAvatarLimit) {
-            $element.find('.avatarMore').hide();
-            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
-          } else {
-            $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
-          }
-        }
-      });
+      //     if (index < inlineAvatarLimit) {
+      //       $element.find('.avatarMore').hide();
+      //       $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
+      //     } else {
+      //       $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
+      //     }
+      //   }
+      // });
     },
     TEXT: function TEXT(headerId, room) {
-      const $element = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
-      $element.find('.avatar').remove();
-      this._append(room.list, $element);
+      // const $element = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
+      // $element.find('.avatar').remove();
+      // this._append(room.list, $element);
     },
     VIDEO: function VIDEO(headerId, room) {
-      const $element = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
-      $element.find('.avatar').remove();
-      this._append(room.list, $element);
+      // const $element = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
+      // $element.find('.avatar').remove();
+      // this._append(room.list, $element);
     },
     _append: function appendAvatart(list, $element) {
       const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
@@ -240,30 +233,31 @@ const share = (() => {
       });
     },
     update: function updateInfo(userId, data) {
-      const $roomBox = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
-      const $textBox = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
-      const $videoBox = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
+      // const $roomBox = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
+      // const $textBox = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
+      // const $videoBox = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
 
-      if ($roomBox) {
-        $roomBox.find(`.avatar[data-id="${userId}"] img`).attr({
-          src: data.imageUrl,
-          title: data.userName,
-        });
-      }
+      // if ($roomBox) {
+      //   $roomBox.find(`.avatar[data-id="${userId}"] img`).attr({
+      //     src: data.imageUrl,
+      //     title: data.userName,
+      //   });
+      // }
 
-      if ($videoBox) {
-        $videoBox.find('.avatar img').attr({
-          src: data.imageUrl,
-          title: data.userName,
-        });
-      }
+      // if ($videoBox) {
+      //   $videoBox.find('.avatar img').attr({
+      //     src: data.imageUrl,
+      //     title: data.userName,
+      //   });
+      // }
 
-      if ($textBox) {
-        $textBox.find('.avatar img').attr({
-          src: data.imageUrl,
-          title: data.userName,
-        });
-      }
+      // if ($textBox) {
+      //   $textBox.find('.avatar img').attr({
+      //     src: data.imageUrl,
+      //     title: data.userName,
+      //   });
+			// }
+			
     },
   };
 
@@ -327,24 +321,17 @@ const share = (() => {
   });
 
   wrtcPubsub.on('disable room buttons', (headerId, actions, target) => {
-    // const $inlineIconButton = findAceHeaderElement(headerId).$el;
-    // const $btnPlus = $inlineIconButton.find('button[data-join="PLUS"]');
-    // $btnPlus.find('.loader').remove();
-    // $btnPlus.append('<div class="loader"></div>');
-    // $btnPlus.prop('disabled', true);
+		const btn = findAceHeaderElement(headerId).$inlineIcon().querySelector('.btn_roomHandler');
+		btn.classList.add("active");
+		btn.setAttribute('disabled', true);
   });
 
   wrtcPubsub.on('enable room buttons', (headerId, action, target) => {
-		// const $inlineIconButton = $body_ace_outer().find('iframe').contents().find('#innerdocbody .nedInlineIcon').find('.wrtcIconLine.'+headerId);
-    // const newAction = action === 'JOIN' ? 'LEAVE' : 'JOIN';
-		// const $btnPlus = $inlineIconButton.find('button[data-join="PLUS"]');
-		// $btnPlus.find('.loader').remove();
-		// setTimeout(() => {
-		// 	$btnPlus.find('.loader').remove();
-		// 	$btnPlus.removeAttr('disabled');
-		// 	$btnPlus.attr({'data-action': newAction});
-		// }, 250);
-
+		const btn = findAceHeaderElement(headerId).$inlineIcon().querySelector('.btn_roomHandler');
+		const newAction = action === 'JOIN' ? 'LEAVE' : 'JOIN';
+		btn.removeAttribute('disabled');
+		btn.setAttribute('data-action',newAction);
+		btn.classList.remove("active");
   });
 
   wrtcPubsub.on('updateWrtcToolbarModal', (headerId, roomInfo) => {
@@ -371,6 +358,7 @@ const share = (() => {
 		}
 	});
 
+
   function findAceHeaderElement(headerId) {
     const $el = $body_ace_outer().find('iframe').contents()
         .find('#innerdocbody').find(`.videoHeader.${headerId}`);
@@ -378,11 +366,13 @@ const share = (() => {
 			exist: $el.length,
       $el,
       text: $el.text(),
-      tag: $el.attr('data-htag'),
+			tag: $el.attr('data-htag'),
+			$inlineIcon: () => $el.find('wrt-inline-icon')[0].shadowRoot
     };
   }
 
   return {
+		init,
     hElements,
     scrollDownToLastChatText,
     getUserFromId,
@@ -390,7 +380,6 @@ const share = (() => {
     $body_ace_outer,
     createShareLink,
     notifyNewUserJoined,
-    roomBoxIconActive,
     appendUserList,
     wrtcStore,
     wrtcPubsub,

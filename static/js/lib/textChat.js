@@ -136,41 +136,9 @@ const textChat = ( () => {
     share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.textChat ul'));
     share.appendUserList(roomInfo, '#wrtc_textChatWrapper  #textChatUserModal ul');
 
-    // notify, a user join the video-chat room
-    // var msg = {
-    // 	time: new Date(),
-    // 	userId: data.userId || user.userId,
-    // 	userName: user.name || data.name || 'anonymous',
-    // 	headerId: data.headerId,
-    // 	userCount: userCount,
-    // 	headerTitle: headTitle
-    // };
-    // share.notifyNewUserJoined('TEXT', msg, 'JOIN');
-
-    // if (data.headerId === currentRoom.headerId) {
-    // 	var privateMsg = {
-    // 		userName: user.name,
-    // 		author: user.userId,
-    // 		headerTitle: headTitle,
-    // 		time: new Date().getTime()
-    // 	};
-    // 	privateNotifyNewUserJoined('TEXT', privateMsg, 'JOIN');
-    // }
-
-    // if (data.headerId === currentRoom.headerId && data.userId !== clientVars.userId) {
-    // 	$.gritter.add({
-    // 		text: '<span class="author-name">' + user.name + '</span>' + 'has joined the text-chat, <b><i> "' + headTitle + '"</b></i>',
-    // 		sticky: false,
-    // 		time: 3000,
-    // 		position: 'center',
-    // 		class_name: 'chat-gritter-msg'
-    // 	});
-    // }
-
     if (data.userId === clientVars.userId) {
       currentRoom = data;
       $headingRoom.attr({'data-text': true});
-      share.roomBoxIconActive();
       activateModal(headerId, headTitle, userCount, roomInfo);
       share.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
       share.wrtcPubsub.emit('componentsFlow', 'text', 'open', true);
@@ -199,7 +167,6 @@ const textChat = ( () => {
 
     if (data.userId === clientVars.userId) {
       $headingRoom.removeAttr('data-text');
-      share.roomBoxIconActive();
       currentRoom = {};
       deactivateModal(data.headerId, roomInfo);
       share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
@@ -244,7 +211,6 @@ const textChat = ( () => {
     $joinBtn = $joinButton;
     socket.emit('userLeave', padId, userData, 'text', removeUserFromRoom);
   }
-
 
   function postAceInit(hook, context, webSocket, docId) {
     socket = webSocket;

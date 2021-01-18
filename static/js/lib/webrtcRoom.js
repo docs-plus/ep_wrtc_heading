@@ -83,18 +83,18 @@ const WrtcRoom = (() => {
       return false;
     }
 
-    if (actions !== 'SHARELINK' && actions !== 'USERPROFILEMODAL' && actions !== 'JOINBYQUERY') { share.wrtcPubsub.emit('disable room buttons', headerId, actions, target); }
-
     if (actions === 'JOIN') {
       switch (target) {
         case 'PLUS':
+					share.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
           joinChatRoom(headerId, userInfo, target);
           break;
         case 'VIDEO':
+					share.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
           videoChat.userJoin(headerId, userInfo, target);
           break;
         case 'TEXT':
-          textChat.userJoin(headerId, userInfo, target);
+          // textChat.userJoin(headerId, userInfo, target);
           break;
         default:
           return false;
@@ -225,8 +225,13 @@ const WrtcRoom = (() => {
 
 		$AceOuter.on('click', '.btn_roomHandler', roomBtnHandler);
 		
-		$AceOuter.find('iframe').contents()
-        .find('#innerdocbody').on('click', '.btn_roomHandler ', roomBtnHandler)
+		$AceOuter.find('iframe').contents().find('#innerdocbody').on('click', 'wrt-inline-icon', function(){
+			const $btn = this.shadowRoot.querySelector('.btn_roomHandler')
+			const headerId = $btn.getAttribute('data-id')
+			const action = $btn.getAttribute('data-action')
+			const target = $btn.getAttribute('data-join')
+			roomBtnHandler(action, headerId, target)
+		})
 
     $(document).on('click', '.btn_roomHandler', roomBtnHandler);
 

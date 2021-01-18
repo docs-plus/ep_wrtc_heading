@@ -23,7 +23,7 @@ exports.eejsBlock_scripts = (hookName, args, cb) => {
 };
 
 exports.eejsBlock_styles = (hookName, args, cb) => {
-  args.content += `<link rel="stylesheet" href="../static/plugins/ep_wrtc_heading/static/css/rtcbox.css?v=${packageJson.version}" type="text/css" />`;
+  args.content += `<link rel="stylesheet" href="../static/plugins/ep_wrtc_heading/static/css/outerLayer.css?v=${packageJson.version}" type="text/css" />`;
   return cb();
 };
 

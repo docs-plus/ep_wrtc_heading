@@ -1,3 +1,13 @@
+#outerdocbody iframe {
+	max-width: 950px!important;
+	box-shadow: none!important;
+	background: inherit!important;
+}
+
+.inner-editor{
+	padding: 5px 0;
+}
+
 .outerdocbody{
 	position: relative;
 }
@@ -8,6 +18,11 @@
 
 #innerdocbody{
 	padding: 40px 55px!important;
+	max-width: 900px;
+	margin: auto;
+	box-shadow: 0 1px 3px 1px rgba(60,64,67,.15);
+	background: #fff;
+	overflow: inherit;
 }
 
 nd-video{
@@ -17,98 +32,22 @@ nd-video{
 }
 
 
-.nedInlineIcon{
+wrt-inline-icon{
 	position: absolute;
-	left: -70px;
+	left: -76px;
+	margin-top: .7em;
+	/* padding: 0!important; */
 	/* top: -14px; */
 }
 
 /*video icon line*/
-#wrtcVideoIcons{
-	order: -1;
-	position: relative;
-	z-index: 20;
-	/* left: -56px; */
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-}
-#wrtcVideoIcons:hover {
-	overflow: initial;
-}
-#wrtcVideoIcons:not(.active) {
-	display: none;
-}
 
 @media (max-width: 800px) {
-	#wrtcVideoIcons {
+	wrt-inline-icon {
 		display: none !important;
 	}
 }
 
-#wrtcVideoIcons > .wrtcIconLine{
-	position: absolute;
-	right: -24px;
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-  align-items: center;
-}
-
-.wrtcIconLine .wrtcIcon > button {
-	border: 1px solid #e6e8e9;
-	border-radius: 0 14px 14px 0;
-	background: #fff;
-	box-shadow: 1px 1px 8px #e6e8e9;
-	margin: 5px;
-	outline: none;
-	width: 40px;
-	height: 40px;
-	padding: 0 6px;
-	transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-	display: flex;
-	align-items: center;
-	color: #333333;
-	justify-content: center;
-}
-
-.wrtcIconLine.active .wrtcIcon > button svg{
-	color: #2678ff;
-}
-
-.wrtcIconLine .wrtcIcon > button:hover{
-	background-color: #2678ff;
-	color: #fff;
-	width: 50px;
-	padding-left: 10px;
-}
-
-.wrtcIconLine .wrtcIcon > button > svg {
-	width: 16px;
-	height: 16px;
-}
-
-.wrtcLineAvatar{
-	order: -1;
-}
-
-.wrtcIconLine .loader {
-	border: 4px solid #f3f3f3;
-	border-top: 4px solid #3498db;
-	border-radius: 50%;
-	animation: spin 2s linear infinite;
-	padding: 16px;
-	position: absolute;
-	z-index: 2;
-	background: transparent;
-	left: -1px;
-	top: -1px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 
 /* inline avater*/
 .wrtc_inlineAvatars{

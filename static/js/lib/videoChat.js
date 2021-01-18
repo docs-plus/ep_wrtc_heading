@@ -95,7 +95,6 @@ const videoChat = (() => {
 
     if (data.userId === clientVars.userId) {
       share.$body_ace_outer().find(`#wrtcVideoIcons #${headerId}`).removeClass('active');
-      share.roomBoxIconActive();
       WRTC.deactivate(data.userId, data.headerId);
       stopWatchNetwork();
       window.headerId = null;
@@ -157,7 +156,6 @@ const videoChat = (() => {
     if (data.userId === clientVars.userId) {
       window.headerId = data.headerId;
 
-      share.roomBoxIconActive();
       startWatchNetwork();
 
       share.$body_ace_outer().find(`#wrtcVideoIcons #${headerId}`).addClass('active');
@@ -381,6 +379,7 @@ const videoChat = (() => {
     gateway_userLeave,
     reloadSession,
     reloadCurrentSession,
-    mediaDevices,
+		mediaDevices,
+		
   };
 })();
