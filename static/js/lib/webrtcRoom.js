@@ -8,7 +8,7 @@ const WrtcRoom = (() => {
   /** --------- Helper --------- */
 
   function scroll2Header(headerId) {
-    const padContainer = share.$body_ace_outer().find('iframe').contents().find('#innerdocbody');
+    const padContainer = Helper.$body_ace_outer().find('iframe').contents().find('#innerdocbody');
     padContainer.find(`.videoHeader.${headerId}`).each(function scrolling() {
       this.scrollIntoView({
         behavior: 'smooth',
@@ -38,7 +38,7 @@ const WrtcRoom = (() => {
 	 * @param {string} headerId
 	 * @param {string} target @enum (chatRoom|video|text)
 	 */
-	function roomBtnHandler(actions, headerId, target) {
+  function roomBtnHandler(actions, headerId, target) {
     if (typeof actions !== 'string') {
       actions.preventDefault();
       // no idea! but in somecases! this function fire twice!
@@ -71,7 +71,7 @@ const WrtcRoom = (() => {
     };
 
     // Before handel request, check socket state
-    if (share.wrtcStore.socketState !== 'OPEND') {
+    if (Helper.wrtcStore.socketState !== 'OPEND') {
       // show the alert that user must reload the page
       $.gritter.add({
         title: 'Video chat no longer responds',
@@ -86,11 +86,11 @@ const WrtcRoom = (() => {
     if (actions === 'JOIN') {
       switch (target) {
         case 'PLUS':
-					share.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
+          Helper.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
           joinChatRoom(headerId, userInfo, target);
           break;
         case 'VIDEO':
-					share.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
+          Helper.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
           videoChat.userJoin(headerId, userInfo, target);
           break;
         case 'TEXT':
@@ -120,9 +120,10 @@ const WrtcRoom = (() => {
     } else if (actions === 'USERPROFILEMODAL') {
       showUserProfileModal(headerId);
     } else if (actions === 'JOINBYQUERY') {
-			const href = $(this).attr("href");
-			joinByQueryString(href);
-		}
+      const href = $(this).attr('href');
+      console.log('akjsdlkjalksjdljalskjdlkajsldkjalksjdlkjalksjd', href);
+      joinByQueryString(href);
+    }
   }
 
   function joinByQueryString(url) {
@@ -132,16 +133,16 @@ const WrtcRoom = (() => {
     let target = urlParams.get('target');
     const join = urlParams.get('join');
 
-		if (!headerId) return true;
-		
-		const inComeURL = new URL(url);
-		const inComePadName = inComeURL.pathname.split('/').pop()
-		const currentPadName = location.pathname.split('/').pop()
+    if (!headerId) return true;
 
-		// check if header id belong to this pad
-		// then if it's not check padName
-    if (!share.wrtcStore.rooms.get(headerId)) {
-			if(inComePadName !== currentPadName) return window.location.href = url
+    const inComeURL = new URL(url);
+    const inComePadName = inComeURL.pathname.split('/').pop();
+    const currentPadName = location.pathname.split('/').pop();
+
+    // check if header id belong to this pad
+    // then if it's not check padName
+    if (!Helper.wrtcStore.rooms.get(headerId)) {
+      if (inComePadName !== currentPadName) return window.location.href = url;
       $.gritter.add({
         title: 'Error',
         text: 'The header seems not to exist anymore!',
@@ -166,11 +167,11 @@ const WrtcRoom = (() => {
     headId = $(this).attr('data-id') || headId;
     target = $(this).attr('data-join') || target;
     target = target.toLowerCase();
-    const title = share.$body_ace_outer().find(`.wbrtc_roomBox.${headId} .titleRoom`).text();
+    const title = Helper.$body_ace_outer().find(`.wbrtc_roomBox.${headId} .titleRoom`).text();
 
     const origin = window.location.origin;
     const pathName = window.location.pathname;
-    const link = `${origin + pathName}?header=${share.slugify(title)}&id=${headId}&target=${target}&join=true`;
+    const link = `${origin + pathName}?header=${Helper.slugify(title)}&id=${headId}&target=${target}&join=true`;
 
     const $temp = $('<input>');
     $('body').append($temp);
@@ -189,7 +190,7 @@ const WrtcRoom = (() => {
 
   function getHeaderRoomY($element) {
     const height = $element.outerHeight();
-    const paddingTop = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
+    const paddingTop = Helper.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
     const aceOuterPadding = parseInt(paddingTop, 10);
     const offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
     return offsetTop + height / 2 - 22;
@@ -203,7 +204,7 @@ const WrtcRoom = (() => {
     $('#ep_profile_users_profile_name').text(user.userName);
     $('#ep_profile_users_profile_desc').text(user.about);
     $('#ep_profile_users_profile_homepage').attr({
-      href: share.getValidUrl(user.homepage),
+      href: Helper.getValidUrl(user.homepage),
       target: '_blank',
     });
 
@@ -221,19 +222,19 @@ const WrtcRoom = (() => {
   }
 
   function activeEventListener() {
-    const $AceOuter = share.$body_ace_outer();
+    const $AceOuter = Helper.$body_ace_outer();
 
-		$AceOuter.on('click', '.btn_roomHandler', roomBtnHandler);
-		
-		$AceOuter.find('iframe').contents().find('#innerdocbody').on('click', 'wrt-inline-icon', function(){
-			const $btn = this.shadowRoot.querySelector('.btn_roomHandler')
-			const headerId = $btn.getAttribute('data-id')
-			const action = $btn.getAttribute('data-action')
-			const target = $btn.getAttribute('data-join')
-			roomBtnHandler(action, headerId, target)
-		})
+    $AceOuter.on('click', '.btn_roomHandler', roomBtnHandler);
 
-    $(document).on('click', '.btn_roomHandler', roomBtnHandler);
+    $AceOuter.find('iframe').contents().find('#innerdocbody').on('click', 'wrt-inline-icon', function () {
+      const $btn = this.shadowRoot.querySelector('.btn_roomHandler');
+      const headerId = $btn.getAttribute('data-id');
+      const action = $btn.getAttribute('data-action');
+      const target = $btn.getAttribute('data-join');
+      roomBtnHandler(action, headerId, target);
+    });
+
+    $(document).on('click', '.btn_roomHandler, .wrtc_roomLink', roomBtnHandler);
 
     $(document).on('mouseenter', '.video-container.local-user', () => {
       $(document).find('#wrtc_modal #networkStatus').addClass('active');
@@ -270,11 +271,11 @@ const WrtcRoom = (() => {
     roomBtnHandler,
     aceSetAuthorStyle: function aceSetAuthorStyle(context) {
       if (context.author) {
-        const user = share.getUserFromId(context.author);
+        const user = Helper.getUserFromId(context.author);
         if (user) {
           // sync user info
-          share.$body_ace_outer().find(`.wrtc_content.textChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(user.name);
-          share.$body_ace_outer().find(`.wrtc_content.videoChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(user.name);
+          Helper.$body_ace_outer().find(`.wrtc_content.textChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(user.name);
+          Helper.$body_ace_outer().find(`.wrtc_content.videoChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(user.name);
         }
       }
     },
@@ -285,7 +286,7 @@ const WrtcRoom = (() => {
       socket = webSocket;
       padId = docId;
       VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
-      share.wrtcPubsub.emit('componentsFlow', 'room', 'init', true);
+      Helper.wrtcPubsub.emit('componentsFlow', 'room', 'init', true);
 
       socket.on('userJoin', (data, roomInfo, target) => {
         if (target === 'video') {
@@ -312,16 +313,14 @@ const WrtcRoom = (() => {
     },
     adoptHeaderYRoom: function adoptHeaderYRoom() {
       // Set all video_heading to be inline with their target REP
-      const $padOuter = share.$body_ace_outer();
-			if (!$padOuter) return;
-			
-			console.log("hi man ")
+      const $padOuter = Helper.$body_ace_outer();
+      if (!$padOuter) return;
 
       // TODO: performance issue
       $padOuter.find('#wbrtc_avatarCol .wrtcIconLine').each(function adjustHeaderIconPosition() {
         const $el = $(this);
         const $headerId = $el.attr('id');
-        const $headingEl = share.findAceHeaderElement(headerId).$el;
+        const $headingEl = Helper.findAceHeaderElement(headerId).$el;
 
         // if the H tags does not find, remove chatBox
         // TODO: and kick out the user form the chatBox
@@ -330,26 +329,26 @@ const WrtcRoom = (() => {
           return false;
         }
 
-        $el.css({top: `${share.getHeaderRoomY($headingEl)-8}px`});
+        $el.css({top: `${Helper.getHeaderRoomY($headingEl) - 16}px`});
       });
     },
     appendVideoIcon: function appendVideoIcon(headerId, options = {createAgain: false}) {
       if (!headerId) return false;
 
-      const roomExist = share.wrtcStore.rooms.has(headerId);
+      const roomExist = Helper.wrtcStore.rooms.has(headerId);
       if (!options.createAgain && roomExist) return false;
 
-			const $elRoomExist = share.findAceHeaderElement(headerId)
+      const $elRoomExist = Helper.findAceHeaderElement(headerId);
 
       if (!roomExist && $elRoomExist.exist) {
-        const $el = share.$body_ace_outer().find('iframe')
+        const $el = Helper.$body_ace_outer().find('iframe')
             .contents()
             .find('#innerdocbody')
             .children('div')
             .find(`.videoHeader.${headerId}`);
 
-        const aceInnerOffset = share.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
-        const target = share.$body_ace_outer().find('#outerdocbody');
+        const aceInnerOffset = Helper.$body_ace_outer().find('iframe[name="ace_inner"]').offset();
+        const target = Helper.$body_ace_outer().find('#outerdocbody');
         const newY = getHeaderRoomY($el);
         const newX = Math.ceil(aceInnerOffset.left);
         const lineNumber = $el.parent().parent().prevAll().length;
@@ -363,18 +362,23 @@ const WrtcRoom = (() => {
           videoChatLimit: VIDEOCHATLIMIT,
         };
 
-        share.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
+        Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
 
         const box = $('#wrtcLinesIcons').tmpl(data);
         target.find('#wrtcVideoIcons').append(box);
         // check the room that has user in there
         // padId, headerId
         socket.emit('getVideoRoomInfo', padId, headerId, (result) => {
-          if (result) share.inlineAvatar.ROOM(headerId, result);
+          if (result) Helper.inlineAvatar.ROOM(headerId, result);
         });
       }
 
       self.adoptHeaderYRoom();
+    },
+    syncVideoAvatart: (headerId) => {
+      socket.emit('getVideoRoomInfo', padId, headerId, (result) => {
+        if (result) Helper.inlineAvatar.ROOM(headerId, result);
+      });
     },
   };
 

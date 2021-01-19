@@ -10,8 +10,8 @@ const roomStatus = {};
 const maxTryToWaitAcceptNewCall = 11;
 
 const acceptNewConnection = ({socket, padId, padparticipators, userData, target, callback}) => {
-	let room = null;
-	console.info(`process webrtc connection`)
+  let room = null;
+  console.info('process webrtc connection');
   if (target === 'video') {
     room = videoChat.socketUserJoin(userData, padparticipators);
     _.set(socket, 'ndHolder.video', room.data);
@@ -29,37 +29,37 @@ const acceptNewConnection = ({socket, padId, padparticipators, userData, target,
 };
 
 const q = new Queue(
-    (({socket, padId,  padparticipators, userData, target, callback, retry}, cb) => {
+    (({socket, padId, padparticipators, userData, target, callback, retry}, cb) => {
       // Some processing here ...
 
       // Firt check if the room has accept call Prop
       if (!_.has(roomStatus, `${padId}.${userData.headerId}.acceptCall`)) {
         // if the Header does not exist create and set 'acceptCall' to false, for next request are comming throw
-				_.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
-				console.info(`Create room, accept call Prop. ${padId}.${userData.headerId}.acceptCall`)
+        _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
+        console.info(`Create room, accept call Prop. ${padId}.${userData.headerId}.acceptCall`);
         // in this case we have to process the request for the first time
         acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
         return cb();
-			}
+      }
 
 
       // otherwise check the room that can accept new call
       // if it is, then `acceptNewConnection` otherwise push the request at the end of queue
       if (_.get(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false)) {
-				console.info(`room ready to accept new call. ${padId}.${userData.headerId}.acceptCal`)
-				_.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
+        console.info(`room ready to accept new call. ${padId}.${userData.headerId}.acceptCal`);
+        _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
         acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
       } else {
-				console.info(`room not ready to accept new call. ${padId}.${userData.headerId}.acceptCal`)
-        if (retry < maxTryToWaitAcceptNewCall) { 
-					q.push({socket, padparticipators, padId, userData, target, callback, retry: retry += 1});
-					console.info(`put the request in queue for next call. [retry]: ${retry}, [maxTryToWaitAcceptNewCall]: ${maxTryToWaitAcceptNewCall}`)
-				} else { 
-					_.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, true);
-					console.info(`unfortunately after ${retry} try, request must be terminate!`)
-					acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
-					callback(null, null, target);
-				}
+        console.info(`room not ready to accept new call. ${padId}.${userData.headerId}.acceptCal`);
+        if (retry < maxTryToWaitAcceptNewCall) {
+          q.push({socket, padparticipators, padId, userData, target, callback, retry: retry += 1});
+          console.info(`put the request in queue for next call. [retry]: ${retry}, [maxTryToWaitAcceptNewCall]: ${maxTryToWaitAcceptNewCall}`);
+        } else {
+          _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, true);
+          console.info(`unfortunately after ${retry} try, request must be terminate!`);
+          acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
+          callback(null, null, target);
+        }
       }
 
       return cb(null, true);
@@ -67,7 +67,7 @@ const q = new Queue(
     {afterProcessDelay: 2000}
 );
 
-const socketInit = (hookName, args,) => {
+const socketInit = (hookName, args) => {
   socketIo = args.io;
   const io = args.io;
 
@@ -82,11 +82,11 @@ const socketInit = (hookName, args,) => {
 
     socket.on('acceptNewCall', (padId, headerId, callback) => {
       // console.log("new acceptCall ", padId, headerId)
-		
-			if(!_.get(roomStatus, `${padId}.${headerId}.acceptCall`, false)){
-				_.set(roomStatus, `${padId}.${headerId}.acceptCall`, true);
-				console.info(`yup, avilable the room to accept new call. ${padId}.${headerId}.acceptCall`)
-			}
+
+      if (!_.get(roomStatus, `${padId}.${headerId}.acceptCall`, false)) {
+        _.set(roomStatus, `${padId}.${headerId}.acceptCall`, true);
+        console.info(`yup, avilable the room to accept new call. ${padId}.${headerId}.acceptCall`);
+      }
       // console.log("new acceptCall ", padId, headerId, _.get(roomStatus, `${padId}.${headerId}.acceptCall`))
     });
 
@@ -188,10 +188,10 @@ const socketInit = (hookName, args,) => {
       const result = videoChat.getRoom(padId, headerId);
       callback(result);
     });
-	});
+  });
 
-	return args;
-}
+  return args;
+};
 
 /**
  * Handles an RTC Message

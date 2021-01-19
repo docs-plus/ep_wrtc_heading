@@ -404,7 +404,7 @@
 #wrtc_textChat .textIcon{
 	width: 16px;
 	display: inline-block;
-	margin: 0 2px 0 6px;
+	margin: 0 2px 0 0;
 	height: 17px;
 }
 .wrtc_text .videoIcon svg, 

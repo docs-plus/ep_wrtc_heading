@@ -12,7 +12,7 @@ const jsfiles = [
   './static/js/lib/jquery.tmpl.min.js',
   './static/js/lib/getStats.min.js',
   // './static/js/lib/components.js',
-  './static/js/lib/clientShare.js',
+  './static/js/lib/helpers.js',
   './static/js/lib/copyPasteEvents.js',
   './static/js/lib/codecsHandler.js',
   './static/js/lib/textChat.js',

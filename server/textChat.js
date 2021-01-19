@@ -17,8 +17,7 @@ exports.socketUserJoin = (data, padparticipators) => {
   };
 
   // if the room does not exist create the room for the first time.
-	if (!rooms[roomKey]) { rooms[roomKey] = []; }
-	
+  if (!rooms[roomKey]) { rooms[roomKey] = []; }
 
 
   result.info.present = rooms[roomKey].length;
@@ -30,10 +29,10 @@ exports.socketUserJoin = (data, padparticipators) => {
 
   result.canUserJoin = true;
   rooms[roomKey].push(data);
-	result.info.present++;
+  result.info.present++;
 
-	// clear participator, check if the current users are sync with room object
-	rooms[roomKey] = rooms[roomKey].filter(x => padparticipators.includes(x.userId))
+  // clear participator, check if the current users are sync with room object
+  rooms[roomKey] = rooms[roomKey].filter((x) => padparticipators.includes(x.userId));
 
   return result;
 };

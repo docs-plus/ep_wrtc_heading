@@ -23,8 +23,8 @@ const socketUserJoin = (data, padparticipators) => {
 
   // does user already joined the room?
   const isUserInRoom = rooms[roomKey].find((x) => x.userId === data.userId);
-	if (isUserInRoom) return false;
-	
+  if (isUserInRoom) return false;
+
   const info = {
     present: rooms[roomKey].length,
     list: rooms[roomKey],
@@ -36,10 +36,10 @@ const socketUserJoin = (data, padparticipators) => {
     info.present++;
   } else {
     canUserJoin = false;
-	}
+  }
 
-	// clear participator, check if the current users are sync with room object
-	rooms[roomKey] = rooms[roomKey].filter(x => padparticipators.includes(x.userId))
+  // clear participator, check if the current users are sync with room object
+  rooms[roomKey] = rooms[roomKey].filter((x) => padparticipators.includes(x.userId));
 
   return {
     canUserJoin,

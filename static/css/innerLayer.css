@@ -38,6 +38,11 @@ wrt-inline-icon{
 	margin-top: .04em;
 	/* padding: 0!important; */
 	/* top: -14px; */
+	cursor: pointer;
+}
+
+wrt-inline-icon button {
+	cursor: pointer;
 }
 
 /*video icon line*/
@@ -64,6 +69,7 @@ wrt-inline-icon{
 	min-width: 100px;
 	max-width: 190px;
 	/* overflow: hidden; */
+	background-color: transparent;
 }
 
 .wrtcIconLine{

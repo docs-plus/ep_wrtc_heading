@@ -190,7 +190,7 @@ const WRTC = (() => {
         self.hide(userId);
         self.hangup(userId, true);
       }
-      share.wrtcStore.userInRoom = false;
+      Helper.wrtcStore.userInRoom = false;
       if (callback) callback();
     },
     // deprecated function
@@ -275,18 +275,18 @@ const WRTC = (() => {
       self.show();
       self.hangupAll();
       self.getUserMedia(headerId);
-      share.wrtcStore.userInRoom = true;
+      Helper.wrtcStore.userInRoom = true;
     },
     deactivate: function deactivate(userId, headerId) {
       if (!userId) return false;
       self.hide(userId);
       self.hangupAll(headerId);
       self.hangup(userId, true, headerId);
-      if (share.wrtcStore.localstream) share.stopStreaming();
-      share.wrtcStore.userInRoom = false;
+      if (Helper.wrtcStore.localstream) Helper.stopStreaming();
+      Helper.wrtcStore.userInRoom = false;
     },
     toggleMuted: function toggleMuted() {
-      const audioTrack = share.wrtcStore.localstream.getAudioTracks()[0];
+      const audioTrack = Helper.wrtcStore.localstream.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
         return !audioTrack.enabled; // returning "Muted" state, which is !enabled
@@ -294,7 +294,7 @@ const WRTC = (() => {
       return true; // if there's no audio track, it's muted
     },
     toggleVideo: function toggleVideo() {
-      const videoTrack = share.wrtcStore.localstream.getVideoTracks()[0];
+      const videoTrack = Helper.wrtcStore.localstream.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         return !videoTrack.enabled;
@@ -308,7 +308,7 @@ const WRTC = (() => {
     },
     setStream: function setStream(userId, stream) {
       if (!userId) return false;
-      const isLocal = userId === share.getUserId();
+      const isLocal = userId === Helper.getUserId();
       const videoId = `video_${userId.replace(/\./g, '_')}`;
       let video = $(`#${videoId}`)[0];
 
@@ -347,7 +347,7 @@ const WRTC = (() => {
     },
     addInterface: function addInterface(userId) {
       if (!userId) return false;
-      const isLocal = userId === share.getUserId();
+      const isLocal = userId === Helper.getUserId();
       const videoId = `video_${userId.replace(/\./g, '_')}`;
       const $video = $(`#${videoId}`);
 
@@ -428,7 +428,7 @@ const WRTC = (() => {
       const peer = msg.from;
       const data = msg.data;
       const type = data.type;
-      if (peer === share.getUserId()) {
+      if (peer === Helper.getUserId()) {
         // console.info('ignore own messages');
         return;
       }
@@ -445,19 +445,19 @@ const WRTC = (() => {
         } else {
           self.createPeerConnection(peer, data.headerId);
         }
-        if (share.wrtcStore.localstream) {
+        if (Helper.wrtcStore.localstream) {
           if (pc[peer].getLocalStreams) {
             if (!pc[peer].getLocalStreams().length) {
-              share.wrtcStore.localstream.getTracks().forEach((track) => {
-                pc[peer].addTrack(track, share.wrtcStore.localstream);
+              Helper.wrtcStore.localstream.getTracks().forEach((track) => {
+                pc[peer].addTrack(track, Helper.wrtcStore.localstream);
               });
 
               // pc[peer].addStream(localStream);
             }
           } else if (pc[peer].localStreams) {
             if (!pc[peer].localStreams.length) {
-              share.wrtcStore.localstream.getTracks().forEach((track) => {
-                pc[peer].addTrack(track, share.wrtcStore.localstream);
+              Helper.wrtcStore.localstream.getTracks().forEach((track) => {
+                pc[peer].addTrack(track, Helper.wrtcStore.localstream);
               });
               // pc[peer].addStream(localStream);
             }
@@ -476,8 +476,8 @@ const WRTC = (() => {
         if (pc[peer]) {
           const answer = new RTCSessionDescription(data.answer);
           pc[peer].setRemoteDescription(answer, () => {
-						// console.log("call setRemoteDescription", new Date().getSeconds())
-					}, logError);
+            // console.log("call setRemoteDescription", new Date().getSeconds())
+          }, logError);
         }
       } else if (type === 'icecandidate') {
         if (pc[peer]) {
@@ -501,11 +501,11 @@ const WRTC = (() => {
       });
     },
     getUserId: function getUserId() {
-      return self._pad && share.getUserId();
+      return self._pad && Helper.getUserId();
     },
     hangup: function hangup(userId, notify, headerId) {
       notify = arguments.length === 1 ? true : notify;
-      if (pc[userId] && userId !== share.getUserId()) {
+      if (pc[userId] && userId !== Helper.getUserId()) {
         self.setStream(userId, '');
         pc[userId].close();
         delete pc[userId];
@@ -529,12 +529,12 @@ const WRTC = (() => {
       constraints = mergeConstraints(constraints, sdpConstraints);
 
       if (!pc[userId]) self.createPeerConnection(userId, headerId);
-      
+
 
       // pc[userId].addStream(localStream);
 
-      share.wrtcStore.localstream.getTracks().forEach((track) => {
-        pc[userId].addTrack(track, share.wrtcStore.localstream);
+      Helper.wrtcStore.localstream.getTracks().forEach((track) => {
+        pc[userId].addTrack(track, Helper.wrtcStore.localstream);
       });
 
       pc[userId].createOffer((desc) => {
@@ -557,7 +557,7 @@ const WRTC = (() => {
             candidate: event.candidate,
           });
         } else {
-					reconnected = 0;
+          reconnected = 0;
           socket.emit('acceptNewCall', padId, window.headerId);
         }
       };
@@ -570,9 +570,9 @@ const WRTC = (() => {
       };
     },
     audioVideoInputChange: function audioVideoInputChange() {
-      share.stopStreaming(() => {
-				self.getUserMedia(window.headerId);
-			});
+      Helper.stopStreaming(() => {
+        self.getUserMedia(window.headerId);
+      });
     },
     attachSinkId: function attachSinkId(element, sinkId) {
       // Attach audio output device to video element using device/sink ID.
@@ -631,10 +631,10 @@ const WRTC = (() => {
       window.navigator.mediaDevices
           .getUserMedia(mediaConstraints)
           .then((stream) => {
-            share.wrtcStore.localstream = stream;
-            self.setStream(share.getUserId(), stream);
+            Helper.wrtcStore.localstream = stream;
+            self.setStream(Helper.getUserId(), stream);
             self._pad.collabClient.getConnectedUsers().forEach((user) => {
-              if (user.userId !== share.getUserId()) {
+              if (user.userId !== Helper.getUserId()) {
                 if (pc[user.userId]) {
                   self.hangup(user.userId, false, headerId);
                 }
@@ -642,7 +642,7 @@ const WRTC = (() => {
               }
             });
           }).catch((err) => {
-            self.showUserMediaError(err, share.getUserId(), headerId);
+            self.showUserMediaError(err, Helper.getUserId(), headerId);
           });
     },
     attemptToReconnect: function attemptToReconnect() {
@@ -670,7 +670,7 @@ const WRTC = (() => {
       element.src = URL.createObjectURL(stream);
     } else {
       console.error('Error attaching stream to element.', element);
-		}
+    }
   };
   var webrtcDetectedBrowser = 'chrome';
 

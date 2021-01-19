@@ -68,7 +68,7 @@
 			"WrtcRoom": true,
 			"io": true,
 			"browser": true,
-			"share": true,
+			"Helper": true,
 			"videoChat": true,
 			"events": true,
 			"$": true,

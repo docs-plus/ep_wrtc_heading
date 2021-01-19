@@ -1,20 +1,18 @@
 'use strict';
 
-const share = (() => {
+const Helper = (() => {
   const avatarUrl = '../static/plugins/ep_profile_modal/static/img/user.png';
   const hElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.h1', '.h2', '.h3', '.h4', '.h5', '.h6'];
-	let ace = null
+  let ace = null;
 
-	const init = (context) => {
-		ace = context.ace
-	}
+  const init = (context) => ace = context.ace;
 
-  const getAvatarUrl = function getAvatarUrl(userId) {
+  const getAvatarUrl = (userId) => {
     if (!userId) return avatarUrl;
     return `/p/getUserProfileImage/${userId}/${window.pad.getPadId()}?t=${new Date().getTime()}`;
   };
 
-  const getValidUrl = function getValidUrl() {
+  const getValidUrl = function () {
     const url = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
 
     if (url === '') return '';
@@ -31,53 +29,46 @@ const share = (() => {
     return newUrl;
   };
 
-  const getUserId = function getUserId() {
-    return clientVars.userId || window.pad.getUserId();
-  };
+  const getUserId = () => clientVars.userId || window.pad.getUserId();
 
-  function stopStreaming(callback) {
-		const stream = wrtcStore.localstream;
+  const stopStreaming = (callback) => {
+    const stream = wrtcStore.localstream;
     if (stream) {
       stream.getTracks().forEach((track) => {
         track.stop();
         stream.removeTrack(track);
       });
-			wrtcStore.localstream = null
-			if(callback) callback()
+      wrtcStore.localstream = null;
+      if (callback) callback();
     }
-  }
+  };
 
-  const scrollDownToLastChatText = function scrollDownToLastChatText(selector) {
+  const scrollDownToLastChatText = (selector) => {
     const $element = $(selector);
     if ($element.length <= 0 || !$element[0]) return true;
     $element.animate({scrollTop: $element[0].scrollHeight}, {duration: 400, queue: false});
   };
 
-  const getUserFromId = function getUserFromId(userId) {
+  const getUserFromId = (userId) => {
     if (!window.pad || !window.pad.collabClient) return null;
     const result = window.pad.collabClient.getConnectedUsers().filter((user) => user.userId === userId);
     const user = result.length > 0 ? result[0] : null;
     return user;
   };
 
-  const slugify = function slugify(text) {
-    return text.toString().toLowerCase().trim().replace(/\s+/g, '-') // Replace spaces with -
-        .replace(/&/g, '-and-') // Replace & with 'and'
-        .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-        .replace(/\--+/g, '-') // Replace multiple - with single -
-        .replace(/^-+/, '') // Trim - from start of text
-        .replace(/-+$/, ''); // Trim - from end of text
-  };
+  const slugify = (text) => text.toString().toLowerCase().trim().replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/&/g, '-and-') // Replace & with 'and'
+      .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+      .replace(/\--+/g, '-') // Replace multiple - with single -
+      .replace(/^-+/, '') // Trim - from start of text
+      .replace(/-+$/, '') // Trim - from end of text
+  ;
 
-  const $body_ace_outer = function $body_ace_outer() {
-    return $(document).find('iframe[name="ace_outer"]').contents();
-  };
+  const $body_ace_outer = () => $(document).find('iframe[name="ace_outer"]').contents();
 
-  const createShareLink = function createShareLink(headingTagId, headerText) {
-    return `${window.location.origin + window.location.pathname}?header=${slugify(headerText)}&headerId=${headingTagId}&joinvideo=true`;
-  };
+  const createShareLink = (headerId, headerText = 'headerText') => `${window.location.origin + window.location.pathname}?header=${slugify(headerText)}&id=${headerId}&target=video&join=true`;
 
-  function addTextChatMessage(msg) {
+  const addTextChatMessage = (msg) => {
     const authorClass = `author-${msg.userId.replace(/[^a-y0-9]/g, (c) => {
       if (c === '.') return '-';
       return `z${c.charCodeAt(0)}z`;
@@ -94,37 +85,36 @@ const share = (() => {
 
     $(document).find('#chatbox #chattext').append(html);
     scrollDownToLastChatText('#chatbox #chattext');
-  }
+  };
 
-  const notifyNewUserJoined = function notifyNewUserJoined(target, msg, action) {
+  const notifyNewUserJoined = (target, msg, action) => {
     const videoIcon = '<span class="videoIcon"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="video" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-video fa-w-18 fa-2x"><path fill="currentColor" d="M336.2 64H47.8C21.4 64 0 85.4 0 111.8v288.4C0 426.6 21.4 448 47.8 448h288.4c26.4 0 47.8-21.4 47.8-47.8V111.8c0-26.4-21.4-47.8-47.8-47.8zm189.4 37.7L416 177.3v157.4l109.6 75.5c21.2 14.6 50.4-.3 50.4-25.8V127.5c0-25.4-29.1-40.4-50.4-25.8z" class=""></path></svg></span>';
     const textIcon = '<span class="textIcon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M416 224V64c0-35.3-28.7-64-64-64H64C28.7 0 0 28.7 0 64v160c0 35.3 28.7 64 64 64v54.2c0 8 9.1 12.6 15.5 7.8l82.8-62.1H352c35.3.1 64-28.6 64-63.9zm96-64h-64v64c0 52.9-43.1 96-96 96H192v64c0 35.3 28.7 64 64 64h125.7l82.8 62.1c6.4 4.8 15.5.2 15.5-7.8V448h32c35.3 0 64-28.7 64-64V224c0-35.3-28.7-64-64-64z"></path></svg></span>';
-    const btnJoin = `<span class='wrtc_roomLink btn_roomHandler' data-join='${target}' data-action='JOIN' data-id='${msg.headerId}' title='Join'>${msg.headerTitle}</span>`;
+    const btnJoin = `<span class='wrtc_roomLink btn_roomHandler' href="${createShareLink(msg.headerId)}" data-join='PLUS' data-action='JOINBYQUERY' data-id='${msg.headerId}' title='Join'>${msg.headerTitle}</span>`;
 
-		const text = "" //action === 'JOIN' ? 'joins' : 'leaves';
-		const userName = `<b>${msg.userName}</b>`
+    const text = ''; // action === 'JOIN' ? 'joins' : 'leaves';
+    const userName = `<b>${msg.userName}</b>`;
 
     if (target === 'PLUS' && action === 'JOIN') {
-
-			if(msg.userCount === 1){
-				msg.text = `${userName} wants to talk about ${videoIcon}${btnJoin}`;
-			} else {
-				const roomSize = +msg.userCount === 0 ? `(JOIN)`: `(${msg.userCount}/${msg.VIDEOCHATLIMIT})`
-				const roomCounter = `<span class='userCount'>${roomSize}</span>`;
-				msg.text = `${userName} joins ${videoIcon}${btnJoin}${roomCounter}`;
-			}
+      if (msg.userCount === 1) {
+        msg.text = `${userName} wants to talk about ${videoIcon}${btnJoin}`;
+      } else {
+        const roomSize = +msg.userCount === 0 ? '(JOIN)' : `(${msg.userCount}/${msg.VIDEOCHATLIMIT})`;
+        const roomCounter = `<span class='userCount'>${roomSize}</span>`;
+        msg.text = `${userName} joins ${videoIcon}${btnJoin}${roomCounter}`;
+      }
     } else if (target === 'TEXT') {
       msg.text = `<span>${text}</span>${textIcon}${btnJoin}${userName}`;
-		}
-		
-		if(!msg.text) return false
+    }
+
+    if (!msg.text) return false;
 
     msg.target = target;
 
     addTextChatMessage(msg);
   };
 
-  const appendUserList = function appendUserList(roomInfo, selector) {
+  const appendUserList = (roomInfo, selector) => {
     if (!roomInfo.list) return true;
     const $element = typeof selector === 'string' ? $(document).find(selector) : selector;
     $element.empty();
@@ -136,10 +126,10 @@ const share = (() => {
 
   // socketState: 'CLOSED', 'OPEND', 'DISCONNECTED'
   const wrtcStore = {
-		userInRoom: false,
-		currentOpenRoom: null,
-		socketState: 'CLOSED',
-		localstream: null,
+    userInRoom: false,
+    currentOpenRoom: null,
+    socketState: 'CLOSED',
+    localstream: null,
     components: {
       text: {init: false, open: false},
       video: {init: false, open: false},
@@ -187,23 +177,17 @@ const share = (() => {
 	 * @property update
 	 */
   const inlineAvatar = {
-    ROOM: function ROOM(headerId, room) {
-
+    ROOM: (headerId, room) => {
       const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
-			let $element = $body_ace_outer().find(`#wbrtc_avatarCol .${headerId}.wrtcIconLine .wrtc_inlineAvatars`);
+      let $element = $body_ace_outer().find(`#wbrtc_avatarCol .${headerId}.wrtcIconLine .wrtc_inlineAvatars`);
 
-			const offsetTop = findAceHeaderElement(headerId).offset.top() - 8
-			const offsetLeft = findAceHeaderElement(headerId).offset.left()
+      const offsetTop = findAceHeaderElement(headerId).offset.top() - 16;
 
-			if(!$element.length) {
-				var avatarBox = $('#wrtcLinesIcons').tmpl({headerId, offsetTop, offsetLeft});
-				$element = $body_ace_outer().find('#wbrtc_avatarCol').append(avatarBox);
-
-				$element = $element.find(`.${headerId}.wrtcIconLine .wrtc_inlineAvatars`)
-				console.log('created', $element)
-			}
-			console.log('exists', $element)
-
+      if (!$element.length) {
+        const avatarBox = $('#wrtcLinesIcons').tmpl({headerId, offsetTop});
+        $element = $body_ace_outer().find('#wbrtc_avatarCol').append(avatarBox);
+        $element = $element.find(`.${headerId}.wrtcIconLine .wrtc_inlineAvatars`);
+      }
 
       const $videoInlineAvatarIcons = $body_ace_outer().find('#wbrtc_avatarCol .wrtc_inlineAvatars');
 
@@ -223,17 +207,17 @@ const share = (() => {
         }
       });
     },
-    TEXT: function TEXT(headerId, room) {
+    TEXT(headerId, room) {
       const $element = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
       $element.find('.avatar').remove();
       this._append(room.list, $element);
     },
-    VIDEO: function VIDEO(headerId, room) {
+    VIDEO(headerId, room) {
       const $element = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
       $element.find('.avatar').remove();
       this._append(room.list, $element);
     },
-    _append: function appendAvatart(list, $element) {
+    _append(list, $element) {
       const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
       list.forEach((el, index) => {
         const userInList = getUserFromId(el.userId) || {colorId: '', name: 'anonymous'};
@@ -247,7 +231,7 @@ const share = (() => {
         }
       });
     },
-    update: function updateInfo(userId, data) {
+    update(userId, data) {
       const $roomBox = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
       const $textBox = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
       const $videoBox = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
@@ -271,8 +255,7 @@ const share = (() => {
           src: data.imageUrl,
           title: data.userName,
         });
-			}
-			
+      }
     },
   };
 
@@ -306,7 +289,7 @@ const share = (() => {
     if (!wrtcStore.rooms.has(headerId)) { wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0}); }
 
     const room = wrtcStore.rooms.get(headerId);
-		let users = room.USERS;
+    let users = room.USERS;
 
     room[target] = roomInfo;
 
@@ -328,25 +311,26 @@ const share = (() => {
     }
 
     inlineAvatar[target](headerId, room[target]);
-		inlineAvatar.ROOM(headerId, users);
-		
-		wrtcStore.rooms.set(headerId, room)
+    inlineAvatar.ROOM(headerId, users);
+
+    wrtcStore.rooms.set(headerId, room);
 
     if (callback) callback(room);
   });
 
   wrtcPubsub.on('disable room buttons', (headerId, actions, target) => {
-		const btn = findAceHeaderElement(headerId).$inlineIcon().querySelector('.btn_roomHandler');
-		btn.classList.add("active");
-		btn.setAttribute('disabled', true);
+    const btn = findAceHeaderElement(headerId).$inlineIcon().querySelector('.btn_roomHandler');
+    btn.classList.add('activeLoader');
+    btn.setAttribute('disabled', true);
   });
 
   wrtcPubsub.on('enable room buttons', (headerId, action, target) => {
-		const btn = findAceHeaderElement(headerId).$inlineIcon().querySelector('.btn_roomHandler');
-		const newAction = action === 'JOIN' ? 'LEAVE' : 'JOIN';
-		btn.removeAttribute('disabled');
-		btn.setAttribute('data-action',newAction);
-		btn.classList.remove("active");
+    const btn = findAceHeaderElement(headerId).$inlineIcon().querySelector('.btn_roomHandler');
+    const newAction = action === 'JOIN' ? 'LEAVE' : 'JOIN';
+    btn.removeAttribute('disabled');
+    btn.setAttribute('data-action', newAction);
+    btn.classList.remove('activeLoader');
+    // btn.classList.add('activeLoader');
   });
 
   wrtcPubsub.on('updateWrtcToolbarModal', (headerId, roomInfo) => {
@@ -363,52 +347,50 @@ const share = (() => {
         .each(function () {
           $(this).attr({'data-id': headerId});
         });
-	});
-	
-	wrtcPubsub.on('updateWrtcToolbarTitleModal',(headerTile, headerId) => {
-		if(headerId === window.headerId){
-			$(`#wrtc_modal #werc_toolbar .nd_title .titleb[data-id='${headerId}'`).html(headerTile);
-			$(document).find(`#wrtc_textChatWrapper .textChatToolbar b[data-id='${headerId}']`).text(headerTile);
-			$(document).find(`.wrtc_roomLink[data-id='${headerId}']`).text(headerTile);
-		}
-	});
-	
+  });
 
-	function getHeaderRoomY($element) {
-		var height = $element.outerHeight();
-		var paddingTop = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
-		var aceOuterPadding = parseInt(paddingTop, 10);
-		var offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
-		return offsetTop + height / 2;
-	}
+  wrtcPubsub.on('updateWrtcToolbarTitleModal', (headerTile, headerId) => {
+    if (headerId === window.headerId) {
+      $(`#wrtc_modal #werc_toolbar .nd_title .titleb[data-id='${headerId}'`).html(headerTile);
+      $(document).find(`#wrtc_textChatWrapper .textChatToolbar b[data-id='${headerId}']`).text(headerTile);
+      $(document).find(`.wrtc_roomLink[data-id='${headerId}']`).text(headerTile);
+    }
+  });
 
-	function getHeaderRoomX($element) {
-		var width = $element.outerWidth();
-		var paddingLeft = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-left');
-		var aceOuterPadding = parseInt(paddingLeft, 10);
-		var offsetLeft = Math.ceil(share.$body_ace_outer().find('iframe[name="ace_inner"]').offset().left - aceOuterPadding);
-		return offsetLeft - width - 6;
-	}
+  const getHeaderRoomY = ($element) => {
+    const height = $element.outerHeight();
+    const paddingTop = Helper.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
+    const aceOuterPadding = parseInt(paddingTop, 10);
+    const offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
+    return offsetTop + height / 2;
+  };
 
+  const getHeaderRoomX = ($element) => {
+    const width = $element.outerWidth();
+    const paddingLeft = Helper.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-left');
+    const aceOuterPadding = parseInt(paddingLeft, 10);
+    const offsetLeft = Math.ceil(Helper.$body_ace_outer().find('iframe[name="ace_inner"]').offset().left - aceOuterPadding);
+    return offsetLeft - width - 6;
+  };
 
-  function findAceHeaderElement(headerId) {
+  const findAceHeaderElement = (headerId) => {
     const $el = $body_ace_outer().find('iframe').contents()
         .find('#innerdocbody').find(`.videoHeader.${headerId}`);
     return {
-			exist: $el.length,
+      exist: $el.length,
       $el,
       text: $el.text(),
-			tag: $el.attr('data-htag'),
-			offset: {
-				top: () => getHeaderRoomY($el),
-				left: () => getHeaderRoomX($el)
-			},
-			$inlineIcon: () => $el.find('wrt-inline-icon')[0].shadowRoot
+      tag: $el.attr('data-htag'),
+      offset: {
+        top: () => getHeaderRoomY($el),
+        left: () => getHeaderRoomX($el),
+      },
+      $inlineIcon: () => $el.find('wrt-inline-icon')[0].shadowRoot,
     };
-  }
+  };
 
   return {
-		init,
+    init,
     hElements,
     scrollDownToLastChatText,
     getUserFromId,
@@ -423,8 +405,8 @@ const share = (() => {
     stopStreaming,
     getValidUrl,
     findAceHeaderElement,
-		inlineAvatar,
-		getHeaderRoomY,
+    inlineAvatar,
+    getHeaderRoomY,
 
   };
 })();

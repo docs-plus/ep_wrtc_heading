@@ -1,7 +1,7 @@
 'use strict';
 const padutils = require('ep_etherpad-lite/static/js/pad_utils').padutils;
 
-const textChat = ( () => {
+const textChat = (() => {
   let socket = null;
   let padId = null;
   let currentRoom = {};
@@ -29,7 +29,7 @@ const textChat = ( () => {
     }).append(userName).append(tim).append(text);
 
     $('#wrtc_textChat').append(message);
-    share.scrollDownToLastChatText('#wrtc_textChat');
+    Helper.scrollDownToLastChatText('#wrtc_textChat');
   }
 
   function eventTextChatInput() {
@@ -39,7 +39,7 @@ const textChat = ( () => {
       const textMessage = $(this).val();
       if (!textMessage) return true;
       $(this).val('');
-      const user = share.getUserFromId(clientVars.userId);
+      const user = Helper.getUserFromId(clientVars.userId);
       if (!user) return true;
       const msg = {text: textMessage, userName: user.name, author: user.userId, time: new Date().getTime()};
       socket.emit('sendTextMessage', padId, currentRoom.headerId, msg, (incomMsg) => {
@@ -113,18 +113,18 @@ const textChat = ( () => {
       });
     });
 
-    share.appendUserList(roomInfo, '#wrtc_textChatWrapper  #textChatUserModal ul');
+    Helper.appendUserList(roomInfo, '#wrtc_textChatWrapper  #textChatUserModal ul');
   }
 
   function addUserToRoom(data, roomInfo) {
     if (!data || !data.userId) return true;
     const headerId = data.headerId;
-    const $headingRoom = share.$body_ace_outer().find(`#${headerId}`);
+    const $headingRoom = Helper.$body_ace_outer().find(`#${headerId}`);
     const headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
     const userCount = roomInfo.present;
     $headingRoom.find('.textChatCount').text(userCount);
 
-    const user = share.getUserFromId(data.userId);
+    const user = Helper.getUserFromId(data.userId);
     // some user may session does exist but the user info does not available in all over the current pad
     if (!user) return true;
 
@@ -133,24 +133,24 @@ const textChat = ( () => {
     const IsUserInRooms = $headingRoom.find(`.wrtc_content.textChat ul li[data-id='${user.userId}']`).text();
     if (IsUserInRooms) return false;
 
-    share.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.textChat ul'));
-    share.appendUserList(roomInfo, '#wrtc_textChatWrapper  #textChatUserModal ul');
+    Helper.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.textChat ul'));
+    Helper.appendUserList(roomInfo, '#wrtc_textChatWrapper  #textChatUserModal ul');
 
     if (data.userId === clientVars.userId) {
       currentRoom = data;
       $headingRoom.attr({'data-text': true});
       activateModal(headerId, headTitle, userCount, roomInfo);
-      share.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
-      share.wrtcPubsub.emit('componentsFlow', 'text', 'open', true);
+      Helper.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
+      Helper.wrtcPubsub.emit('componentsFlow', 'text', 'open', true);
     }
 
-    share.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'TEXT', roomInfo, () => {});
+    Helper.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'TEXT', roomInfo, () => {});
   }
 
   function removeUserFromRoom(data, roomInfo, target, cb) {
     if (!data || !data.userId) return true;
     const headerId = data.headerId;
-    const $headingRoom = share.$body_ace_outer().find(`#${headerId}`);
+    const $headingRoom = Helper.$body_ace_outer().find(`#${headerId}`);
     const headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
 
     const userCount = roomInfo.present;
@@ -158,8 +158,8 @@ const textChat = ( () => {
 
     const $textChatUserList = $headingRoom.find('.wrtc_content.textChat ul');
 
-    share.appendUserList(roomInfo, $textChatUserList);
-    share.appendUserList(roomInfo, '#wrtc_textChatWrapper #textChatUserModal ul');
+    Helper.appendUserList(roomInfo, $textChatUserList);
+    Helper.appendUserList(roomInfo, '#wrtc_textChatWrapper #textChatUserModal ul');
 
     if (userCount === 0) {
       $textChatUserList.append(`<li class="empty">Be the first to join the <button class="btn_joinChat_text" data-action="JOIN" data-id="${headerId}" data-join="TEXT"><b>text-chat</b></button></li>`);
@@ -169,32 +169,32 @@ const textChat = ( () => {
       $headingRoom.removeAttr('data-text');
       currentRoom = {};
       deactivateModal(data.headerId, roomInfo);
-      share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
-      share.wrtcPubsub.emit('componentsFlow', 'text', 'open', false);
+      Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+      Helper.wrtcPubsub.emit('componentsFlow', 'text', 'open', false);
     }
 
-    share.wrtcPubsub.emit('update store', data, headerId, 'LEAVE', 'TEXT', roomInfo, () => {});
+    Helper.wrtcPubsub.emit('update store', data, headerId, 'LEAVE', 'TEXT', roomInfo, () => {});
 
     if (cb && typeof cb === 'function') cb();
   }
 
   function userJoin(headerId, userData, $joinButton) {
     if (!userData || !userData.userId) {
-      share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+      Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
       return false;
     }
 
     // check if user already in that room
     if (currentRoom && currentRoom.headerId === headerId) {
-      share.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+      Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
       return false;
     }
 
     $joinBtn = $joinButton;
 
-		share.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
-		
-		const padparticipators = window.pad.collabClient.getConnectedUsers().map(x=>x.userId)
+    Helper.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
+
+    const padparticipators = window.pad.collabClient.getConnectedUsers().map((x) => x.userId);
 
     if (!currentRoom.userId) {
       socket.emit('userJoin', padId, padparticipators, userData, 'text', addUserToRoom);
@@ -215,7 +215,7 @@ const textChat = ( () => {
   function postAceInit(hook, context, webSocket, docId) {
     socket = webSocket;
     padId = docId;
-    share.wrtcPubsub.emit('componentsFlow', 'text', 'init', true);
+    Helper.wrtcPubsub.emit('componentsFlow', 'text', 'init', true);
     eventListers();
   }
 
