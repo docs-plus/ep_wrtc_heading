@@ -7,6 +7,12 @@ const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomStrin
 /*                              Plugin                                  */
 /** **********************************************************************/
 
+
+
+
+
+// console.log(nativeHTMLELement)
+
 const EPwrtcHeading = (() => {
   let padOuter = null;
   let padInner = null;
@@ -62,8 +68,8 @@ const EPwrtcHeading = (() => {
 
     // insert wbrtc containers
     const $target = outerBody;
-    if ($target.find('#wrtcVideoIcons').length) return false;
-    $target.prepend('<div id="wrtcVideoIcons"></div><div id="wbrtc_avatarCol"></div>');
+    if ($target.find('#wbrtc_avatarCol').length) return false;
+    $target.prepend(`<div id="wbrtc_avatarCol"></div>`);
 
     // module settings
     $('#options-wrtc-heading').on('change', () => {
@@ -140,10 +146,11 @@ const hooks = {
     const userId = window.pad.getUserId() || clientVars.padId;
 		const padId = window.pad.getPadId() || clientVars.userId;
 		
+
 		// init ui native component
-		ace.callWithAce(innerAce => {
-			const customElements = innerAce.frame.contentWindow.customElements;
-			new Components(customElements);
+		ace.callWithAce(function(innerAce) {
+			// console.log(share.$body_ace_outer().find('iframe')[0].contentWindow.customElements)
+
 		});
 
     // TODO: make sure the priority of these components are in line
@@ -159,20 +166,23 @@ const hooks = {
     WrtcRoom.postAceInit(hook, context, socket, padId);
 
     // When Editor is ready, append video and textChat modal to body
-    $('#editorcontainer iframe').ready(() => {
+    $('#editorcontainer iframe').ready(function() {
       WRTC.appendVideoModalToBody();
-      textChat.appendTextChatModalToBody();
+			textChat.appendTextChatModalToBody();
       // setTimeout(WrtcRoom.findTags, 250);
     });
 
-    // $(window).resize(_.debounce(WrtcRoom.adoptHeaderYRoom, 250));
+    $(window).resize(_.debounce(WrtcRoom.adoptHeaderYRoom, 250));
   },
   aceEditEvent: function aceEditEvent(hook, context) {
     const eventType = context.callstack.editEvent.eventType;
     // ignore these types
     if ('handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps'.includes(eventType)) return;
 
-    // if (context.callstack.domClean) WrtcRoom.adoptHeaderYRoom();
+    if (
+			context.callstack.domClean && 
+			(share.wrtcStore.components.video.open || share.wrtcStore.components.text.open)
+		) WrtcRoom.adoptHeaderYRoom();
 
     // some times init ep_wrtc_heading is not yet in the plugin list
     // if (context.callstack.docTextChanged) WrtcRoom.adoptHeaderYRoom();
@@ -270,6 +280,7 @@ exports.acePostWriteDomLineHTML = function (name, context) {
     })
   }
 };
+
 exports.aceDomLineProcessLineAttributes = function (name, context) {
   const cls = context.cls;
   const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
@@ -282,7 +293,7 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
 			const $header = share.findAceHeaderElement(headerId)
 			share.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
 		}
-
+	
     const modifier = {
       preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}"><wrt-inline-icon headerid="${headerId}"></wrt-inline-icon>`,
       postHtml: '</nd-video>',
@@ -290,6 +301,9 @@ exports.aceDomLineProcessLineAttributes = function (name, context) {
 		};
 		
 		result.push(modifier);
-  }
+	}
+	
   return result;
 };
+
+

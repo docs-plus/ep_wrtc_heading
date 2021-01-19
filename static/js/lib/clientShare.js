@@ -188,35 +188,50 @@ const share = (() => {
 	 */
   const inlineAvatar = {
     ROOM: function ROOM(headerId, room) {
-      // const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
-      // const $element = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine.'+headerId+' .wrtc_inlineAvatars');
-      // const $videoInlineAvatarIcons = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
 
-      // $element.find('.avatar').remove();
-      // Object.keys(room).forEach((key, index) => {
-      //   const userInList = getUserFromId(room[key].userId) || {colorId: '', name: 'anonymous'};
-      //   if (userInList.userId) {
-      //     // if user avatar find in other room remove it
-      //     $videoInlineAvatarIcons.find(`.avatar[data-id="${userInList.userId}"]`).remove();
+      const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
+			let $element = $body_ace_outer().find(`#wbrtc_avatarCol .${headerId}.wrtcIconLine .wrtc_inlineAvatars`);
 
-      //     if (index < inlineAvatarLimit) {
-      //       $element.find('.avatarMore').hide();
-      //       $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
-      //     } else {
-      //       $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
-      //     }
-      //   }
-      // });
+			const offsetTop = findAceHeaderElement(headerId).offset.top() - 8
+			const offsetLeft = findAceHeaderElement(headerId).offset.left()
+
+			if(!$element.length) {
+				var avatarBox = $('#wrtcLinesIcons').tmpl({headerId, offsetTop, offsetLeft});
+				$element = $body_ace_outer().find('#wbrtc_avatarCol').append(avatarBox);
+
+				$element = $element.find(`.${headerId}.wrtcIconLine .wrtc_inlineAvatars`)
+				console.log('created', $element)
+			}
+			console.log('exists', $element)
+
+
+      const $videoInlineAvatarIcons = $body_ace_outer().find('#wbrtc_avatarCol .wrtc_inlineAvatars');
+
+      $element.find('.avatar').remove();
+      Object.keys(room).forEach((key, index) => {
+        const userInList = getUserFromId(room[key].userId) || {colorId: '', name: 'anonymous'};
+        if (userInList.userId) {
+          // if user avatar find in other room remove it
+          $videoInlineAvatarIcons.find(`.avatar[data-id="${userInList.userId}"]`).remove();
+
+          if (index < inlineAvatarLimit) {
+            $element.find('.avatarMore').hide();
+            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
+          } else {
+            $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
+          }
+        }
+      });
     },
     TEXT: function TEXT(headerId, room) {
-      // const $element = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
-      // $element.find('.avatar').remove();
-      // this._append(room.list, $element);
+      const $element = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
+      $element.find('.avatar').remove();
+      this._append(room.list, $element);
     },
     VIDEO: function VIDEO(headerId, room) {
-      // const $element = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
-      // $element.find('.avatar').remove();
-      // this._append(room.list, $element);
+      const $element = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
+      $element.find('.avatar').remove();
+      this._append(room.list, $element);
     },
     _append: function appendAvatart(list, $element) {
       const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
@@ -233,30 +248,30 @@ const share = (() => {
       });
     },
     update: function updateInfo(userId, data) {
-      // const $roomBox = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
-      // const $textBox = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
-      // const $videoBox = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
+      const $roomBox = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
+      const $textBox = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
+      const $videoBox = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
 
-      // if ($roomBox) {
-      //   $roomBox.find(`.avatar[data-id="${userId}"] img`).attr({
-      //     src: data.imageUrl,
-      //     title: data.userName,
-      //   });
-      // }
+      if ($roomBox) {
+        $roomBox.find(`.avatar[data-id="${userId}"] img`).attr({
+          src: data.imageUrl,
+          title: data.userName,
+        });
+      }
 
-      // if ($videoBox) {
-      //   $videoBox.find('.avatar img').attr({
-      //     src: data.imageUrl,
-      //     title: data.userName,
-      //   });
-      // }
+      if ($videoBox) {
+        $videoBox.find('.avatar img').attr({
+          src: data.imageUrl,
+          title: data.userName,
+        });
+      }
 
-      // if ($textBox) {
-      //   $textBox.find('.avatar img').attr({
-      //     src: data.imageUrl,
-      //     title: data.userName,
-      //   });
-			// }
+      if ($textBox) {
+        $textBox.find('.avatar img').attr({
+          src: data.imageUrl,
+          title: data.userName,
+        });
+			}
 			
     },
   };
@@ -357,6 +372,23 @@ const share = (() => {
 			$(document).find(`.wrtc_roomLink[data-id='${headerId}']`).text(headerTile);
 		}
 	});
+	
+
+	function getHeaderRoomY($element) {
+		var height = $element.outerHeight();
+		var paddingTop = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
+		var aceOuterPadding = parseInt(paddingTop, 10);
+		var offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
+		return offsetTop + height / 2;
+	}
+
+	function getHeaderRoomX($element) {
+		var width = $element.outerWidth();
+		var paddingLeft = share.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-left');
+		var aceOuterPadding = parseInt(paddingLeft, 10);
+		var offsetLeft = Math.ceil(share.$body_ace_outer().find('iframe[name="ace_inner"]').offset().left - aceOuterPadding);
+		return offsetLeft - width - 6;
+	}
 
 
   function findAceHeaderElement(headerId) {
@@ -367,6 +399,10 @@ const share = (() => {
       $el,
       text: $el.text(),
 			tag: $el.attr('data-htag'),
+			offset: {
+				top: () => getHeaderRoomY($el),
+				left: () => getHeaderRoomX($el)
+			},
 			$inlineIcon: () => $el.find('wrt-inline-icon')[0].shadowRoot
     };
   }
@@ -387,7 +423,8 @@ const share = (() => {
     stopStreaming,
     getValidUrl,
     findAceHeaderElement,
-    inlineAvatar,
+		inlineAvatar,
+		getHeaderRoomY,
 
   };
 })();

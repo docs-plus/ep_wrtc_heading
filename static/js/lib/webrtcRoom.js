@@ -313,14 +313,15 @@ const WrtcRoom = (() => {
     adoptHeaderYRoom: function adoptHeaderYRoom() {
       // Set all video_heading to be inline with their target REP
       const $padOuter = share.$body_ace_outer();
-      if (!$padOuter) return;
+			if (!$padOuter) return;
+			
+			console.log("hi man ")
 
       // TODO: performance issue
-      $padOuter.find('.wrtcIconLine').each(function adjustHeaderIconPosition() {
+      $padOuter.find('#wbrtc_avatarCol .wrtcIconLine').each(function adjustHeaderIconPosition() {
         const $el = $(this);
-        const $boxId = $el.attr('id');
-        const hClassId = `.videoHeader.${$boxId}`;
-        const $headingEl = $padOuter.find('iframe').contents().find('#innerdocbody').find(hClassId);
+        const $headerId = $el.attr('id');
+        const $headingEl = share.findAceHeaderElement(headerId).$el;
 
         // if the H tags does not find, remove chatBox
         // TODO: and kick out the user form the chatBox
@@ -329,7 +330,7 @@ const WrtcRoom = (() => {
           return false;
         }
 
-        $el.css({top: `${getHeaderRoomY($headingEl)}px`});
+        $el.css({top: `${share.getHeaderRoomY($headingEl)-8}px`});
       });
     },
     appendVideoIcon: function appendVideoIcon(headerId, options = {createAgain: false}) {
