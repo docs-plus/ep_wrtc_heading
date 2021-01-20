@@ -21,15 +21,21 @@
 	max-width: 900px;
 	margin: auto;
 	box-shadow: 0 1px 3px 1px rgba(60,64,67,.15);
-	background: #fff;
+	background: #fff!important;
 	overflow: inherit;
+	outline: none;
 }
 
 nd-video{
-	display: flex;
 	position: relative;
-	align-items: center;
+	width: 100%;
+	word-wrap: break-word;
 }
+nd-video span{
+	width: 100%;
+	word-wrap: break-word;
+}
+
 
 
 wrt-inline-icon{
