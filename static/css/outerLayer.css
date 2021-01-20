@@ -4,6 +4,13 @@
 	padding: 40px 55px!important;
 } */
 
+
+@media (max-width: 500px){
+	#wrtc_modal{
+		min-width: 100%;
+	}
+}
+
 #wrtc_modal{
 	position: absolute;
 	top: 0;

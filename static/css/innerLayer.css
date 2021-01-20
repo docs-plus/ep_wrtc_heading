@@ -30,7 +30,9 @@ nd-video{
 	position: relative;
 	width: 100%;
 	word-wrap: break-word;
+	display: block;
 }
+
 nd-video span{
 	width: 100%;
 	word-wrap: break-word;
@@ -50,9 +52,25 @@ wrt-inline-icon button {
 }
 
 /*video icon line*/
+
+
+@media (max-width: 720px){
+	#innerdocbody {
+			padding : 15px !important;
+	}
+}
+
 @media (max-width: 900px) {
-	wrt-inline-icon, #wbrtc_avatarCol {
+	#wbrtc_avatarCol {
 		display: none !important;
+	}
+	#innerdocbody{
+		width: 90%;
+		padding: 15px 15px 15px 30px!important;
+		margin-right: 10px;
+	}
+	wrt-inline-icon{
+		left: -50px
 	}
 }
 
