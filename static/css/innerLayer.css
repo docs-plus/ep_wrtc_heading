@@ -46,18 +46,14 @@ wrt-inline-icon button {
 }
 
 /*video icon line*/
-
-@media (max-width: 800px) {
-	wrt-inline-icon {
+@media (max-width: 900px) {
+	wrt-inline-icon, #wbrtc_avatarCol {
 		display: none !important;
 	}
 }
 
 
 /* inline avater*/
-
-
-
 #wbrtc_avatarCol{
 	position: relative;
 	height: 100%;
