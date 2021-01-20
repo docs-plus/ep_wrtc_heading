@@ -320,7 +320,7 @@ const WrtcRoom = (() => {
       $padOuter.find('#wbrtc_avatarCol .wrtcIconLine').each(function adjustHeaderIconPosition() {
         const $el = $(this);
         const $headerId = $el.attr('id');
-        const $headingEl = Helper.findAceHeaderElement(headerId).$el;
+        const $headingEl = Helper.findAceHeaderElement($headerId).$el;
 
         // if the H tags does not find, remove chatBox
         // TODO: and kick out the user form the chatBox
