@@ -304,6 +304,7 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
       processedMarker: true,
     };
 
+		Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});	
     result.push(modifier);
   }
 
