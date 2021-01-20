@@ -22,6 +22,8 @@
 
 # ep_wrtc_heading
 
+>Note: This version is not compatible with [etherpad-lite](https://github.com/ether/etherpad-lite), use the etherpad [docs.plus](https://github.com/nwspk/docs.plus) version instead
+
 Video Headings Plugin for Etherpad.
 
 WebRTC video/audio, a dedicated chat room for each headlines (h tags).
