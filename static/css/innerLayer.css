@@ -36,15 +36,13 @@ nd-video span{
 	word-wrap: break-word;
 }
 
-
-
 wrt-inline-icon{
 	position: absolute;
 	left: -76px;
 	margin-top: .04em;
-	/* padding: 0!important; */
-	/* top: -14px; */
 	cursor: pointer;
+	top: 50%;
+	transform: translateY(-50%);
 }
 
 wrt-inline-icon button {
