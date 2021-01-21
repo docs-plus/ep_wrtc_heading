@@ -17,6 +17,7 @@
 }
 
 #innerdocbody{
+	width: 100%;
 	padding: 40px 55px!important;
 	max-width: 900px;
 	margin: auto;
@@ -24,6 +25,7 @@
 	background: #fff!important;
 	overflow: inherit;
 	outline: none;
+	min-height: 700px;
 }
 
 nd-video{
