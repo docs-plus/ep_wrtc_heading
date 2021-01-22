@@ -94,7 +94,7 @@ const WrtcRoom = (() => {
           videoChat.userJoin(headerId, userInfo, target);
           break;
         case 'TEXT':
-          // textChat.userJoin(headerId, userInfo, target);
+          textChat.userJoin(headerId, userInfo, target);
           break;
         default:
           return false;

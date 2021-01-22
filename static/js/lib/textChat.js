@@ -133,8 +133,8 @@ const textChat = (() => {
     const IsUserInRooms = $headingRoom.find(`.wrtc_content.textChat ul li[data-id='${user.userId}']`).text();
     if (IsUserInRooms) return false;
 
-    Helper.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.textChat ul'));
-    Helper.appendUserList(roomInfo, '#wrtc_textChatWrapper  #textChatUserModal ul');
+    // Helper.appendUserList(roomInfo, $headingRoom.find('.wrtc_content.textChat ul'));
+    // Helper.appendUserList(roomInfo, '#wrtc_textChatWrapper  #textChatUserModal ul');
 
     if (data.userId === clientVars.userId) {
       currentRoom = data;
@@ -151,7 +151,6 @@ const textChat = (() => {
     if (!data || !data.userId) return true;
     const headerId = data.headerId;
     const $headingRoom = Helper.$body_ace_outer().find(`#${headerId}`);
-    const headTitle = $headingRoom.find('.wrtc_header b.titleRoom').text();
 
     const userCount = roomInfo.present;
     $headingRoom.find('.textChatCount').text(userCount);
@@ -191,8 +190,6 @@ const textChat = (() => {
     }
 
     $joinBtn = $joinButton;
-
-    Helper.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
 
     const padparticipators = window.pad.collabClient.getConnectedUsers().map((x) => x.userId);
 

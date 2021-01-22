@@ -91,8 +91,24 @@ const socketInit = (hookName, args) => {
     });
 
     socket.on('userJoin', (padId, padparticipators, userData, target, callback) => {
-      // console.log("USERJOINING", padId, userData, target)
-      q.push({socket, padId, padparticipators, userData, target, callback, retry: 0});
+			
+			if(target === 'video'){
+				q.push({socket, padId, padparticipators, userData, target, callback, retry: 0});
+			} else {
+				let room = null;
+				if (target === 'text') {
+					room = textChat.socketUserJoin(userData, padparticipators);
+					_.set(socket, 'ndHolder.text', room.data);
+				} 
+			
+				if (room.canUserJoin) {
+					socket.broadcast.to(padId).emit('userJoin', room.data, room.info, target);
+					callback(room.data, room.info, target);
+				} else {
+					callback(null, room.info, target);
+				}	
+			}
+
     });
 
     socket.on('userLeave', (padId, userData, target, callback) => {
