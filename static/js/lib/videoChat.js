@@ -99,10 +99,8 @@ const videoChat = (() => {
       stopWatchNetwork();
       window.headerId = null;
 
-      Helper.findAceHeaderElement(headerId)
-          .$inlineIcon()
-          .querySelector('.btn_roomHandler')
-          .classList.remove('active');
+			const videoBtn = Helper.findAceHeaderElement(headerId).$inlineIcon()
+			if(videoBtn) videoBtn.querySelector('.btn_roomHandler').classList.remove('active');
 
       currentRoom = {};
 
@@ -163,10 +161,9 @@ const videoChat = (() => {
 
       startWatchNetwork();
 
-      Helper.findAceHeaderElement(headerId)
-          .$inlineIcon()
-          .querySelector('.btn_roomHandler')
-          .classList.add('active');
+      const videoBtn = Helper.findAceHeaderElement(headerId).$inlineIcon()
+			if(videoBtn) videoBtn.querySelector('.btn_roomHandler').classList.add('active');
+          
 
 
       WRTC.activate(data.headerId, user.userId);
