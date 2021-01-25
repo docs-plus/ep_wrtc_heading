@@ -41,7 +41,7 @@ gulp.task('html', () => gulp.src('templates/components/*.html')
 		.pipe(gulp.dest('templates')));
 		
 gulp.task('bump', () => {
-		gulp.src('./package.json')
+		return gulp.src('./package.json')
 		.pipe(bump())
 		.pipe(gulp.dest('./'));
 	});
@@ -56,13 +56,11 @@ gulp.task('git:publish', function(){
 	])
 	.pipe(git.add())
 	.pipe(git.commit('build, version'))
-	.pipe(git.push('origin', (err) => {if (err) throw err}));
+	// .pipe(git.push('origin', (err) => {if (err) throw err}));
 });
 
 gulp.task('watch', () => {
   gulp.watch(jsfiles, gulp.series(['js', 'html']));
 });
 
-gulp.task('build', () => {
-  gulp.watch(jsfiles, gulp.series(['js', 'html', 'bump', 'git:publish']));
-});
+gulp.task('build', gulp.series(['js', 'html', 'bump', 'git:publish']));
