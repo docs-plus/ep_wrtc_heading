@@ -59,8 +59,16 @@ gulp.task('git:publish', function(){
 	// .pipe(git.push('origin', (err) => {if (err) throw err}));
 });
 
+// Run git push
+// branch is the current branch & remote branch to push to
+gulp.task('git:psuh', function(){
+  git.push('origin', function (err) {
+    if (err) throw err;
+  });
+});
+
 gulp.task('watch', () => {
   gulp.watch(jsfiles, gulp.series(['js', 'html']));
 });
 
-gulp.task('build', gulp.series(['js', 'html', 'bump', 'git:publish']));
+gulp.task('build', gulp.series(['js', 'html', 'bump', 'git:publish', 'git:psuh']));
