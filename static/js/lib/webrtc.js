@@ -179,7 +179,7 @@ const WRTC = (() => {
         if (user) {
           $(`#video_${user.userId.replace(/\./g, '_')}`).css({
             'border-color': user.colorId,
-          }).siblings('.user-name').text(user.name);
+          }).siblings('.user-name').text(user.name || 'anonymous');
         }
       }
     },
@@ -320,7 +320,7 @@ const WRTC = (() => {
           'max-height': videoSizes.small,
         }).appendTo($('#wrtc_modal .videoWrapper'));
 
-        videoContainer.append($('<div class="user-name">').text(user.name));
+        videoContainer.append($('<div class="user-name">').text(user.name || 'anonymous'));
 
         video = $('<video playsinline>').attr('id', videoId).css({
           'border-color': user.colorId,
