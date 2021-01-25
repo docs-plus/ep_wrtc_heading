@@ -56,13 +56,12 @@ gulp.task('git:publish', function(){
 	])
 	.pipe(git.add())
 	.pipe(git.commit('build, version'))
-	// .pipe(git.push('origin', (err) => {if (err) throw err}));
 });
 
 // Run git push
 // branch is the current branch & remote branch to push to
-gulp.task('git:psuh', function(){
-  git.push('origin', function (err) {
+gulp.task('git:psuh', () => {
+  return git.push('origin', (err) => {
     if (err) throw err;
   });
 });
