@@ -22,13 +22,15 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "gulp watch",
 		"build": "gulp js",
-		"build:prod": "gulp js html --production",
+		"build:prod": "gulp build --production",
 		"lint": "eslint --fix .",
 		"lint:dry": "eslint --fix-dry-run ."
 	},
 	"dependencies": {
 		"better-queue": "^3.8.10",
 		"debug": "^4.3.1",
+		"gulp-bump": "^3.2.0",
+		"gulp-git": "^2.10.1",
 		"lodash": "^4.17.20"
 	},
 	"devDependencies": {

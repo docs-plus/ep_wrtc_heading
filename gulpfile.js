@@ -5,7 +5,8 @@ const mode = require('gulp-mode')();
 const sourcemaps = require('gulp-sourcemaps');
 const htmlmin = require('gulp-htmlmin');
 const rename = require('gulp-rename');
-var bump = require('gulp-bump');
+const bump = require('gulp-bump');
+const git = require('gulp-git');
 
 
 const jsfiles = [
@@ -45,6 +46,23 @@ gulp.task('bump', () => {
 		.pipe(gulp.dest('./'));
 	});
 
+
+gulp.task('git:publish', function(){
+  return gulp.src([
+		'./static/js/wrtc.heading.mini.js',
+		'./static/js/wrtc.heading.mini.js.map',
+		'./templates/webrtcComponent.mini.html',
+		'./package.json'
+	])
+	.pipe(git.add())
+	.pipe(git.commit('build, version'))
+	.pipe(git.push('origin', (err) => {if (err) throw err}));
+});
+
 gulp.task('watch', () => {
   gulp.watch(jsfiles, gulp.series(['js', 'html']));
+});
+
+gulp.task('build', () => {
+  gulp.watch(jsfiles, gulp.series(['js', 'html', 'bump', 'git:publish']));
 });
