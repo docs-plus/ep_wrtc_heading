@@ -5,6 +5,8 @@ const mode = require('gulp-mode')();
 const sourcemaps = require('gulp-sourcemaps');
 const htmlmin = require('gulp-htmlmin');
 const rename = require('gulp-rename');
+var bump = require('gulp-bump');
+
 
 const jsfiles = [
   './static/js/lib/adapter.js',
@@ -35,7 +37,13 @@ gulp.task('js', gulpifyJs);
 gulp.task('html', () => gulp.src('templates/components/*.html')
     .pipe(htmlmin({collapseWhitespace: true, removeComments: true, minifyJS: true}))
     .pipe(concat('webrtcComponent.mini.html'))
-    .pipe(gulp.dest('templates')));
+		.pipe(gulp.dest('templates')));
+		
+gulp.task('bump', () => {
+		gulp.src('./package.json')
+		.pipe(bump())
+		.pipe(gulp.dest('./'));
+	});
 
 gulp.task('watch', () => {
   gulp.watch(jsfiles, gulp.series(['js', 'html']));
