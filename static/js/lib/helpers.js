@@ -9,7 +9,7 @@ const Helper = (() => {
 
   const getAvatarUrl = (userId) => {
     if (!userId) return avatarUrl;
-    return `/p/getUserProfileImage/${userId}/${window.pad.getPadId()}?t=${new Date().getTime()}`;
+    return `/static/getUserProfileImage/${userId}/${window.pad.getPadId()}?t=${new Date().getTime()}`;
   };
 
   const getValidUrl = function () {

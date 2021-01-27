@@ -200,7 +200,7 @@ const WrtcRoom = (() => {
     const userId = $(this).attr('data-id') || headerId;
     const user = window.clientVars.ep_profile_list[userId];
     if (!user) return false;
-    const imageUrl = user.imageUrl || `/p/getUserProfileImage/${userId}/${padId}?t=${new Date().getTime()}`;
+    const imageUrl = user.imageUrl || `/static/getUserProfileImage/${userId}/${padId}?t=${new Date().getTime()}`;
     $('#ep_profile_users_profile_name').text(user.userName);
     $('#ep_profile_users_profile_desc').text(user.about);
     $('#ep_profile_users_profile_homepage').attr({
