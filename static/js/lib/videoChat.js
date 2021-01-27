@@ -356,8 +356,9 @@ const videoChat = (() => {
       $(document)
           .find('.video-container.local-user .latency')
           .css({color})
-          .text(`${Math.ceil(pingos.avg)}ms`);
-      $(document).find('#networkStatus').html(`RTT: ${pingos.latency}ms, min: ${pingos.LMin}ms, max: ${pingos.LMax}ms, avg:${pingos.avg}ms`);
+					.text(`${Math.ceil(pingos.avg)}ms`);
+					
+      // $(document).find('#networkStatus').html(`RTT: ${pingos.latency}ms, min: ${pingos.LMin}ms, max: ${pingos.LMax}ms, avg:${pingos.avg}ms`);
 
       // Helper.wrtcPubsub.emit('update network information', pingos);
     });

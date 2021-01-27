@@ -64,7 +64,7 @@
 	display: none;
 }
 
-#wrtc_modal #networkStatus.active,
+/* #wrtc_modal #networkStatus.active, */
 #wrtc_modal #networkError.active {
 	bottom: -30px;
 	opacity: 1;
