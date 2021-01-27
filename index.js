@@ -12,18 +12,18 @@ const statErrorNames = ['Abort', 'Hardware', 'NotFound', 'NotSupported', 'Permis
 exports.socketio = socketInit;
 
 exports.eejsBlock_mySettings = (hookName, args, cb) => {
-  args.content += eejs.require('ep_wrtc_heading/templates/settings.ejs');
+  args.content += eejs.require('ep_wrtc_heading/static/templates/settings.ejs');
   return cb();
 };
 
 exports.eejsBlock_scripts = (hookName, args, cb) => {
-  args.content += eejs.require('ep_wrtc_heading/templates/webrtcComponent.mini.html', {}, module);
-  args.content += `<script src='../static/plugins/ep_wrtc_heading/static/js/wrtc.heading.mini.js?v=${packageJson.version}' defer></script>`;
+  args.content += eejs.require('ep_wrtc_heading/static/dist/templates/webrtcComponent.mini.html', {}, module);
+  args.content += `<script src='../static/plugins/ep_wrtc_heading/static/dist/js/wrtc.heading.mini.js?v=${packageJson.version}' defer></script>`;
   return cb();
 };
 
 exports.eejsBlock_styles = (hookName, args, cb) => {
-  args.content += `<link rel="stylesheet" href="../static/plugins/ep_wrtc_heading/static/css/outerLayer.css?v=${packageJson.version}" type="text/css" />`;
+  args.content += `<link rel="stylesheet" href="../static/plugins/ep_wrtc_heading/static/dist/css/outerLayer.css?v=${packageJson.version}" type="text/css" />`;
   return cb();
 };
 

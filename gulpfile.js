@@ -7,6 +7,7 @@ const htmlmin = require('gulp-htmlmin');
 const rename = require('gulp-rename');
 const bump = require('gulp-bump');
 const git = require('gulp-git');
+const cleanCSS = require('gulp-clean-css');
 
 
 const jsfiles = [
@@ -24,21 +25,28 @@ const jsfiles = [
   './static/js/lib/webrtc.js',
 ];
 
+const cssFiles = ['./static/css/**/*.css']
+const htmlFiles = ['./static/templates/*.html']
+
 const gulpifyJs = function () {
   return gulp.src(jsfiles)
       .pipe(mode.production(sourcemaps.init()))
       .pipe(mode.production(uglify(/* options */)))
       .pipe(concat('wrtc.heading.mini.js'))
       .pipe(mode.production(sourcemaps.write('.')))
-      .pipe(gulp.dest('static/js'));
+      .pipe(gulp.dest('static/dist/js'));
 };
 
 gulp.task('js', gulpifyJs);
 
-gulp.task('html', () => gulp.src('templates/components/*.html')
+gulp.task('html', () => gulp.src(htmlFiles)
     .pipe(htmlmin({collapseWhitespace: true, removeComments: true, minifyJS: true}))
     .pipe(concat('webrtcComponent.mini.html'))
-		.pipe(gulp.dest('templates')));
+		.pipe(gulp.dest('static/dist/templates')));
+
+gulp.task('css', () => gulp.src(cssFiles)
+		.pipe(cleanCSS({compatibility: 'ie8'}))
+		.pipe(gulp.dest('static/dist/css')));		
 		
 gulp.task('bump', () => {
 		return gulp.src('./package.json')
@@ -46,17 +54,13 @@ gulp.task('bump', () => {
 		.pipe(gulp.dest('./'));
 	});
 
-
-gulp.task('git:publish', function(){
-  return gulp.src([
-		'./static/js/wrtc.heading.mini.js',
-		'./static/js/wrtc.heading.mini.js.map',
-		'./templates/webrtcComponent.mini.html',
+gulp.task('git:publish', () => gulp.src([
+		'./static/dist/',
 		'./package.json'
 	])
 	.pipe(git.add())
 	.pipe(git.commit('build, version'))
-});
+);
 
 // Run git push
 // branch is the current branch & remote branch to push to
@@ -67,7 +71,8 @@ gulp.task('git:psuh', () => {
 });
 
 gulp.task('watch', () => {
-  gulp.watch(jsfiles, gulp.series(['js', 'html']));
+  gulp.watch([...jsfiles, ...cssFiles, ...htmlFiles], gulp.series(['js','css', 'html']));
 });
 
-gulp.task('build', gulp.series(['js', 'html', 'bump', 'git:publish', 'git:psuh']));
+gulp.task('build', gulp.series(['js','css','html']));
+gulp.task('build:publish', gulp.series(['js','css','html', 'bump', 'git:publish', 'git:psuh']));

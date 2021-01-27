@@ -21,8 +21,8 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "gulp watch",
-		"build": "gulp js",
-		"build:prod": "gulp build --production",
+		"build": "gulp build",
+		"build:publish": "gulp build:publish --production",
 		"lint": "eslint --fix .",
 		"lint:dry": "eslint --fix-dry-run ."
 	},
@@ -41,8 +41,10 @@
 		"eslint-plugin-prefer-arrow": "^1.2.2",
 		"eslint-plugin-promise": "^4.2.1",
 		"gulp": "^4.0.2",
+		"gulp-clean-css": "^4.3.0",
 		"gulp-concat": "^2.6.1",
 		"gulp-htmlmin": "^5.0.1",
+		"gulp-imagemin": "^7.1.0",
 		"gulp-mode": "^1.0.2",
 		"gulp-rename": "^2.0.0",
 		"gulp-sourcemaps": "^2.6.5",
@@ -59,6 +61,7 @@
 		"root": true,
 		"extends": "etherpad/plugin",
 		"ignorePatterns": [
+			"/static/dist/",
 			"/static/js/lib/getStats.min.js",
 			"/static/js/lib/getUserMediaPolyfill.js",
 			"/static/js/lib/jquery.tmpl.min.js",

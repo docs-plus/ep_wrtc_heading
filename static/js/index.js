@@ -198,7 +198,7 @@ const hooks = {
   },
   aceEditorCSS: () => {
     const version = clientVars.webrtc.version || 1;
-    return [`ep_wrtc_heading/static/css/innerLayer.css?v=${version}`];
+    return [`ep_wrtc_heading/static/dist/css/innerLayer.css?v=${version}`];
   },
   aceSetAuthorStyle: (hook, context) => {
     WrtcRoom.aceSetAuthorStyle(context);
