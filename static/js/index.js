@@ -289,7 +289,9 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
   const cls = context.cls;
   const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
   const headingType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
-  const result = [];
+	const result = [];
+	if(typeof Helper === 'undefined') return result
+
   if (videoHEaderType && headingType) {
     const headerId = videoHEaderType[1];
     // if video or textChat modal is open! update modal title
