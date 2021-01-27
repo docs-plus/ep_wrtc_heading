@@ -46,9 +46,9 @@ exports.clientVars = (hook, context, callback) => {
     };
   }
 
-  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoChatLimit) {
-    VIDEO_CHAT_LIMIT = Config.update('VIDEO_CHAT_LIMIT', settings.ep_wrtc_heading.videoChatLimit);
-  }
+  // if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoChatLimit) {
+  //   VIDEO_CHAT_LIMIT = Config.update('VIDEO_CHAT_LIMIT', settings.ep_wrtc_heading.videoChatLimit);
+  // }
 
   if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoCodec) {
     video.codec = settings.ep_wrtc_heading.videoCodec;
@@ -79,7 +79,7 @@ exports.handleMessage = (hook, context, callback) => {
   }
 };
 
-function handleErrorStatMessage(statName) {
+const handleErrorStatMessage = (statName) => {
   if (statErrorNames.indexOf(statName) !== -1) {
     stats.meter(`ep_wrtc_heading_err_${statName}`).mark();
   } else {

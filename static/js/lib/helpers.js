@@ -319,17 +319,17 @@ const Helper = (() => {
   });
 
   wrtcPubsub.on('disable room buttons', (headerId, actions, target) => {
-		let btn = findAceHeaderElement(headerId).$inlineIcon()
-		if(!btn) return;
-		btn = btn.querySelector('.btn_roomHandler');
+    let btn = findAceHeaderElement(headerId).$inlineIcon();
+    if (!btn) return;
+    btn = btn.querySelector('.btn_roomHandler');
     btn.classList.add('activeLoader');
     btn.setAttribute('disabled', true);
   });
 
   wrtcPubsub.on('enable room buttons', (headerId, action, target) => {
-		let btn = findAceHeaderElement(headerId).$inlineIcon()
-		if(!btn) return;
-		btn = btn.querySelector('.btn_roomHandler');
+    let btn = findAceHeaderElement(headerId).$inlineIcon();
+    if (!btn) return;
+    btn = btn.querySelector('.btn_roomHandler');
     const newAction = action === 'JOIN' ? 'LEAVE' : 'JOIN';
     btn.removeAttribute('disabled');
     btn.setAttribute('data-action', newAction);
@@ -361,8 +361,8 @@ const Helper = (() => {
     }
   });
 
-  const getHeaderRoomY = ($element) => {	
-		if(!$element.length) return;
+  const getHeaderRoomY = ($element) => {
+    if (!$element.length) return;
     const height = $element.outerHeight();
     const paddingTop = Helper.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
     const aceOuterPadding = parseInt(paddingTop, 10);
@@ -371,7 +371,7 @@ const Helper = (() => {
   };
 
   const getHeaderRoomX = ($element) => {
-		if(!$element.length) return;
+    if (!$element.length) return;
     const width = $element.outerWidth();
     const paddingLeft = Helper.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-left');
     const aceOuterPadding = parseInt(paddingLeft, 10);
@@ -391,7 +391,7 @@ const Helper = (() => {
         top: () => getHeaderRoomY($el),
         left: () => getHeaderRoomX($el),
       },
-      $inlineIcon: () => $el.find('wrt-inline-icon').length? $el.find('wrt-inline-icon')[0].shadowRoot : null,
+      $inlineIcon: () => $el.find('wrt-inline-icon').length ? $el.find('wrt-inline-icon')[0].shadowRoot : null,
     };
   };
 

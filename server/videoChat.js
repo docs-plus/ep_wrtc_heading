@@ -3,7 +3,6 @@ const Config = require('../config');
 // data Structure
 // "padId:headerId": [{object}]
 const rooms = {};
-const roomsQueue = {};
 
 const getRoom = (padId, headerId) => {
   const roomKey = `${padId}:${headerId}`;

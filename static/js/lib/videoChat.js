@@ -99,8 +99,8 @@ const videoChat = (() => {
       stopWatchNetwork();
       window.headerId = null;
 
-			const videoBtn = Helper.findAceHeaderElement(headerId).$inlineIcon()
-			if(videoBtn) videoBtn.querySelector('.btn_roomHandler').classList.remove('active');
+      const videoBtn = Helper.findAceHeaderElement(headerId).$inlineIcon();
+      if (videoBtn) videoBtn.querySelector('.btn_roomHandler').classList.remove('active');
 
       currentRoom = {};
 
@@ -161,9 +161,8 @@ const videoChat = (() => {
 
       startWatchNetwork();
 
-      const videoBtn = Helper.findAceHeaderElement(headerId).$inlineIcon()
-			if(videoBtn) videoBtn.querySelector('.btn_roomHandler').classList.add('active');
-          
+      const videoBtn = Helper.findAceHeaderElement(headerId).$inlineIcon();
+      if (videoBtn) videoBtn.querySelector('.btn_roomHandler').classList.add('active');
 
 
       WRTC.activate(data.headerId, user.userId);
@@ -356,8 +355,8 @@ const videoChat = (() => {
       $(document)
           .find('.video-container.local-user .latency')
           .css({color})
-					.text(`${Math.ceil(pingos.avg)}ms`);
-					
+          .text(`${Math.ceil(pingos.avg)}ms`);
+
       // $(document).find('#networkStatus').html(`RTT: ${pingos.latency}ms, min: ${pingos.LMin}ms, max: ${pingos.LMax}ms, avg:${pingos.avg}ms`);
 
       // Helper.wrtcPubsub.emit('update network information', pingos);

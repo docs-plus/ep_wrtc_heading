@@ -100,7 +100,7 @@ exports.getMessages = async (padId, headId, {limit = TEXT_CHAT_LIMIT, offset = 0
 };
 
 // WRTC:TEXT:padId:headerId:textId
-exports.save = async function (padId, headId, message) {
+exports.save = async (padId, headId, message) => {
   let messageKey = `${TEXT_CHAT_KEY + padId}:${headId}`;
 
   const existMessageId = ((((latestTextChatId || {})[padId]) || {})[headId]);

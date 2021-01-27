@@ -91,24 +91,22 @@ const socketInit = (hookName, args) => {
     });
 
     socket.on('userJoin', (padId, padparticipators, userData, target, callback) => {
-			
-			if(target === 'video'){
-				q.push({socket, padId, padparticipators, userData, target, callback, retry: 0});
-			} else {
-				let room = null;
-				if (target === 'text') {
-					room = textChat.socketUserJoin(userData, padparticipators);
-					_.set(socket, 'ndHolder.text', room.data);
-				} 
-			
-				if (room.canUserJoin) {
-					socket.broadcast.to(padId).emit('userJoin', room.data, room.info, target);
-					callback(room.data, room.info, target);
-				} else {
-					callback(null, room.info, target);
-				}	
-			}
+      if (target === 'video') {
+        q.push({socket, padId, padparticipators, userData, target, callback, retry: 0});
+      } else {
+        let room = null;
+        if (target === 'text') {
+          room = textChat.socketUserJoin(userData, padparticipators);
+          _.set(socket, 'ndHolder.text', room.data);
+        }
 
+        if (room.canUserJoin) {
+          socket.broadcast.to(padId).emit('userJoin', room.data, room.info, target);
+          callback(room.data, room.info, target);
+        } else {
+          callback(null, room.info, target);
+        }
+      }
     });
 
     socket.on('userLeave', (padId, userData, target, callback) => {
@@ -214,7 +212,7 @@ const socketInit = (hookName, args) => {
  * @param client the client that send this message
  * @param message the message from the client
  */
-function handleRTCMessage(client, payload) {
+const handleRTCMessage = (client, payload) => {
   // if(!socketIo) return false
   const userId = sessioninfos[client.id].author;
   const to = payload.to;
