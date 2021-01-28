@@ -560,7 +560,10 @@ const WRTC = (() => {
           reconnected = 0;
           socket.emit('acceptNewCall', padId, window.headerId);
         }
-      };
+			};
+			pc[userId].oniceconnectionstatechange = function(){
+				console.info('[wrtc]: ICE state: ',pc[userId], pc[userId].iceConnectionState);
+		 	}
       pc[userId].ontrack = function (event) {
         remoteStream[userId] = event.streams[0];
         self.setStream(userId, event.streams[0]);
