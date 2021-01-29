@@ -58,7 +58,9 @@ const WRTC = (() => {
       }
       if (clientVars.webrtc.video.sizes.small) {
         videoSizes.small = `${clientVars.webrtc.video.sizes.small}px`;
-      }
+			}
+			
+			console.log(pcConfig.iceServers)
 
       self._pad = context.pad || window.pad;
 
@@ -492,7 +494,7 @@ const WRTC = (() => {
           }
         }
       } else {
-        console.error('unknown message', data);
+        console.error('[wrtc]: unknown message', data);
       }
     },
     hangupAll: function hangupAll(_headerId) {
@@ -565,6 +567,7 @@ const WRTC = (() => {
 				console.info('[wrtc]: ICE state: ',pc[userId], pc[userId].iceConnectionState);
 		 	}
       pc[userId].ontrack = function (event) {
+        console.log(event, "ontrack")
         remoteStream[userId] = event.streams[0];
         self.setStream(userId, event.streams[0]);
       };
@@ -665,6 +668,7 @@ const WRTC = (() => {
   // Normalize RTC implementation between browsers
   // var getUserMedia = window.navigator.mediaDevices.getUserMedia
   var attachMediaStream = function attachMediaStream(element, stream) {
+    console.log("Notify add stream", stream)
     if (typeof element.srcObject !== 'undefined') {
       element.srcObject = stream;
     } else if (typeof element.mozSrcObject !== 'undefined') {
