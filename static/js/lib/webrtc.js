@@ -564,12 +564,15 @@ const WRTC = (() => {
         }
 			};
 			pc[userId].oniceconnectionstatechange = function(){
-				console.info('[wrtc]: ICE state: ',pc[userId], pc[userId].iceConnectionState);
+        console.info('[wrtc]: ICE state: ',pc[userId], pc[userId].iceConnectionState);
+        if( pc[userId].iceConnectionState ==='connected'){
+          self.setStream(userId, remoteStream[userId]);
+        }
 		 	}
       pc[userId].ontrack = function (event) {
         console.log(event, "ontrack")
         remoteStream[userId] = event.streams[0];
-        self.setStream(userId, event.streams[0]);
+        // self.setStream(userId, event.streams[0]);
       };
       pc[userId].onremovestream = function () {
         self.setStream(userId, '');
