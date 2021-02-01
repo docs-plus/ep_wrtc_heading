@@ -4,6 +4,11 @@ const Config = require('../config');
 // "padId:headerId": [{object}]
 const rooms = {};
 
+/**
+ * 
+ * @param {string} padId 
+ * @param {string} headerId 
+ */
 const getRoom = (padId, headerId) => {
   const roomKey = `${padId}:${headerId}`;
   return rooms[roomKey];
@@ -13,7 +18,7 @@ const socketUserJoin = (data, padparticipators) => {
   const padId = data.padId;
   const headerId = data.headerId;
   const roomKey = `${padId}:${headerId}`;
-  let canUserJoin = false;
+	let canUserJoin = false;
 
   // if the room does not exist create the room for the first time.
   if (!rooms[roomKey]) {

@@ -67,7 +67,8 @@ const WrtcRoom = (() => {
       userName: clientVars.userName || 'anonymous',
       headerId,
       target,
-      action: actions,
+			action: actions,
+			
     };
 
     // Before handel request, check socket state

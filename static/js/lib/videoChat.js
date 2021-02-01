@@ -29,9 +29,7 @@ const videoChat = (() => {
     }, pingos.interavCheck);
   };
 
-  const stopWatchNetwork = function stopWatchNetwork() {
-    clearInterval(networkInterval);
-  };
+  const stopWatchNetwork = () => clearInterval(networkInterval);
 
   function mediaDevices() {
     navigator.mediaDevices.enumerateDevices().then((data) => {
@@ -66,9 +64,7 @@ const videoChat = (() => {
     });
   }
 
-  function isUserMediaAvailable() {
-    return window.navigator.mediaDevices.getUserMedia({audio: true, video: true});
-  }
+  const isUserMediaAvailable = () => window.navigator.mediaDevices.getUserMedia({audio: true, video: true});
 
   function removeUserFromRoom(data, roomInfo, cb) {
     if (!data || !roomInfo || !data.userId) return false;

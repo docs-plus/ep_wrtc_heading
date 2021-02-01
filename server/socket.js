@@ -3,6 +3,7 @@ const videoChat = require('./videoChat');
 const textChat = require('./textChat');
 const Queue = require('better-queue');
 const sessioninfos = require('ep_etherpad-lite/node/handler/PadMessageHandler').sessioninfos;
+const { pad } = require('lodash');
 let socketIo = null;
 
 
@@ -11,7 +12,9 @@ const maxTryToWaitAcceptNewCall = 11;
 
 const acceptNewConnection = ({socket, padId, padparticipators, userData, target, callback}) => {
   let room = null;
-  console.info('process webrtc connection');
+	console.info('process webrtc connection');
+	// assign user socket id
+	Object.assign(userData, {socketId: socket.id});
   if (target === 'video') {
     room = videoChat.socketUserJoin(userData, padparticipators);
     _.set(socket, 'ndHolder.video', room.data);
@@ -81,8 +84,6 @@ const socketInit = (hookName, args) => {
     });
 
     socket.on('acceptNewCall', (padId, headerId, callback) => {
-      // console.log("new acceptCall ", padId, headerId)
-
       if (!_.get(roomStatus, `${padId}.${headerId}.acceptCall`, false)) {
         _.set(roomStatus, `${padId}.${headerId}.acceptCall`, true);
         console.info(`yup, avilable the room to accept new call. ${padId}.${headerId}.acceptCall`);
@@ -155,11 +156,10 @@ const socketInit = (hookName, args) => {
       callback(message, messageId);
     });
 
-
     socket.on('pingil', (padId, headerId, userId, latency) => {
-      socket.broadcast
-          .to(padId)
-          .emit('userLatancy', {padId, headerId, userId, latency});
+			const room = videoChat.getRoom(padId, headerId)
+			if(room.length)
+				room.map(user => socket.broadcast.to(user.socketId).emit('userLatancy', {padId, headerId, userId, latency}));
       socket.emit('pongol', {padId, headerId, userId, latency});
     });
 
