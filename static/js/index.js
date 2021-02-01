@@ -146,6 +146,8 @@ const hooks = {
 
     // init ui native component
     ace.callWithAce((innerAce) => {
+		
+			
       // console.log(Helper.$body_ace_outer().find('iframe')[0].contentWindow.customElements)
 
     });
@@ -214,13 +216,33 @@ const hooks = {
   },
   aceSelectionChanged: (rep, context) => {
     if (context.callstack.type === 'insertheading') {
-      rep = context.rep;
-      context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
+			// rep = context.rep;
+			// console.log(rep, context)
+      // context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
     }
   },
   aceInitialized: (hook, context) => {
     const editorInfo = context.editorInfo;
-    editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
+		editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
+		const tags = ['h1','h2', 'h3', 'h4', 'h5', 'h6'];
+		// this is overwrite from ep_heading2 
+		editorInfo.ace_doInsertHeading = (level) => {
+			const {documentAttributeManager, rep} = context;
+			if (!(rep.selStart && rep.selEnd)) return;
+			if (level >= 0 && tags[level] === undefined) return;
+			const firstLine = rep.selStart[0];
+			const lastLine = Math.max(firstLine, rep.selEnd[0] - ((rep.selEnd[1] === 0) ? 1 : 0));
+			_(_.range(firstLine, lastLine + 1)).each((i) => {
+				if (level >= 0) {
+					documentAttributeManager.setAttributeOnLine(i, 'heading', tags[level]);
+					documentAttributeManager.setAttributeOnLine(i, 'headingTagId', randomString(16));
+				} else {
+					documentAttributeManager.removeAttributeOnLine(i, 'heading');
+					documentAttributeManager.removeAttributeOnLine(i, 'headingTagId');
+				}
+			});
+		};
+
   },
   chatNewMessage: (hook, context, callback) => {
     let text = context.text;
