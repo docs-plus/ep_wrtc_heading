@@ -3,12 +3,11 @@ const videoChat = require('./videoChat');
 const textChat = require('./textChat');
 const Queue = require('better-queue');
 const sessioninfos = require('ep_etherpad-lite/node/handler/PadMessageHandler').sessioninfos;
-const { pad } = require('lodash');
 let socketIo = null;
 
 
 const roomStatus = {};
-const maxTryToWaitAcceptNewCall = 11;
+const maxTryToWaitAcceptNewCall = 9;
 
 const acceptNewConnection = ({socket, padId, padparticipators, userData, target, callback}) => {
   let room = null;
@@ -158,7 +157,7 @@ const socketInit = (hookName, args) => {
 
     socket.on('pingil', (padId, headerId, userId, latency) => {
 			const room = videoChat.getRoom(padId, headerId)
-			if(room.length)
+			if(room && room.length)
 				room.map(user => socket.broadcast.to(user.socketId).emit('userLatancy', {padId, headerId, userId, latency}));
       socket.emit('pongol', {padId, headerId, userId, latency});
     });
