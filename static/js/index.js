@@ -2,6 +2,14 @@
 
 const _ = require('ep_etherpad-lite/static/js/underscore');
 const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
+const Sentry = require("@sentry/browser");
+const {Integrations} = require("@sentry/browser");
+
+Sentry.init({
+  dsn: "https://49ca204e744442b0b8954d7207921536@o514733.ingest.sentry.io/5618437",
+  integrations: [new Integrations.BrowserTracing()],
+  tracesSampleRate: 1.0,
+});
 
 /** **********************************************************************/
 /*                              Plugin                                  */
