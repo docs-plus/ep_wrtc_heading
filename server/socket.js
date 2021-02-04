@@ -193,7 +193,7 @@ const socketInit = (hookName, args) => {
 
     socket.on('RTC_MESSAGE', (context) => {
       if (context.type === 'RTC_MESSAGE') {
-        Object.assign(context, {client: {id: socket.id.split('#')[1]}});
+				Object.assign(context, {client: {id: socket.id.split('#')[1]}});
         handleRTCMessage(context.client, context.payload);
       }
     });
@@ -214,9 +214,9 @@ const socketInit = (hookName, args) => {
  */
 const handleRTCMessage = (client, payload) => {
   // if(!socketIo) return false
-  const userId = sessioninfos[client.id].author;
+	const userId = payload.from;
   const to = payload.to;
-  const padId = sessioninfos[client.id].padId;
+  const padId = payload.padId;
   const room = socketIo.sockets.adapter.rooms[padId];
   const clients = [];
 

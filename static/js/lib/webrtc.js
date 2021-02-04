@@ -416,7 +416,7 @@ const WRTC = (() => {
     sendMessage: function sendMessage(to, data) {
       socket.emit('RTC_MESSAGE', {
         type: 'RTC_MESSAGE',
-        payload: {data, to, padId},
+        payload: {data, to, padId, from: Helper.getUserId()},
       }, (data) => {
         // console.log('coming data', data);
       });
