@@ -2,6 +2,7 @@
 
 const _ = require('ep_etherpad-lite/static/js/underscore');
 const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
+const ioClient = require("ep_wrtc_heading/static/js/socket.io.min");
 
 /** **********************************************************************/
 /*                              Plugin                                  */
@@ -31,11 +32,11 @@ const EPwrtcHeading = (() => {
     const loc = document.location;
     const port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
     const url = `${loc.protocol}//${loc.hostname}:${port}/` + 'heading_chat_room';
-    const socket = io.connect(url, {
-      reconnectionAttempts: 9,
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 6000,
+    const socket = ioClient.connect('http://localhost:3000/heading_chat_room', {
+			reconnectionDelay: 1000,
+			autoConnect: true,
+			reconnection: true,
+			transports: ['websocket'] // 'polling'
     });
 
     // reason (String) either ‘io server disconnect’, ‘io client disconnect’, or ‘ping timeout’
@@ -47,16 +48,18 @@ const EPwrtcHeading = (() => {
     // unfortunately when reconnection happen, etherpad break down totally
     // Helper.wrtcPubsub.emit('socket state', 'OPEND');
     socket.on('connect', () => {
+			socket.emit('join pad', padId, userId, () => {
+				console.info("user has joined to ", padId)
+			});
       Helper.wrtcPubsub.emit('socket state', 'OPEND');
-      console.info('[wrtc]: socket connect', socket.id);
+
+			console.log(socket)
     });
 
     socket.on('connect_error', (error) => {
       console.error('[wrtc]: socket connect_error:', error);
       Helper.wrtcPubsub.emit('socket state', 'DISCONNECTED');
     });
-
-    socket.emit('join pad', padId, userId, () => {});
 
     // find containers
     padOuter = $('iframe[name="ace_outer"]').contents();
