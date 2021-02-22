@@ -30,9 +30,13 @@ const EPwrtcHeading = (() => {
 
   const init = (ace, padId, userId) => {
     const loc = document.location;
-    const port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
-    const url = `${loc.protocol}//${loc.hostname}:${port}/` + 'heading_chat_room';
-    const socket = ioClient.connect('http://localhost:3000/heading_chat_room', {
+    let socketURL = clientVars.webrtc.socketLocalAddress
+
+		if(loc.hostname != 'localhost'){
+			socketURL = clientVars.webrtc.socketRemoteAddress
+		} 
+
+    const socket = ioClient.connect(`${socketURL}/heading_chat_room`, {
 			reconnectionDelay: 1000,
 			autoConnect: true,
 			reconnection: true,

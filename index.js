@@ -57,6 +57,8 @@ exports.clientVars = (hook, context, callback) => {
   const result = {
     webrtc: {
       version: packageJson.version,
+			socketRemoteAddress: Config.get("CLIENT_SOCKET_REMOTE_ADDRESS"),
+			socketLocalAddress: Config.get("CLIENT_SOCKET_LOCAL_ADDRESS"),
       videoChatLimit: Config.get('VIDEO_CHAT_LIMIT'),
       inlineAvatarLimit: Config.get('INLINE_AVATAR_LIMIT'),
       iceServers,
