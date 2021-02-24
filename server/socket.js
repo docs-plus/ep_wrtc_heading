@@ -1,3 +1,7 @@
+/**
+ * Depricated file!
+ * We move to ws.router
+ */
 const _ = require('lodash');
 const videoChat = require('./videoChat');
 const textChat = require('./textChat');

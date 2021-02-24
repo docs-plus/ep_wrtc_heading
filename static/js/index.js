@@ -36,13 +36,16 @@ const EPwrtcHeading = (() => {
 			socketURL = clientVars.webrtc.socketRemoteAddress
 		} 
 
-    const socket = ioClient.connect(`${socketURL}/heading_chat_room`, {
+		socketURL = `${socketURL}/heading_chat_room`
+
+    const socket = ioClient.connect(socketURL, {
 			reconnectionDelay: 1000,
 			autoConnect: true,
 			reconnection: true,
 			transports: ['websocket'] // 'polling'
     });
 
+		console.info(`socket address ${socketURL}`)
     // reason (String) either ‘io server disconnect’, ‘io client disconnect’, or ‘ping timeout’
     socket.on('disconnect', (reason) => {
       console.error('[wrtc]: socket disconnection, reason:', reason);
@@ -56,8 +59,6 @@ const EPwrtcHeading = (() => {
 				console.info("user has joined to ", padId)
 			});
       Helper.wrtcPubsub.emit('socket state', 'OPEND');
-
-			console.log(socket)
     });
 
     socket.on('connect_error', (error) => {

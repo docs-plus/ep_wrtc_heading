@@ -9,7 +9,8 @@ const {socketInit} = require('./server/socket');
 // Make sure any updates to this are reflected in README
 const statErrorNames = ['Abort', 'Hardware', 'NotFound', 'NotSupported', 'Permission', 'SecureConnection', 'Unknown'];
 
-exports.socketio = socketInit;
+// TODO: support etherpad socket
+exports.socketio = () => {};
 
 exports.eejsBlock_mySettings = (hookName, args, cb) => {
   args.content += eejs.require('ep_wrtc_heading/static/templates/settings.ejs');
