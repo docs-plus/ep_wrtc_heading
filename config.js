@@ -5,7 +5,7 @@ const settings = {
   INLINE_AVATAR_LIMIT: 6,
   VIDEO_CODEC: 'VP9',
   AUDIO_CODEC: 'OPUS',
-	CLIENT_SOCKET_REMOTE_ADDRESS: "https://ws.docs.plus",
+	CLIENT_SOCKET_REMOTE_ADDRESS: "http://localhost:3000",
 	CLIENT_SOCKET_LOCAL_ADDRESS:	 "http://localhost:3000"
 };
 

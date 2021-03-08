@@ -30,6 +30,7 @@ exports.eejsBlock_styles = (hookName, args, cb) => {
 
 exports.clientVars = (hook, context, callback) => {
   let enabled = true;
+  let remoteSocketAddress = Config.get('CLIENT_SOCKET_REMOTE_ADDRESS');
   if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.enabled === false) {
     enabled = settings.ep_wrtc_heading.enabled;
   }
@@ -55,11 +56,15 @@ exports.clientVars = (hook, context, callback) => {
     video.codec = settings.ep_wrtc_heading.videoCodec;
   }
 
+  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.socketAddress) {
+    remoteSocketAddress = settings.ep_wrtc_heading.socketAddress;
+  }
+
   const result = {
     webrtc: {
       version: packageJson.version,
-			socketRemoteAddress: Config.get("CLIENT_SOCKET_REMOTE_ADDRESS"),
-			socketLocalAddress: Config.get("CLIENT_SOCKET_LOCAL_ADDRESS"),
+      socketRemoteAddress: remoteSocketAddress,
+      socketLocalAddress: Config.get('CLIENT_SOCKET_LOCAL_ADDRESS'),
       videoChatLimit: Config.get('VIDEO_CHAT_LIMIT'),
       inlineAvatarLimit: Config.get('INLINE_AVATAR_LIMIT'),
       iceServers,
@@ -88,4 +93,4 @@ const handleErrorStatMessage = (statName) => {
   } else {
     statsLogger.warn(`Invalid ep_wrtc_heading error stat: ${statName}`);
   }
-}
+};
