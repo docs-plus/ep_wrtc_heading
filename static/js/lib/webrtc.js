@@ -60,8 +60,6 @@ const WRTC = (() => {
         videoSizes.small = `${clientVars.webrtc.video.sizes.small}px`;
 			}
 			
-			console.log(pcConfig.iceServers)
-
       self._pad = context.pad || window.pad;
 
       $(document).on('change', 'select#audioSource', self.audioVideoInputChange);

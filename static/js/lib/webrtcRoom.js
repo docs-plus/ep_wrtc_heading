@@ -122,7 +122,6 @@ const WrtcRoom = (() => {
       showUserProfileModal(headerId);
     } else if (actions === 'JOINBYQUERY') {
       const href = $(this).attr('href');
-      console.log('akjsdlkjalksjdljalskjdlkajsldkjalksjdlkjalksjd', href);
       joinByQueryString(href);
     }
   }

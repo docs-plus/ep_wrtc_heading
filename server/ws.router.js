@@ -214,7 +214,6 @@ module.exports.init = (io, { pid, namespace, preservedNamespace }) => {
 
     socket.on('RTC_MESSAGE', (context) => {
       if (context.type === 'RTC_MESSAGE') {
-				console.log(socket.id)
 				Object.assign(context, {client: {id: socket.id.split('#')[1]}});
         handleRTCMessage(socket,context.client, context.payload);
       }

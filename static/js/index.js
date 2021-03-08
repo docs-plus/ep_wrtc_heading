@@ -45,7 +45,6 @@ const EPwrtcHeading = (() => {
 			transports: ['websocket'] // 'polling'
     });
 
-		console.info(`socket address ${socketURL}`)
     // reason (String) either ‘io server disconnect’, ‘io client disconnect’, or ‘ping timeout’
     socket.on('disconnect', (reason) => {
       console.error('[wrtc]: socket disconnection, reason:', reason);
@@ -56,7 +55,7 @@ const EPwrtcHeading = (() => {
     // Helper.wrtcPubsub.emit('socket state', 'OPEND');
     socket.on('connect', () => {
 			socket.emit('join pad', padId, userId, () => {
-				console.info("user has joined to ", padId)
+				// console.info("user has joined to ", padId)
 			});
       Helper.wrtcPubsub.emit('socket state', 'OPEND');
     });
