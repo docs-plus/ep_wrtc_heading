@@ -22,7 +22,6 @@
 			},
 			"hooks": {
 				"socketio": "ep_wrtc_heading/index",
-				"expressConfigure": "ep_wrtc_heading/server/express",
 				"eejsBlock_scripts": "ep_wrtc_heading/index",
 				"eejsBlock_mySettings": "ep_wrtc_heading/index",
 				"eejsBlock_styles": "ep_wrtc_heading/index",
