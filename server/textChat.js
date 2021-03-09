@@ -1,7 +1,7 @@
 const db = require('./dbRepository');
 const {TEXT_CHAT_KEY, TEXT_CHAT_LIMIT} = require('../config');
 const latestTextChatId = {};
-const rooms = {};
+let rooms = new Map();
 
 exports.socketUserJoin = (data, padparticipators) => {
   const padId = data.padId;
@@ -17,22 +17,24 @@ exports.socketUserJoin = (data, padparticipators) => {
   };
 
   // if the room does not exist create the room for the first time.
-  if (!rooms[roomKey]) { rooms[roomKey] = []; }
+  if (!rooms.has(roomKey)) { rooms.set(roomKey, []); }
 
-
-  result.info.present = rooms[roomKey].length;
-  result.info.list = rooms[roomKey];
+  result.info.present = rooms.get(roomKey).length;
+  result.info.list = rooms.get(roomKey);
 
   // does user already joined the room?
-  const isUserInRoom = rooms[roomKey].find((x) => x.userId === data.userId);
+  const isUserInRoom = rooms.get(roomKey).find((x) => x.userId === data.userId);
   if (isUserInRoom) return result;
 
   result.canUserJoin = true;
-  rooms[roomKey].push(data);
+
+	const newRoom = rooms.get(roomKey).push(data);
+	rooms.set(roomKey, newRoom);
+
   result.info.present++;
 
   // clear participator, check if the current users are sync with room object
-  rooms[roomKey] = rooms[roomKey].filter((x) => padparticipators.includes(x.userId));
+  rooms.set(roomKey, rooms.get(roomKey).filter((x) => padparticipators.includes(x.userId)));
 
   return result;
 };
@@ -46,17 +48,17 @@ exports.socketUserLeave = (data) => {
     info: null,
   };
 
-  if (!rooms[roomKey]) return result;
+  if (!rooms.has(roomKey)) return result;
 
   // remove user in that room
-  rooms[roomKey] = rooms[roomKey].filter((x) => !(x.userId === data.userId));
+  rooms.set(roomKey, rooms[roomKey].filter((x) => !(x.userId === data.userId))) 
 
   // if there is not anymore user in that room, delete room
-  if (rooms[roomKey] && rooms[roomKey].length === 0) { delete rooms[roomKey]; }
+  if (rooms.has(roomKey) && rooms.get(roomKey).length === 0) { rooms.delete(roomKey); }
 
   result.info = {
-    present: rooms[roomKey] ? rooms[roomKey].length : 0,
-    list: rooms[roomKey] || [],
+    present: rooms.has(roomKey) ? rooms.get(roomKey).length : 0,
+    list: rooms.get(roomKey) || [],
   };
 
   return result;
@@ -72,17 +74,17 @@ exports.socketDisconnect = (data) => {
     padId,
   };
 
-  if (!rooms[roomKey]) return result;
+  if (!rooms.has(roomKey)) return result;
 
   // remove user in that room
-  rooms[roomKey] = rooms[roomKey].filter((x) => !(x.userId === data.userId));
+  rooms.set(roomKey, rooms.get(roomKey).filter((x) => !(x.userId === data.userId)));
 
   // if there is not anymore user in that room, delete room
-  if (rooms[roomKey] && rooms[roomKey].length === 0) { delete rooms[roomKey]; }
+  if (rooms.has(roomKey) && rooms.get(roomKey).length === 0) { rooms.delete(roomKey); }
 
   const roomInfo = {
-    present: rooms[roomKey] ? rooms[roomKey].length : 0,
-    list: rooms[roomKey] || [],
+    present: rooms.has(roomKey) ? rooms.get(roomKey).length : 0,
+    list: rooms.get(roomKey) || [],
   };
 
   result.data = data;

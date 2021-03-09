@@ -261,9 +261,12 @@ const Helper = (() => {
 
   wrtcPubsub.on('update network information', () => {});
 
+	/**
+	 * state (DISCONNECTED|OPEND)
+	 */
   wrtcPubsub.on('socket state', (state) => {
     wrtcStore.socketState = state;
-    // console.info('[wrtc]: socket state has been change, new state:', state, wrtcStore.userInRoom, window.headerId);
+    console.info('[wrtc]: socket state has been change, new state:', state, wrtcStore.userInRoom, window.headerId);
     if (state === 'OPEND' && wrtcStore.userInRoom) {
       console.info('Try reconnecting...');
       WRTC.attemptToReconnect();

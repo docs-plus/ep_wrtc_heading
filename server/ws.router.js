@@ -42,7 +42,6 @@ const q = new Queue(
         return cb();
       }
 
-
       // otherwise check the room that can accept new call
       // if it is, then `acceptNewConnection` otherwise push the request at the end of queue
       if (_.get(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false)) {

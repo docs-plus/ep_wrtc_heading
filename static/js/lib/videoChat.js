@@ -269,7 +269,9 @@ const videoChat = (() => {
     if (showAlert && !isBulkUpdate) {
       $.gritter.add({
         title: 'Video chat Limitation',
-        text: `The video-chat room has been reached its limitation. \r\n <br> The size of this video-chat room is ${VIDEOCHATLIMIT}.`,
+        text: `The video chat room has reached its limit. \r\n The size of this video chat room is ${VIDEOCHATLIMIT}. 
+				(If this seems wrong, please share the problem with the support team.) 
+				`,
         sticky: false,
         class_name: 'error',
         time: '5000',
@@ -293,9 +295,12 @@ const videoChat = (() => {
  *
  *	@returns
   */
-  function gateway_userJoin(data, roomInfo, showAlert, bulkUpdate) {
-    if (!data) return reachedVideoRoomSize(null, true, false);
+  function gateway_userJoin(data, roomInfo, showAlert = true, bulkUpdate = false) {
+		console.info(`[wrtc]:`,data, roomInfo, showAlert)
+		// If user data does not exist reutrn false
+    if (!data) return reachedVideoRoomSize(null, false, false);
 
+		// if user data exist then check room size
     if (data && reachedVideoRoomSize(roomInfo, showAlert, bulkUpdate)) {
       return addUserToRoom(data, roomInfo);
     } else if (bulkUpdate) {
