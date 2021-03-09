@@ -1,4 +1,6 @@
 const db = require('ep_etherpad-lite/node/db/DB');
+const settings = require('ep_etherpad-lite/node/utils/Settings');
+console.log(settings, "=-=--=-=-=-=")
 
 try {
 	db.init();
