@@ -1,11 +1,11 @@
 const db = require('ep_etherpad-lite/node/db/DB');
 
-try {
-	db.init();
-} catch (error) {
-	console.error(`exception thrown: ${e.message}`);
-  if (e.stack) console.log(e.stack);
-}
+// try {
+// 	db.init();
+// } catch (error) {
+// 	console.error(`exception thrown: ${e.message}`);
+//   if (e.stack) console.log(e.stack);
+// }
 
 exports.get = (key) => db.get(key).catch((error) => {
   throw new Error(`[repository]: set has an error,${error.message}`);
