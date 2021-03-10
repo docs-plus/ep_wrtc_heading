@@ -71,7 +71,7 @@ const WRTC = (() => {
         self.hangupAll();
       });
       socket.on('RTC_MESSAGE', (context) => {
-				console.log('RTC_MESSAGE', context)
+				// console.log('RTC_MESSAGE', context)
         if (context.data.payload.data.headerId === window.headerId) self.receiveMessage(context.data.payload);
       });
     },

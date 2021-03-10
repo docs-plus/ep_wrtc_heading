@@ -5,7 +5,7 @@ const Queue = require('better-queue');
 let socketIo = null;
 
 const roomStatus = {};
-const maxTryToWaitAcceptNewCall = 9;
+const maxTryToWaitAcceptNewCall = 3;
 
 const acceptNewConnection = ({socket, padId, padparticipators, userData, target, callback}) => {
   let room = null;
