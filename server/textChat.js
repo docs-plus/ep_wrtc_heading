@@ -28,7 +28,8 @@ exports.socketUserJoin = (data, padparticipators) => {
 
   result.canUserJoin = true;
 
-	const newRoom = rooms.get(roomKey).push(data);
+	const newRoom = rooms.get(roomKey);
+	newRoom.push(data)
 	rooms.set(roomKey, newRoom);
 
   result.info.present++;
