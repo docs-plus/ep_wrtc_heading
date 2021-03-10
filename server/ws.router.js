@@ -184,7 +184,7 @@ module.exports.init = (io, { pid, namespace, preservedNamespace }) => {
     });
 
     socket.on('reloadVideoSession', (padId, headerId) => {
-      io.of('/heading_chat_room').to(padId).emit('reloadVideoSession', headerId);
+      io.to(padId).emit('reloadVideoSession', headerId);
     });
 
     socket.on('disconnect', () => {
