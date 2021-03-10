@@ -52,7 +52,7 @@ exports.socketUserLeave = (data) => {
   if (!rooms.has(roomKey)) return result;
 
   // remove user in that room
-  rooms.set(roomKey, rooms[roomKey].filter((x) => !(x.userId === data.userId))) 
+  rooms.set(roomKey, rooms.get(roomKey).filter((x) => !(x.userId === data.userId))) 
 
   // if there is not anymore user in that room, delete room
   if (rooms.has(roomKey) && rooms.get(roomKey).length === 0) { rooms.delete(roomKey); }
