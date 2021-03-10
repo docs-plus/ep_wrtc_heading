@@ -667,7 +667,6 @@ const WRTC = (() => {
   // Normalize RTC implementation between browsers
   // var getUserMedia = window.navigator.mediaDevices.getUserMedia
   var attachMediaStream = function attachMediaStream(element, stream) {
-    console.log("Notify add stream", stream)
     if (typeof element.srcObject !== 'undefined') {
       element.srcObject = stream;
     } else if (typeof element.mozSrcObject !== 'undefined') {
