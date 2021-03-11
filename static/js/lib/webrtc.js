@@ -71,8 +71,10 @@ const WRTC = (() => {
         self.hangupAll();
       });
       socket.on('RTC_MESSAGE', (context) => {
-				// console.log('RTC_MESSAGE', context)
-        if (context.data.payload.data.headerId === window.headerId) self.receiveMessage(context.data.payload);
+				// filter RTC_message just for how is in headerId room
+				const payload = context.data.payload;
+				if(payload.to !== Helper.getUserId()) return;
+        if (payload.data.headerId === window.headerId) self.receiveMessage(context.data.payload);
       });
     },
     appendVideoModalToBody: function appendVideoModalToBody() {
@@ -209,6 +211,7 @@ const WRTC = (() => {
       // For reference on standard errors returned by getUserMedia:
       // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
       // However keep in mind that we add our own errors in getUserMediaPolyfill
+			console.error(`[wrtc]: mediaError, ${err}`)
       switch (err.name) {
         case 'CustomNotSupportedError':
           reason = 'Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>' + 'To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera.' + '<a href="http://www.webrtc.org/" target="_new">Find out more</a>';
@@ -410,12 +413,12 @@ const WRTC = (() => {
     sendErrorStat: function sendErrorStat(statName) {
       const msg = {component: 'pad', type: 'STATS', data: {statName, type: 'RTC_MESSAGE'}};
       socket.emit('acceptNewCall', padId, window.headerId);
-      self._pad.socket.json.send(msg);
+			socket.emit('message', msg)
     },
-    sendMessage: function sendMessage(to, data) {
+    sendMessage: function sendMessage(to, data, socketIdTo) {
       socket.emit('RTC_MESSAGE', {
         type: 'RTC_MESSAGE',
-        payload: {data, to, padId, from: Helper.getUserId()},
+        payload: {data, to, padId, from: Helper.getUserId(), socket: {from: socket.id, to: socketIdTo}},
       }, (data) => {
         // console.log('coming data', data);
       });
@@ -426,7 +429,7 @@ const WRTC = (() => {
       // });
     },
     receiveMessage: function receiveMessage(msg) {
-      const peer = msg.from;
+      const peer = msg.from; // userId
       const data = msg.data;
       const type = data.type;
       if (peer === Helper.getUserId()) {
@@ -500,9 +503,6 @@ const WRTC = (() => {
       Object.keys(pc).forEach((userId) => {
         self.hangup(userId, true, _headerId);
       });
-    },
-    getUserId: function getUserId() {
-      return self._pad && Helper.getUserId();
     },
     hangup: function hangup(userId, notify, headerId) {
       notify = arguments.length === 1 ? true : notify;

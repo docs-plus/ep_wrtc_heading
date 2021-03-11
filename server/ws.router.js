@@ -75,6 +75,7 @@ const handleRTCMessage = (socket,client, payload) => {
   // if(!socketIo) return false
 	const userId = payload.from;
   const padId = payload.padId;
+	const to = payload.to;
 
   const msg = {
     type: 'COLLABROOM',
@@ -82,6 +83,7 @@ const handleRTCMessage = (socket,client, payload) => {
       type: 'RTC_MESSAGE',
       payload: {
         from: userId,
+				to: to,
         data: payload.data,
       },
     },
