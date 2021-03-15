@@ -45,6 +45,7 @@ const socketUserJoin = (data, padparticipators) => {
   }
 
   // clear participator, check if the current users are sync with room object
+	// TODO: This one does not work, I think i have to move it up!
 	rooms.set(roomKey, rooms.get(roomKey).filter((x) => padparticipators.includes(x.userId)));
 
   return {

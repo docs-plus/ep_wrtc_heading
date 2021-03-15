@@ -317,7 +317,7 @@ const videoChat = (() => {
   function postAceInit(hook, context, webSocket, docId) {
     socket = webSocket;
     padId = docId;
-    VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
+    VIDEOCHATLIMIT = 2000; //clientVars.webrtc.videoChatLimit;
     Helper.wrtcPubsub.emit('componentsFlow', 'video', 'init', true);
     // mediaDevices();
 
