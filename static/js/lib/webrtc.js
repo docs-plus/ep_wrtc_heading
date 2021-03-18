@@ -59,7 +59,7 @@ const WRTC = (() => {
       if (clientVars.webrtc.video.sizes.small) {
         videoSizes.small = `${clientVars.webrtc.video.sizes.small}px`;
 			}
-			
+
       self._pad = context.pad || window.pad;
 
       $(document).on('change', 'select#audioSource', self.audioVideoInputChange);
@@ -73,7 +73,7 @@ const WRTC = (() => {
       socket.on('RTC_MESSAGE', (context) => {
 				// filter RTC_message just for how is in headerId room
 				const payload = context.data.payload;
-				if(payload.to !== Helper.getUserId()) return;
+				if (payload.to !== Helper.getUserId()) return;
         if (payload.data.headerId === window.headerId) self.receiveMessage(context.data.payload);
       });
     },
@@ -211,7 +211,7 @@ const WRTC = (() => {
       // For reference on standard errors returned by getUserMedia:
       // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
       // However keep in mind that we add our own errors in getUserMediaPolyfill
-			console.error(`[wrtc]: mediaError, ${err}`)
+      console.error(`[wrtc]: mediaError, ${err}`);
       switch (err.name) {
         case 'CustomNotSupportedError':
           reason = 'Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>' + 'To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera.' + '<a href="http://www.webrtc.org/" target="_new">Find out more</a>';
@@ -413,7 +413,7 @@ const WRTC = (() => {
     sendErrorStat: function sendErrorStat(statName) {
       const msg = {component: 'pad', type: 'STATS', data: {statName, type: 'RTC_MESSAGE'}};
       socket.emit('acceptNewCall', padId, window.headerId);
-			socket.emit('message', msg)
+      socket.emit('message', msg);
     },
     sendMessage: function sendMessage(to, data, socketIdTo) {
       socket.emit('RTC_MESSAGE', {
@@ -561,12 +561,12 @@ const WRTC = (() => {
           reconnected = 0;
           socket.emit('acceptNewCall', padId, window.headerId);
         }
-			};
-			pc[userId].oniceconnectionstatechange = function(){
-				console.info('[wrtc]: ICE state: ',pc[userId], pc[userId].iceConnectionState);
-		 	}
+      };
+      pc[userId].oniceconnectionstatechange = function () {
+        console.info('[wrtc]: ICE state: ', pc[userId], pc[userId].iceConnectionState);
+		 	};
       pc[userId].ontrack = function (event) {
-        console.log(event, "ontrack")
+        console.log(event, 'ontrack');
         remoteStream[userId] = event.streams[0];
         self.setStream(userId, event.streams[0]);
       };
