@@ -125,7 +125,9 @@ const Helper = (() => {
   };
 
   // socketState: 'CLOSED', 'OPEND', 'DISCONNECTED'
+  // enable: plugin active/deactivate
   const wrtcStore = {
+    enable: true,
     userInRoom: false,
     currentOpenRoom: null,
     socketState: 'CLOSED',
@@ -258,6 +260,27 @@ const Helper = (() => {
       }
     },
   };
+
+
+  /**
+	 * @param {boolean} state
+	 */
+  wrtcPubsub.on('plugin enable', (state) => {
+    $body_ace_outer().find('iframe').contents()
+        .find('#innerdocbody').find('.videoHeader wrt-inline-icon').each((i, el) => {
+          el.shadowRoot.querySelector('.btn_roomHandler').style.display = state ? 'flex' : 'none';
+        });
+
+    Helper.$body_ace_outer().find('#outerdocbody')
+        .find('#wbrtc_avatarCol')[0].style.display = state ? 'flex' : 'none';
+
+    // deactive
+    if (!state) {
+      videoChat.userLeave(window.headerId, wrtcPubsub.currentOpenRoom, 'PLUS');
+      wrtcPubsub.currentOpenRoom = null;
+    }
+    wrtcStore.enable = state;
+  });
 
   wrtcPubsub.on('update network information', () => {});
 

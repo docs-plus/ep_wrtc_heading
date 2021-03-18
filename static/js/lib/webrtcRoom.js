@@ -52,6 +52,12 @@ const WrtcRoom = (() => {
 
     if (!headerId || !target) return true;
 
+		// If the plugin is disabled
+		if(!Helper.wrtcStore.enable) {
+			console.info("[wrtc]: Plugin disabled")
+			return
+		};
+
     const hasHref = $(this).attr('href');
     // if the link belong to the other pad.
     // navigate to the new pad
@@ -85,6 +91,7 @@ const WrtcRoom = (() => {
     }
 
     if (actions === 'JOIN') {
+			Helper.wrtcPubsub.currentOpenRoom = userInfo
       switch (target) {
         case 'PLUS':
           Helper.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
@@ -101,6 +108,7 @@ const WrtcRoom = (() => {
           return false;
       }
     } else if (actions === 'LEAVE') {
+			Helper.wrtcPubsub.currentOpenRoom = null
       switch (target) {
         case 'PLUS':
           leaveChatRoom(headerId, userInfo, target);

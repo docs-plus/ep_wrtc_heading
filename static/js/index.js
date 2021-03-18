@@ -16,15 +16,11 @@ const EPwrtcHeading = (() => {
   let outerBody = null;
 
   const enableWrtcHeading = () => {
-    padOuter.find('#wrtcVideoIcons').addClass('active');
-    $('#rtcbox').addClass('active');
+    Helper.wrtcPubsub.emit('plugin enable', true);
   };
 
   const disableWrtcHeading = () => {
-    padOuter.find('#wrtcVideoIcons').removeClass('active');
-    $('#rtcbox').removeClass('active');
-    // TODO: fully disable plugin
-    // WrtcRoom.hangupAll();
+    Helper.wrtcPubsub.emit('plugin enable', false);
   };
 
   const init = (ace, padId, userId) => {
@@ -78,11 +74,9 @@ const EPwrtcHeading = (() => {
     $target.prepend('<div id="wbrtc_avatarCol"></div>');
 
     // module settings
-    $('#options-wrtc-heading').on('change', () => {
+    $('#options-wrtc-heading').on('change', (e) => {
       $('#options-wrtc-heading').is(':checked') ? enableWrtcHeading() : disableWrtcHeading();
     });
-
-    $('#options-wrtc-heading').trigger('change');
 
     if (browser.chrome || browser.firefox) {
       padInner.contents().on('copy', (e) => {
