@@ -5,8 +5,9 @@ const settings = {
   INLINE_AVATAR_LIMIT: 6,
   VIDEO_CODEC: 'VP9',
   AUDIO_CODEC: 'OPUS',
-	CLIENT_SOCKET_REMOTE_ADDRESS: "http://localhost:3000",
-	CLIENT_SOCKET_LOCAL_ADDRESS:	 "http://localhost:3000"
+  CLIENT_SOCKET_REMOTE_ADDRESS: '',
+  SOCKET_NAMESPACE: 'heading_chat_room',
+  USE_ETHERPAD_SOCKET: true,
 };
 
 const update = (key, val) => {

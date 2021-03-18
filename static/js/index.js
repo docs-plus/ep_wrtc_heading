@@ -2,7 +2,6 @@
 
 const _ = require('ep_etherpad-lite/static/js/underscore');
 const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
-const ioClient = require("ep_wrtc_heading/static/js/socket.io.min");
 
 /** **********************************************************************/
 /*                              Plugin                                  */
@@ -30,19 +29,22 @@ const EPwrtcHeading = (() => {
 
   const init = (ace, padId, userId) => {
     const loc = document.location;
-    let socketURL = clientVars.webrtc.socketLocalAddress
+    const port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
+    let socketURL = clientVars.webrtc.socketRemoteAddress;
+    let ioClient = require('ep_wrtc_heading/static/js/socket.io.min');
 
-		if(loc.hostname != 'localhost'){
-			socketURL = clientVars.webrtc.socketRemoteAddress
-		} 
+    if (clientVars.webrtc.useEtherpadSocket || loc.hostname === 'localhost') {
+      ioClient = io;
+      socketURL = `${loc.protocol}//${loc.hostname}:${port}`;
+    }
 
-		socketURL = `${socketURL}/heading_chat_room`
+    socketURL = `${socketURL}/${clientVars.webrtc.socketNamespace}`;
 
     const socket = ioClient.connect(socketURL, {
-			reconnectionDelay: 1000,
-			autoConnect: true,
-			reconnection: true,
-			transports: ['websocket'] // 'polling'
+      reconnectionDelay: 1000,
+      autoConnect: true,
+      reconnection: true,
+      transports: ['websocket'], // 'polling'
     });
 
     // reason (String) either ‘io server disconnect’, ‘io client disconnect’, or ‘ping timeout’
@@ -54,9 +56,9 @@ const EPwrtcHeading = (() => {
     // unfortunately when reconnection happen, etherpad break down totally
     // Helper.wrtcPubsub.emit('socket state', 'OPEND');
     socket.on('connect', () => {
-			socket.emit('join pad', padId, userId, () => {
-				// console.info("user has joined to ", padId)
-			});
+      socket.emit('join pad', padId, userId, () => {
+        // console.info("user has joined to ", padId)
+      });
       Helper.wrtcPubsub.emit('socket state', 'OPEND');
     });
 
@@ -153,8 +155,8 @@ const hooks = {
 
     // init ui native component
     ace.callWithAce((innerAce) => {
-		
-			
+
+
       // console.log(Helper.$body_ace_outer().find('iframe')[0].contentWindow.customElements)
 
     });
@@ -223,33 +225,32 @@ const hooks = {
   },
   aceSelectionChanged: (rep, context) => {
     if (context.callstack.type === 'insertheading') {
-			// rep = context.rep;
-			// console.log(rep, context)
+      // rep = context.rep;
+      // console.log(rep, context)
       // context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
     }
   },
   aceInitialized: (hook, context) => {
     const editorInfo = context.editorInfo;
-		editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
-		const tags = ['h1','h2', 'h3', 'h4', 'h5', 'h6'];
-		// this is overwrite from ep_heading2 
-		editorInfo.ace_doInsertHeading = (level) => {
-			const {documentAttributeManager, rep} = context;
-			if (!(rep.selStart && rep.selEnd)) return;
-			if (level >= 0 && tags[level] === undefined) return;
-			const firstLine = rep.selStart[0];
-			const lastLine = Math.max(firstLine, rep.selEnd[0] - ((rep.selEnd[1] === 0) ? 1 : 0));
-			_(_.range(firstLine, lastLine + 1)).each((i) => {
-				if (level >= 0) {
-					documentAttributeManager.setAttributeOnLine(i, 'heading', tags[level]);
-					documentAttributeManager.setAttributeOnLine(i, 'headingTagId', randomString(16));
-				} else {
-					documentAttributeManager.removeAttributeOnLine(i, 'heading');
-					documentAttributeManager.removeAttributeOnLine(i, 'headingTagId');
-				}
-			});
-		};
-
+    editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
+    const tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+    // this is overwrite from ep_heading2
+    editorInfo.ace_doInsertHeading = (level) => {
+      const {documentAttributeManager, rep} = context;
+      if (!(rep.selStart && rep.selEnd)) return;
+      if (level >= 0 && tags[level] === undefined) return;
+      const firstLine = rep.selStart[0];
+      const lastLine = Math.max(firstLine, rep.selEnd[0] - ((rep.selEnd[1] === 0) ? 1 : 0));
+      _(_.range(firstLine, lastLine + 1)).each((i) => {
+        if (level >= 0) {
+          documentAttributeManager.setAttributeOnLine(i, 'heading', tags[level]);
+          documentAttributeManager.setAttributeOnLine(i, 'headingTagId', randomString(16));
+        } else {
+          documentAttributeManager.removeAttributeOnLine(i, 'heading');
+          documentAttributeManager.removeAttributeOnLine(i, 'headingTagId');
+        }
+      });
+    };
   },
   chatNewMessage: (hook, context, callback) => {
     let text = context.text;
@@ -318,8 +319,8 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
   const cls = context.cls;
   const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
   const headingType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
-	const result = [];
-	if(typeof Helper === 'undefined') return result
+  const result = [];
+  if (typeof Helper === 'undefined') return result;
 
   if (videoHEaderType && headingType) {
     const headerId = videoHEaderType[1];

@@ -9,9 +9,9 @@ const maxTryToWaitAcceptNewCall = 3;
 
 const acceptNewConnection = ({socket, padId, padparticipators, userData, target, callback}) => {
   let room = null;
-	console.info('process webrtc connection');
-	// assign user socket id
-	Object.assign(userData, {socketId: socket.id});
+  console.info('process webrtc connection');
+  // assign user socket id
+  Object.assign(userData, {socketId: socket.id});
   if (target === 'video') {
     room = videoChat.socketUserJoin(userData, padparticipators);
     _.set(socket, 'ndHolder.video', room.data);
@@ -71,11 +71,11 @@ const q = new Queue(
  * @param client the client that send this message
  * @param message the message from the client
  */
-const handleRTCMessage = (socket,client, payload) => {
+const handleRTCMessage = (socket, client, payload) => {
   // if(!socketIo) return false
-	const userId = payload.from;
+  const userId = payload.from;
   const padId = payload.padId;
-	const to = payload.to;
+  const to = payload.to;
 
   const msg = {
     type: 'COLLABROOM',
@@ -83,19 +83,19 @@ const handleRTCMessage = (socket,client, payload) => {
       type: 'RTC_MESSAGE',
       payload: {
         from: userId,
-				to: to,
+        to,
         data: payload.data,
       },
     },
   };
-	socketIo.to(padId).emit("RTC_MESSAGE", msg);
-}
+  socketIo.to(padId).emit('RTC_MESSAGE', msg);
+};
 
-module.exports.init = (io, { pid, namespace, preservedNamespace }) => {
-	console.info(`Socket[${pid}] with namespace:${namespace} has loaded!`)
+module.exports.init = (io, {pid, namespace, preservedNamespace}) => {
+  console.info(`Socket[${pid}] with namespace:${namespace} has loaded!`);
   socketIo = io;
   io.on('connection', (socket) => {
-		console.info(`Client[${pid}] connected .. user ${socket.id} .. namespace ${namespace}`)
+    console.info(`Client[${pid}] connected .. user ${socket.id} .. namespace ${namespace}`);
 
     socket.on('join pad', (padId, userId, callback) => {
       socket.ndHolder = {video: {}, text: {}};
@@ -179,9 +179,8 @@ module.exports.init = (io, { pid, namespace, preservedNamespace }) => {
     });
 
     socket.on('pingil', (padId, headerId, userId, latency) => {
-			const room = videoChat.getRoom(padId, headerId)
-			if(room && room.length)
-				room.map(user => socket.broadcast.to(user.socketId).emit('userLatancy', {padId, headerId, userId, latency}));
+      const room = videoChat.getRoom(padId, headerId);
+      if (room && room.length) room.map((user) => socket.broadcast.to(user.socketId).emit('userLatancy', {padId, headerId, userId, latency}));
       socket.emit('pongol', {padId, headerId, userId, latency});
     });
 
@@ -215,8 +214,8 @@ module.exports.init = (io, { pid, namespace, preservedNamespace }) => {
 
     socket.on('RTC_MESSAGE', (context) => {
       if (context.type === 'RTC_MESSAGE') {
-				Object.assign(context, {client: {id: socket.id.split('#')[1]}});
-        handleRTCMessage(socket,context.client, context.payload);
+        Object.assign(context, {client: {id: socket.id.split('#')[1]}});
+        handleRTCMessage(socket, context.client, context.payload);
       }
     });
 
@@ -224,7 +223,5 @@ module.exports.init = (io, { pid, namespace, preservedNamespace }) => {
       const result = videoChat.getRoom(padId, headerId);
       callback(result);
     });
-
   });
-}
-
+};

@@ -1,10 +1,15 @@
 const db = require('ep_etherpad-lite/node/db/DB');
+const settings = require('ep_etherpad-lite/node/utils/Settings');
 
-try {
-	db.init();
-} catch (error) {
-	console.error(`exception thrown: ${e.message}`);
-  if (e.stack) console.log(e.stack);
+console.log('hi======>>>', settings.ep_wrtc_heading.useEtherpadSocket);
+
+if (settings && !settings.ep_wrtc_heading.useEtherpadSocket) {
+  try {
+    db.init();
+  } catch (error) {
+    console.error(`exception thrown: ${e.message}`);
+    if (e.stack) console.log(e.stack);
+  }
 }
 
 exports.get = (key) => db.get(key).catch((error) => {

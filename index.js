@@ -5,12 +5,22 @@ const statsLogger = log4js.getLogger('stats');
 const stats = require('ep_etherpad-lite/node/stats');
 const packageJson = require('./package.json');
 const Config = require('./config');
-const {socketInit} = require('./server/socket');
 // Make sure any updates to this are reflected in README
 const statErrorNames = ['Abort', 'Hardware', 'NotFound', 'NotSupported', 'Permission', 'SecureConnection', 'Unknown'];
-
+if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.hasOwnProperty('useEtherpadSocket')) {
+  Config.update('USE_ETHERPAD_SOCKET', settings.ep_wrtc_heading.useEtherpadSocket);
+}
+const useEtherpadSocket = Config.get('USE_ETHERPAD_SOCKET');
+const socketNamespace = Config.get('SOCKET_NAMESPACE');
 // TODO: support etherpad socket
-exports.socketio = () => {};
+exports.socketio = (hookName, args, cb) => {
+  if (settings.ep_wrtc_heading && useEtherpadSocket) {
+    console.info('[wrtc]: use etherpad socket system');
+    io = args.io.of(`/${socketNamespace}`);
+    const opt = {pid: process.pid, namespace: socketNamespace, preservedNamespace: {}};
+    require('./server/ws.router').init(io, opt);
+  }
+};
 
 exports.eejsBlock_mySettings = (hookName, args, cb) => {
   args.content += eejs.require('ep_wrtc_heading/static/templates/settings.ejs');
@@ -31,6 +41,7 @@ exports.eejsBlock_styles = (hookName, args, cb) => {
 exports.clientVars = (hook, context, callback) => {
   let enabled = true;
   let remoteSocketAddress = Config.get('CLIENT_SOCKET_REMOTE_ADDRESS');
+
   if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.enabled === false) {
     enabled = settings.ep_wrtc_heading.enabled;
   }
@@ -56,15 +67,17 @@ exports.clientVars = (hook, context, callback) => {
     video.codec = settings.ep_wrtc_heading.videoCodec;
   }
 
-  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.socketAddress) {
+  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.hasOwnProperty('socketAddress')) {
     remoteSocketAddress = settings.ep_wrtc_heading.socketAddress;
+    Config.update('CLIENT_SOCKET_REMOTE_ADDRESS', remoteSocketAddress);
   }
 
   const result = {
     webrtc: {
       version: packageJson.version,
+      useEtherpadSocket,
       socketRemoteAddress: remoteSocketAddress,
-      socketLocalAddress: Config.get('CLIENT_SOCKET_LOCAL_ADDRESS'),
+      socketNamespace,
       videoChatLimit: Config.get('VIDEO_CHAT_LIMIT'),
       inlineAvatarLimit: Config.get('INLINE_AVATAR_LIMIT'),
       iceServers,
