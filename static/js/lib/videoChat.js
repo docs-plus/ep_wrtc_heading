@@ -296,11 +296,11 @@ const videoChat = (() => {
  *	@returns
   */
   function gateway_userJoin(data, roomInfo, showAlert = true, bulkUpdate = false) {
-		console.info(`[wrtc]:`,data, roomInfo, showAlert)
-		// If user data does not exist reutrn false
+    console.info('[wrtc]:', data, roomInfo, showAlert);
+    // If user data does not exist reutrn false
     if (!data) return reachedVideoRoomSize(null, false, false);
 
-		// if user data exist then check room size
+    // if user data exist then check room size
     if (data && reachedVideoRoomSize(roomInfo, showAlert, bulkUpdate)) {
       return addUserToRoom(data, roomInfo);
     } else if (bulkUpdate) {
@@ -317,7 +317,7 @@ const videoChat = (() => {
   function postAceInit(hook, context, webSocket, docId) {
     socket = webSocket;
     padId = docId;
-    VIDEOCHATLIMIT = 2000; //clientVars.webrtc.videoChatLimit;
+    VIDEOCHATLIMIT = 2000; // clientVars.webrtc.videoChatLimit;
     Helper.wrtcPubsub.emit('componentsFlow', 'video', 'init', true);
     // mediaDevices();
 

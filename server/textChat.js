@@ -1,7 +1,7 @@
 const db = require('./dbRepository');
 const {TEXT_CHAT_KEY, TEXT_CHAT_LIMIT} = require('../config');
 const latestTextChatId = {};
-let rooms = new Map();
+const rooms = new Map();
 
 exports.socketUserJoin = (data, padparticipators) => {
   const padId = data.padId;
@@ -28,9 +28,9 @@ exports.socketUserJoin = (data, padparticipators) => {
 
   result.canUserJoin = true;
 
-	const newRoom = rooms.get(roomKey);
-	newRoom.push(data)
-	rooms.set(roomKey, newRoom);
+  const newRoom = rooms.get(roomKey);
+  newRoom.push(data);
+  rooms.set(roomKey, newRoom);
 
   result.info.present++;
 
@@ -52,7 +52,7 @@ exports.socketUserLeave = (data) => {
   if (!rooms.has(roomKey)) return result;
 
   // remove user in that room
-  rooms.set(roomKey, rooms.get(roomKey).filter((x) => !(x.userId === data.userId))) 
+  rooms.set(roomKey, rooms.get(roomKey).filter((x) => !(x.userId === data.userId)));
 
   // if there is not anymore user in that room, delete room
   if (rooms.has(roomKey) && rooms.get(roomKey).length === 0) { rooms.delete(roomKey); }

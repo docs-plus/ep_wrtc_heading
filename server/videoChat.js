@@ -2,12 +2,12 @@ const Config = require('../config');
 
 // data Structure
 // "padId:headerId": [{object}]
-let rooms = new Map();
+const rooms = new Map();
 
 /**
- * 
- * @param {string} padId 
- * @param {string} headerId 
+ *
+ * @param {string} padId
+ * @param {string} headerId
  */
 const getRoom = (padId, headerId) => {
   const roomKey = `${padId}:${headerId}`;
@@ -18,7 +18,7 @@ const socketUserJoin = (data, padparticipators) => {
   const padId = data.padId;
   const headerId = data.headerId;
   const roomKey = `${padId}:${headerId}`;
-	let canUserJoin = false;
+  let canUserJoin = false;
 
   // if the room does not exist create the room for the first time.
   if (!rooms.has(roomKey)) {
@@ -37,16 +37,16 @@ const socketUserJoin = (data, padparticipators) => {
   if (info.present < Config.get('VIDEO_CHAT_LIMIT')) {
     canUserJoin = true;
     const newRoom = rooms.get(roomKey);
-		newRoom.push(data);
-		rooms.set(roomKey, newRoom);
+    newRoom.push(data);
+    rooms.set(roomKey, newRoom);
     info.present++;
   } else {
     canUserJoin = false;
   }
 
   // clear participator, check if the current users are sync with room object
-	// TODO: This one does not work, I think i have to move it up!
-	rooms.set(roomKey, rooms.get(roomKey).filter((x) => padparticipators.includes(x.userId)));
+  // TODO: This one does not work, I think i have to move it up!
+  rooms.set(roomKey, rooms.get(roomKey).filter((x) => padparticipators.includes(x.userId)));
 
   return {
     canUserJoin,
@@ -98,7 +98,7 @@ const socketDisconnect = (data) => {
 
 
   // remove user in that room
-  rooms.set(roomKey, rooms.get(roomKey).filter((x) => !(x.userId === data.userId)))
+  rooms.set(roomKey, rooms.get(roomKey).filter((x) => !(x.userId === data.userId)));
 
   // if there is not anymore user in that room, delete room
   if (rooms.has(roomKey) && rooms.get(roomKey).length === 0) { rooms.delete(roomKey); }

@@ -261,7 +261,7 @@ const Helper = (() => {
 
   wrtcPubsub.on('update network information', () => {});
 
-	/**
+  /**
 	 * state (DISCONNECTED|OPEND)
 	 */
   wrtcPubsub.on('socket state', (state) => {
