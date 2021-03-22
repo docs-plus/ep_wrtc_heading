@@ -8,6 +8,7 @@ const settings = {
   CLIENT_SOCKET_REMOTE_ADDRESS: '',
   SOCKET_NAMESPACE: 'heading_chat_room',
   USE_ETHERPAD_SOCKET: true,
+	DISPLAY_INLINE_AVATAR: true
 };
 
 const update = (key, val) => {

@@ -122,6 +122,11 @@ const hooks = {
       });
     }
 
+    // If the ep_profile_modal plugin is disabled
+    if(!clientVars.plugins.plugins.ep_profile_modal){
+      clientVars.webrtc.displayInlineAvatar = false
+    }
+
     // Bridge into the ep_profiles
     window.clientVars.ep_profile_list = {};
     getSocket().on('message', (obj) => {
@@ -148,12 +153,7 @@ const hooks = {
 
 
     // init ui native component
-    ace.callWithAce((innerAce) => {
-
-
-      // console.log(Helper.$body_ace_outer().find('iframe')[0].contentWindow.customElements)
-
-    });
+    ace.callWithAce((innerAce) => {});
 
     // TODO: make sure the priority of these components are in line
     // TODO: make sure clientVars contain all data that's necessary

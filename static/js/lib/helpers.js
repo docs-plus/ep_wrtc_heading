@@ -180,6 +180,8 @@ const Helper = (() => {
 	 */
   const inlineAvatar = {
     ROOM: (headerId, room) => {
+      if(!clientVars.webrtc.displayInlineAvatar) return;
+
       const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
       let $element = $body_ace_outer().find(`#wbrtc_avatarCol .${headerId}.wrtcIconLine .wrtc_inlineAvatars`);
 
@@ -210,12 +212,22 @@ const Helper = (() => {
       });
     },
     TEXT(headerId, room) {
-      const $element = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
+    const $element = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
+    if(!clientVars.webrtc.displayInlineAvatar) {
+      $element.hide()
+      return;
+    };
+    $element.show()
       $element.find('.avatar').remove();
       this._append(room.list, $element);
     },
     VIDEO(headerId, room) {
       const $element = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
+      if(!clientVars.webrtc.displayInlineAvatar) {
+        $element.hide()
+        return;
+      };
+      $element.show()
       $element.find('.avatar').remove();
       this._append(room.list, $element);
     },
@@ -234,6 +246,8 @@ const Helper = (() => {
       });
     },
     update(userId, data) {
+      if(!clientVars.webrtc.displayInlineAvatar) return;
+
       const $roomBox = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
       const $textBox = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
       const $videoBox = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
@@ -306,7 +320,7 @@ const Helper = (() => {
   });
 
   wrtcPubsub.on('update inlineAvater info', (userId, data) => {
-    inlineAvatar.update(userId, data);
+    if(clientVars.webrtc.displayInlineAvatar) inlineAvatar.update(userId, data);
   });
 
   wrtcPubsub.on('update store', (requestUser, headerId, action, target, roomInfo, callback) => {
