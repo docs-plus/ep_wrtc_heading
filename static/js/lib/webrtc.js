@@ -49,9 +49,9 @@ const WRTC = (() => {
       padId = docId;
       socket = webSocket;
 
-      pcConfig.iceServers = clientVars.webrtc && clientVars.webrtc.iceServers ? clientVars.webrtc.iceServers : [{
-        urls: 'stun:stun.l.google.com:19302',
-      }];
+      if(!clientVars.webrtc) throw new Error ('[wrtc]: webrtc settings not found')
+
+      pcConfig.iceServers = clientVars.webrtc.iceServers
 
       if (clientVars.webrtc.video.sizes.large) {
         videoSizes.large = `${clientVars.webrtc.video.sizes.large}px`;

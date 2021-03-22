@@ -46,7 +46,7 @@ exports.clientVars = (hook, context, callback) => {
     enabled = settings.ep_wrtc_heading.enabled;
   }
 
-  let iceServers = [{url: 'stun:stun.l.google.com:19302'}];
+  let iceServers = [{urls: [Config.get('GOOGLE_STUN_SERVER')]}];
   if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.iceServers) {
     iceServers = settings.ep_wrtc_heading.iceServers;
   }

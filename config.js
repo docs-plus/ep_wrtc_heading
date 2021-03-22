@@ -8,7 +8,8 @@ const settings = {
   CLIENT_SOCKET_REMOTE_ADDRESS: '',
   SOCKET_NAMESPACE: 'heading_chat_room',
   USE_ETHERPAD_SOCKET: true,
-	DISPLAY_INLINE_AVATAR: true
+	DISPLAY_INLINE_AVATAR: true,
+  GOOGLE_STUN_SERVER: 'stun:stun.l.google.com:19302'
 };
 
 const update = (key, val) => {
