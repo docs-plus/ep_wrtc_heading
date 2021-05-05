@@ -1,6 +1,6 @@
 'use strict';
 
-const _ = require('ep_etherpad-lite/static/js/underscore');
+const _ = require('underscore');
 const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 let ioClient = require('ep_wrtc_heading/static/js/socketIoMin');
 

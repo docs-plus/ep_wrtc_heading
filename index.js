@@ -20,6 +20,7 @@ exports.socketio = (hookName, args, cb) => {
     const opt = {pid: process.pid, namespace: socketNamespace, preservedNamespace: {}};
     require('./server/ws.router').init(io, opt);
   }
+  return cb();
 };
 
 exports.eejsBlock_mySettings = (hookName, args, cb) => {
