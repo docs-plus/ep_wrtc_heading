@@ -2,6 +2,7 @@
 
 const _ = require('ep_etherpad-lite/static/js/underscore');
 const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
+let ioClient = require('ep_wrtc_heading/static/js/socketIoMin');
 
 /** **********************************************************************/
 /*                              Plugin                                  */
@@ -27,7 +28,7 @@ const EPwrtcHeading = (() => {
     const loc = document.location;
     const port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
     let socketURL = clientVars.webrtc.socketRemoteAddress;
-    let ioClient = require('ep_wrtc_heading/static/js/socket.io.min');
+
 
     if (clientVars.webrtc.useEtherpadSocket || loc.hostname === 'localhost') {
       ioClient = io;
@@ -35,6 +36,8 @@ const EPwrtcHeading = (() => {
     }
 
     socketURL = `${socketURL}/${clientVars.webrtc.socketNamespace}`;
+
+    console.info(`socket address: ${socketURL}`)
 
     const socket = ioClient.connect(socketURL, {
       reconnectionDelay: 1000,
