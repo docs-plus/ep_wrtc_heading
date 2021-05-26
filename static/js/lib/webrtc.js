@@ -599,19 +599,19 @@ const WRTC = (() => {
       }
     },
     changeAudioDestination: function changeAudioDestination() {
-      const audioOutputSelect = document.querySelector('select#audioOutput');
+      const audioOutputSelect = document.querySelector('#wrtc_settings .select.audioOutputSec');
       const audioDestination = audioOutputSelect.value;
       const videoElement = localVideoElement;
       self.attachSinkId(videoElement, audioDestination);
     },
     getUserMedia: function getUserMedia(headerId) {
-      audioInputSelect = document.querySelector('select#audioSource');
-      videoSelect = document.querySelector('select#videoSource');
-      audioOutputSelect = document.querySelector('select#audioOutput');
+      audioInputSelect = document.querySelector('#wrtc_settings .select.audioSource');
+      audioOutputSelect = document.querySelector('#wrtc_settings .select.audioOutputSec');
+      videoSelect = document.querySelector('#wrtc_settings .select.videoSourc');
 
-      const audioSource = audioInputSelect.value;
-      const videoSource = videoSelect.value;
-      const audioOutput = audioOutputSelect.value;
+      const audioSource = audioInputSelect ? audioInputSelect.value : null;
+      const videoSource = videoSelect ? videoSelect.value : null;
+      const audioOutput = audioOutputSelect ? audioOutputSelect.value : null;
 
       const mediaConstraints = {
         audio: true,
