@@ -39,9 +39,13 @@ const videoChat = (() => {
         videoSettings = JSON.parse(videoSettings);
       }
 
-      const audioInputSelect = document.querySelector('select#audioSource');
-      const audioOutputSelect = document.querySelector('select#audioOutput');
-      const videoSelect = document.querySelector('select#videoSource');
+      const audioInputSection = document.querySelector("#wrtc_settings .select.audioSource");
+      const audioOutputSection = document.querySelector('#wrtc_settings .select.audioOutputSec');
+      const videoSection = document.querySelector('#wrtc_settings .select.videoSource');
+
+			const audioInputElement = document.createElement("select");
+			const audioOutputElement = document.createElement("select");
+			const videoElement = document.createElement("select");
 
       for (let i = 0; i !== data.length; ++i) {
         const deviceInfo = data[i];
@@ -50,17 +54,21 @@ const videoChat = (() => {
         if (deviceInfo.kind === 'audioinput') {
           option.text = deviceInfo.label || `microphone ${audioInputSelect.length + 1}`;
           if (videoSettings.microphone === deviceInfo.deviceId) option.selected = true;
-          audioInputSelect.appendChild(option);
+          audioInputElement.appendChild(option);
         } else if (deviceInfo.kind === 'audiooutput') {
           option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
           if (videoSettings.speaker === deviceInfo.deviceId) option.selected = true;
-          audioOutputSelect.appendChild(option);
+          audioOutputElement.appendChild(option);
         } else if (deviceInfo.kind === 'videoinput') {
           option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
           if (videoSettings.camera === deviceInfo.deviceId) option.selected = true;
-          videoSelect.appendChild(option);
+          videoElement.appendChild(option);
         }
       }
+
+			audioInputSection.appendChild(audioInputElement);
+			audioOutputSection.appendChild(audioOutputElement);
+			videoSection.appendChild(videoElement);
     });
   }
 
