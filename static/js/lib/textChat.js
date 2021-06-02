@@ -41,7 +41,8 @@ const textChat = (() => {
       $(this).val('');
       const user = Helper.getUserFromId(clientVars.userId);
       if (!user) return true;
-      const msg = {text: textMessage, userName: user.name, author: user.userId, time: new Date().getTime()};
+      const userName = user.name || 'anonymous';
+      const msg = {text: textMessage, userName, author: user.userId, time: new Date().getTime()};
       socket.emit('sendTextMessage', padId, currentRoom.headerId, msg, (incomMsg) => {
         createAndAppendMessage(incomMsg);
       });

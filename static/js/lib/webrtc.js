@@ -49,16 +49,16 @@ const WRTC = (() => {
       padId = docId;
       socket = webSocket;
 
-      if(!clientVars.webrtc) throw new Error ('[wrtc]: webrtc settings not found')
+      if (!clientVars.webrtc) throw new Error('[wrtc]: webrtc settings not found');
 
-      pcConfig.iceServers = clientVars.webrtc.iceServers
+      pcConfig.iceServers = clientVars.webrtc.iceServers;
 
       if (clientVars.webrtc.video.sizes.large) {
         videoSizes.large = `${clientVars.webrtc.video.sizes.large}px`;
       }
       if (clientVars.webrtc.video.sizes.small) {
         videoSizes.small = `${clientVars.webrtc.video.sizes.small}px`;
-			}
+      }
 
       self._pad = context.pad || window.pad;
 
@@ -71,9 +71,9 @@ const WRTC = (() => {
         self.hangupAll();
       });
       socket.on('RTC_MESSAGE', (context) => {
-				// filter RTC_message just for how is in headerId room
-				const payload = context.data.payload;
-				if (payload.to !== Helper.getUserId()) return;
+        // filter RTC_message just for how is in headerId room
+        const payload = context.data.payload;
+        if (payload.to !== Helper.getUserId()) return;
         if (payload.data.headerId === window.headerId) self.receiveMessage(context.data.payload);
       });
     },
@@ -180,9 +180,10 @@ const WRTC = (() => {
       if (context.author) {
         const user = self.getUserFromId(context.author);
         if (user) {
+          const userName = user.name || 'anonymous';
           $(`#video_${user.userId.replace(/\./g, '_')}`).css({
             'border-color': user.colorId,
-          }).siblings('.user-name').text(user.name || 'anonymous');
+          }).siblings('.user-name').text(userName);
         }
       }
     },
@@ -323,8 +324,8 @@ const WRTC = (() => {
           'width': videoSizes.small,
           'max-height': videoSizes.small,
         }).appendTo($('#wrtc_modal .videoWrapper'));
-
-        videoContainer.append($('<div class="user-name">').text(user.name || 'anonymous'));
+        const userName = user.name || 'anonymous';
+        videoContainer.append($('<div class="user-name">').text(userName));
 
         video = $('<video playsinline>').attr('id', videoId).css({
           'border-color': user.colorId,

@@ -120,7 +120,8 @@ const Helper = (() => {
     $element.empty();
     roomInfo.list.forEach((el) => {
       const userInList = getUserFromId(el.userId) || {colorId: '', name: 'anonymous', userId: '0000000'};
-      $element.append(`<li data-id=${el.userId} style='border-color: ${userInList.colorId}'><div class='avatar'><div title='${userInList.name}' style="background: url('${getAvatarUrl(el.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>${userInList.name}</li>`);
+      const userName = userInList.name || 'anonymous';
+      $element.append(`<li data-id=${el.userId} style='border-color: ${userInList.colorId}'><div class='avatar'><div title='${userName}' style="background: url('${getAvatarUrl(el.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>${userName}</li>`);
     });
   };
 
@@ -180,7 +181,7 @@ const Helper = (() => {
 	 */
   const inlineAvatar = {
     ROOM: (headerId, room) => {
-      if(!clientVars.webrtc.displayInlineAvatar) return;
+      if (!clientVars.webrtc.displayInlineAvatar) return;
 
       const inlineAvatarLimit = clientVars.webrtc.inlineAvatarLimit || 4;
       let $element = $body_ace_outer().find(`#wbrtc_avatarCol .${headerId}.wrtcIconLine .wrtc_inlineAvatars`);
@@ -203,8 +204,9 @@ const Helper = (() => {
           $videoInlineAvatarIcons.find(`.avatar[data-id="${userInList.userId}"]`).remove();
 
           if (index < inlineAvatarLimit) {
+            const userName = userInList.name || 'anonymous';
             $element.find('.avatarMore').hide();
-            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
+            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userName}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
           } else {
             $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
           }
@@ -212,22 +214,22 @@ const Helper = (() => {
       });
     },
     TEXT(headerId, room) {
-    const $element = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
-    if(!clientVars.webrtc.displayInlineAvatar) {
-      $element.hide()
-      return;
-    };
-    $element.show()
+      const $element = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
+      if (!clientVars.webrtc.displayInlineAvatar) {
+        $element.hide();
+        return;
+      }
+      $element.show();
       $element.find('.avatar').remove();
       this._append(room.list, $element);
     },
     VIDEO(headerId, room) {
       const $element = $(document).find('#werc_toolbar .wrtc_inlineAvatars');
-      if(!clientVars.webrtc.displayInlineAvatar) {
-        $element.hide()
+      if (!clientVars.webrtc.displayInlineAvatar) {
+        $element.hide();
         return;
-      };
-      $element.show()
+      }
+      $element.show();
       $element.find('.avatar').remove();
       this._append(room.list, $element);
     },
@@ -237,8 +239,9 @@ const Helper = (() => {
         const userInList = getUserFromId(el.userId) || {colorId: '', name: 'anonymous'};
         if (userInList.userId) {
           if (index < inlineAvatarLimit) {
+            const userName = userInList.name || 'anonymous';
             $element.find('.avatarMore').hide();
-            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userInList.name}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
+            $element.append(`<div class="avatar btn_roomHandler" data-join="null" data-action="USERPROFILEMODAL" data-id="${userInList.userId}"><div title='${userName}' style="background: url('${getAvatarUrl(userInList.userId)}') no-repeat 50% 50% ; background-size : cover;"></div></div>`);
           } else {
             $element.find('.avatarMore').show().text(`+${index + 1 - inlineAvatarLimit}`);
           }
@@ -246,7 +249,7 @@ const Helper = (() => {
       });
     },
     update(userId, data) {
-      if(!clientVars.webrtc.displayInlineAvatar) return;
+      if (!clientVars.webrtc.displayInlineAvatar) return;
 
       const $roomBox = $body_ace_outer().find('#wrtcVideoIcons .wrtcIconLine .wrtc_inlineAvatars');
       const $textBox = $(document).find('#wrtc_textChatWrapper .wrtc_inlineAvatars');
@@ -320,7 +323,7 @@ const Helper = (() => {
   });
 
   wrtcPubsub.on('update inlineAvater info', (userId, data) => {
-    if(clientVars.webrtc.displayInlineAvatar) inlineAvatar.update(userId, data);
+    if (clientVars.webrtc.displayInlineAvatar) inlineAvatar.update(userId, data);
   });
 
   wrtcPubsub.on('update store', (requestUser, headerId, action, target, roomInfo, callback) => {

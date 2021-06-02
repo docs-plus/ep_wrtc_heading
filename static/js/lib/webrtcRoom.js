@@ -52,11 +52,11 @@ const WrtcRoom = (() => {
 
     if (!headerId || !target) return true;
 
-		// If the plugin is disabled
-		if(!Helper.wrtcStore.enable) {
-			console.info("[wrtc]: Plugin disabled")
-			return
-		};
+    // If the plugin is disabled
+    if (!Helper.wrtcStore.enable) {
+      console.info('[wrtc]: Plugin disabled');
+      return;
+    }
 
     const hasHref = $(this).attr('href');
     // if the link belong to the other pad.
@@ -73,8 +73,8 @@ const WrtcRoom = (() => {
       userName: clientVars.userName || 'anonymous',
       headerId,
       target,
-			action: actions,
-			
+      action: actions,
+
     };
 
     // Before handel request, check socket state
@@ -91,7 +91,7 @@ const WrtcRoom = (() => {
     }
 
     if (actions === 'JOIN') {
-			Helper.wrtcPubsub.currentOpenRoom = userInfo
+      Helper.wrtcPubsub.currentOpenRoom = userInfo;
       switch (target) {
         case 'PLUS':
           Helper.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
@@ -108,7 +108,7 @@ const WrtcRoom = (() => {
           return false;
       }
     } else if (actions === 'LEAVE') {
-			Helper.wrtcPubsub.currentOpenRoom = null
+      Helper.wrtcPubsub.currentOpenRoom = null;
       switch (target) {
         case 'PLUS':
           leaveChatRoom(headerId, userInfo, target);
@@ -282,8 +282,9 @@ const WrtcRoom = (() => {
         const user = Helper.getUserFromId(context.author);
         if (user) {
           // sync user info
-          Helper.$body_ace_outer().find(`.wrtc_content.textChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(user.name);
-          Helper.$body_ace_outer().find(`.wrtc_content.videoChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(user.name);
+          const userName = user.name || 'anonymous';
+          Helper.$body_ace_outer().find(`.wrtc_content.textChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(userName);
+          Helper.$body_ace_outer().find(`.wrtc_content.videoChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(userName);
         }
       }
     },
