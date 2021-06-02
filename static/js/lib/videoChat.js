@@ -39,13 +39,13 @@ const videoChat = (() => {
         videoSettings = JSON.parse(videoSettings);
       }
 
-      const audioInputSection = document.querySelector("#wrtc_settings .select.audioSource");
+      const audioInputSection = document.querySelector('#wrtc_settings .select.audioSource');
       const audioOutputSection = document.querySelector('#wrtc_settings .select.audioOutputSec');
       const videoSection = document.querySelector('#wrtc_settings .select.videoSource');
 
-			const audioInputElement = document.createElement("select");
-			const audioOutputElement = document.createElement("select");
-			const videoElement = document.createElement("select");
+      const audioInputElement = document.createElement('select');
+      const audioOutputElement = document.createElement('select');
+      const videoElement = document.createElement('select');
 
       for (let i = 0; i !== data.length; ++i) {
         const deviceInfo = data[i];
@@ -66,9 +66,9 @@ const videoChat = (() => {
         }
       }
 
-			audioInputSection.appendChild(audioInputElement);
-			audioOutputSection.appendChild(audioOutputElement);
-			videoSection.appendChild(videoElement);
+      audioInputSection.appendChild(audioInputElement);
+      audioOutputSection.appendChild(audioOutputElement);
+      videoSection.appendChild(videoElement);
     });
   }
 
@@ -277,8 +277,8 @@ const videoChat = (() => {
     if (showAlert && !isBulkUpdate) {
       $.gritter.add({
         title: 'Video chat Limitation',
-        text: `The video chat room has reached its limit. \r\n The size of this video chat room is ${VIDEOCHATLIMIT}. 
-				(If this seems wrong, please share the problem with the support team.) 
+        text: `The video chat room has reached its limit. \r\n The size of this video chat room is ${VIDEOCHATLIMIT}.
+				(If this seems wrong, please share the problem with the support team.)
 				`,
         sticky: false,
         class_name: 'error',

@@ -73,7 +73,7 @@ exports.clientVars = (hook, context, callback) => {
     Config.update('CLIENT_SOCKET_REMOTE_ADDRESS', remoteSocketAddress);
   }
 
-  if(settings.ep_wrtc_heading && settings.ep_wrtc_heading.hasOwnProperty('displayInlineAvatar')){
+  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.hasOwnProperty('displayInlineAvatar')) {
     Config.update('DISPLAY_INLINE_AVATAR', settings.ep_wrtc_heading.displayInlineAvatar);
   }
 
@@ -85,7 +85,7 @@ exports.clientVars = (hook, context, callback) => {
       socketNamespace,
       videoChatLimit: Config.get('VIDEO_CHAT_LIMIT'),
       inlineAvatarLimit: Config.get('INLINE_AVATAR_LIMIT'),
-			displayInlineAvatar: Config.get('DISPLAY_INLINE_AVATAR'),
+      displayInlineAvatar: Config.get('DISPLAY_INLINE_AVATAR'),
       iceServers,
       enabled,
       video,

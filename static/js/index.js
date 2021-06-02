@@ -37,7 +37,7 @@ const EPwrtcHeading = (() => {
 
     socketURL = `${socketURL}/${clientVars.webrtc.socketNamespace}`;
 
-    console.info(`socket address: ${socketURL}`)
+    console.info(`socket address: ${socketURL}`);
 
     const socket = ioClient.connect(socketURL, {
       reconnectionDelay: 1000,
@@ -126,8 +126,8 @@ const hooks = {
     }
 
     // If the ep_profile_modal plugin is disabled
-    if(!clientVars.plugins.plugins.ep_profile_modal){
-      clientVars.webrtc.displayInlineAvatar = false
+    if (!clientVars.plugins.plugins.ep_profile_modal) {
+      clientVars.webrtc.displayInlineAvatar = false;
     }
 
     // Bridge into the ep_profiles
