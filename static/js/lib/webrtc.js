@@ -178,7 +178,7 @@ const WRTC = (() => {
     },
     aceSetAuthorStyle: function aceSetAuthorStyle(context) {
       if (context.author) {
-        const user = self.getUserFromId(context.author);
+        const user = Helper.getUserFromId(context.author);
         if (user) {
           const userName = user.name || 'anonymous';
           $(`#video_${user.userId.replace(/\./g, '_')}`).css({
@@ -305,19 +305,13 @@ const WRTC = (() => {
         return !videoTrack.enabled;
       }
     },
-    getUserFromId: function getUserFromId(userId) {
-      if (!self._pad || !self._pad.collabClient) return null;
-      const result = self._pad.collabClient.getConnectedUsers().filter((user) => user.userId === userId);
-      const user = result.length > 0 ? result[0] : null;
-      return user;
-    },
     setStream: function setStream(userId, stream) {
       if (!userId) return false;
       const isLocal = userId === Helper.getUserId();
       const videoId = `video_${userId.replace(/\./g, '_')}`;
       let video = $(`#${videoId}`)[0];
 
-      const user = self.getUserFromId(userId);
+      const user = Helper.getUserFromId(userId);
 
       if (!video && stream) {
         const videoContainer = $("<div class='video-container'>").css({
@@ -610,9 +604,9 @@ const WRTC = (() => {
       audioOutputSelect = document.querySelector('#wrtc_settings .select.audioOutputSec');
       videoSelect = document.querySelector('#wrtc_settings .select.videoSourc');
 
-      const audioSource = audioInputSelect ? audioInputSelect.value : null;
-      const videoSource = videoSelect ? videoSelect.value : null;
-      const audioOutput = audioOutputSelect ? audioOutputSelect.value : null;
+      const audioSource = audioInputSelect ? audioInputSelect.value : undefined;
+      const videoSource = videoSelect ? videoSelect.value : undefined;
+      const audioOutput = audioOutputSelect ? audioOutputSelect.value : undefined;
 
       const mediaConstraints = {
         audio: true,

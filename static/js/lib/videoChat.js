@@ -52,15 +52,15 @@ const videoChat = (() => {
         const option = document.createElement('option');
         option.value = deviceInfo.deviceId;
         if (deviceInfo.kind === 'audioinput') {
-          option.text = deviceInfo.label || `microphone ${audioInputSelect.length + 1}`;
+          option.text = deviceInfo.label || `microphone ${audioInputSection? audioInputSection.length + 1 : "1"}`;
           if (videoSettings.microphone === deviceInfo.deviceId) option.selected = true;
           audioInputElement.appendChild(option);
         } else if (deviceInfo.kind === 'audiooutput') {
-          option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
+          option.text = deviceInfo.label || `speaker ${audioOutputSection? audioOutputSection.length + 1: "1"}`;
           if (videoSettings.speaker === deviceInfo.deviceId) option.selected = true;
           audioOutputElement.appendChild(option);
         } else if (deviceInfo.kind === 'videoinput') {
-          option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
+          option.text = deviceInfo.label || `camera ${videoSection? videoSection.length + 1: "1"}`;
           if (videoSettings.camera === deviceInfo.deviceId) option.selected = true;
           videoElement.appendChild(option);
         }
