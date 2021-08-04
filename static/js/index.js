@@ -313,29 +313,30 @@ exports.acePostWriteDomLineHTML = function (name, context) {
 };
 
 exports.aceDomLineProcessLineAttributes = (name, context) => {
-  const cls = context.cls;
-  const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
-  const headingType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
-  const result = [];
-  if (typeof Helper === 'undefined') return result;
+  // const cls = context.cls;
+  // const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
+  // const headingType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
+  // const result = [];
+  // if (typeof Helper === 'undefined') return result;
 
-  if (videoHEaderType && headingType) {
-    const headerId = videoHEaderType[1];
-    // if video or textChat modal is open! update modal title
-    if (Helper.wrtcStore.components.video.open || Helper.wrtcStore.components.text.open) {
-      const $header = Helper.findAceHeaderElement(headerId);
-      Helper.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
-    }
+  // if (videoHEaderType && headingType) {
+  //   const headerId = videoHEaderType[1];
+  //   // if video or textChat modal is open! update modal title
+  //   if (Helper.wrtcStore.components.video.open || Helper.wrtcStore.components.text.open) {
+  //     const $header = Helper.findAceHeaderElement(headerId);
+  //     Helper.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
+  //   }
 
-    const modifier = {
-      preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}"><wrt-inline-icon headerid="${headerId}"></wrt-inline-icon>`,
-      postHtml: '</nd-video>',
-      processedMarker: true,
-    };
+  //   const modifier = {
+  //     preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}"><wrt-inline-icon headerid="${headerId}"></wrt-inline-icon>`,
+  //     postHtml: '</nd-video>',
+  //     processedMarker: true,
+  //   };
 
-    Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
-    result.push(modifier);
-  }
+  //   Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
+  //   result.push(modifier);
+  // }
 
-  return result;
+  // return result;
+  return [];
 };
