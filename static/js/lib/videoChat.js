@@ -52,15 +52,15 @@ const videoChat = (() => {
         const option = document.createElement('option');
         option.value = deviceInfo.deviceId;
         if (deviceInfo.kind === 'audioinput') {
-          option.text = deviceInfo.label || `microphone ${audioInputSection? audioInputSection.length + 1 : "1"}`;
+          option.text = deviceInfo.label || `microphone ${audioInputSection ? audioInputSection.length + 1 : '1'}`;
           if (videoSettings.microphone === deviceInfo.deviceId) option.selected = true;
           audioInputElement.appendChild(option);
         } else if (deviceInfo.kind === 'audiooutput') {
-          option.text = deviceInfo.label || `speaker ${audioOutputSection? audioOutputSection.length + 1: "1"}`;
+          option.text = deviceInfo.label || `speaker ${audioOutputSection ? audioOutputSection.length + 1 : '1'}`;
           if (videoSettings.speaker === deviceInfo.deviceId) option.selected = true;
           audioOutputElement.appendChild(option);
         } else if (deviceInfo.kind === 'videoinput') {
-          option.text = deviceInfo.label || `camera ${videoSection? videoSection.length + 1: "1"}`;
+          option.text = deviceInfo.label || `camera ${videoSection ? videoSection.length + 1 : '1'}`;
           if (videoSettings.camera === deviceInfo.deviceId) option.selected = true;
           videoElement.appendChild(option);
         }
@@ -82,8 +82,7 @@ const videoChat = (() => {
     const userCount = roomInfo.present;
     $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text(userCount);
 
-    if(userCount === 0)
-      $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text("");
+    if (userCount === 0) $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text('');
 
     const user = Helper.getUserFromId(data.userId);
 
@@ -150,8 +149,7 @@ const videoChat = (() => {
     const userCount = roomInfo.present;
 
     $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text(userCount);
-    if(userCount === 0)
-      $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text("");
+    if (userCount === 0) $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text('');
 
     if (data.action === 'JOIN') {
       // notify, a user join the video-chat room

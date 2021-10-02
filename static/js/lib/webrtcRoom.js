@@ -244,7 +244,7 @@ const WrtcRoom = (() => {
 
 
     // integration with ep_rocketChat
-    $(document).on('click', "#toc .itemRow.tocItem", function(){
+    $(document).on('click', '#toc .itemRow.tocItem', function () {
       const headerId = $(this).attr('sectionid');
       const room = Helper.wrtcStore.rooms.get(headerId);
 
@@ -256,11 +256,9 @@ const WrtcRoom = (() => {
       // check wrtc store
       $('.header_videochat_icon .icon .userCount').text(room.VIDEO.present);
       // does the current user present in this room
-      const currentUserPresent = room.VIDEO.list.find(x=> x.userId === clientVars.userId);
+      const currentUserPresent = room.VIDEO.list.find((x) => x.userId === clientVars.userId);
 
-      if(currentUserPresent)
-        $('.header_videochat_icon .icon').addClass('active');
-
+      if (currentUserPresent) $('.header_videochat_icon .icon').addClass('active');
     });
 
     $(document).on('click', '.btn_roomHandler, .wrtc_roomLink', roomBtnHandler);

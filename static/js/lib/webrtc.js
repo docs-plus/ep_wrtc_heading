@@ -142,7 +142,7 @@ const WRTC = (() => {
                 return '0 Bytes';
               }
 
-              return `${(bytes / Math.pow(k, i)).toPrecision(3)} ${sizes[i]}`;
+              return `${(bytes / k ** i).toPrecision(3)} ${sizes[i]}`;
             };
 
             getStats(pc[userID[0]], (result) => {

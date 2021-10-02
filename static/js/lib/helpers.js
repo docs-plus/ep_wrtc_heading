@@ -50,7 +50,7 @@ const Helper = (() => {
   };
 
   const getUserFromId = (userId) => {
-    let anonymousUser = {name: "anonymous", userId, colorId: "#FFF"}
+    const anonymousUser = {name: 'anonymous', userId, colorId: '#FFF'};
     if (!window.pad || !window.pad.collabClient) return anonymousUser;
     const result = window.pad.collabClient.getConnectedUsers().filter((user) => user.userId === userId);
     const user = result.length > 0 ? result[0] : anonymousUser;
