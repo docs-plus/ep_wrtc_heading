@@ -76,7 +76,6 @@ const WrtcRoom = (() => {
       action: actions,
 
     };
-
     // Before handel request, check socket state
     if (Helper.wrtcStore.socketState !== 'OPEND') {
       // show the alert that user must reload the page
@@ -149,6 +148,7 @@ const WrtcRoom = (() => {
 
     // check if header id belong to this pad
     // then if it's not check padName
+
     if (!Helper.wrtcStore.rooms.get(headerId)) {
       if (inComePadName !== currentPadName) return window.location.href = url;
       $.gritter.add({
@@ -163,7 +163,7 @@ const WrtcRoom = (() => {
 
     if (headerId) scroll2Header(headerId);
 
-    if (join === 'true') {
+    if (join === 'true' && target) {
       target = target.toUpperCase();
       setTimeout(() => {
         roomBtnHandler('JOIN', headerId, target);
@@ -240,6 +240,27 @@ const WrtcRoom = (() => {
       const action = $btn.getAttribute('data-action');
       const target = $btn.getAttribute('data-join');
       roomBtnHandler(action, headerId, target);
+    });
+
+
+    // integration with ep_rocketChat
+    $(document).on('click', "#toc .itemRow.tocItem", function(){
+      const headerId = $(this).attr('sectionid');
+      const room = Helper.wrtcStore.rooms.get(headerId);
+
+      // clear the button
+      $('.header_videochat_icon').attr('data-id', headerId);
+      $('.header_videochat_icon .icon').removeClass('active');
+      $('.header_videochat_icon .icon .userCount').text('');
+
+      // check wrtc store
+      $('.header_videochat_icon .icon .userCount').text(room.VIDEO.present);
+      // does the current user present in this room
+      const currentUserPresent = room.VIDEO.list.find(x=> x.userId === clientVars.userId);
+
+      if(currentUserPresent)
+        $('.header_videochat_icon .icon').addClass('active');
+
     });
 
     $(document).on('click', '.btn_roomHandler, .wrtc_roomLink', roomBtnHandler);

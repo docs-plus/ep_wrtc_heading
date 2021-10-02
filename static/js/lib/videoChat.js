@@ -80,6 +80,10 @@ const videoChat = (() => {
     const headerTitle = Helper.findAceHeaderElement(headerId).text;
 
     const userCount = roomInfo.present;
+    $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text(userCount);
+
+    if(userCount === 0)
+      $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text("");
 
     const user = Helper.getUserFromId(data.userId);
 
@@ -94,6 +98,7 @@ const videoChat = (() => {
         headerTitle,
         VIDEOCHATLIMIT,
       };
+      $(`.header_videochat_icon[data-id='${headerId}'] .icon`).removeClass('active');
       Helper.notifyNewUserJoined('PLUS', msg, 'LEAVE');
     }
 
@@ -144,6 +149,9 @@ const videoChat = (() => {
     // if (IsUserInRooms) return false;
     const userCount = roomInfo.present;
 
+    $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text(userCount);
+    if(userCount === 0)
+      $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text("");
 
     if (data.action === 'JOIN') {
       // notify, a user join the video-chat room
@@ -159,6 +167,8 @@ const videoChat = (() => {
 
       Helper.notifyNewUserJoined('PLUS', msg, 'JOIN');
     }
+
+    $(`.header_videochat_icon[data-id='${headerId}'] .icon`).addClass('active');
 
     if (data.userId === clientVars.userId) {
       window.headerId = data.headerId;

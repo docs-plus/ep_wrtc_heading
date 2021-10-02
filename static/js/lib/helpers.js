@@ -425,7 +425,7 @@ const Helper = (() => {
 
   const findAceHeaderElement = (headerId) => {
     const $el = $body_ace_outer().find('iframe').contents()
-        .find('#innerdocbody').find(`.videoHeader.${headerId}`);
+        .find('#innerdocbody').find(`.heading.${headerId}`);
     return {
       exist: $el.length,
       $el,

@@ -1,5 +1,5 @@
 
-/* 
+/*
 #outerdocbody iframe, #outerdocbody > #innerdocbody{
 	padding: 40px 55px!important;
 } */
@@ -15,7 +15,7 @@
 	position: absolute;
 	top: 0;
 	left: 50%;
-	transform: translate(-50%, -100%);	
+	transform: translate(-50%, -100%);
 	width: fit-content;
 	max-width: 90%;
 	height: auto;
@@ -35,7 +35,7 @@
 }
 
 
-#wrtc_modal #networkStatus, 
+#wrtc_modal #networkStatus,
 #wrtc_modal #networkError {
 	background: #ddd;
 	padding: 4px 10px;
@@ -94,6 +94,7 @@
 }
 #werc_toolbar .nd_title .fa_video{
 	width: 20px;
+  height: 24px;
 	margin-bottom: -6px;
 }
 #werc_toolbar .nd_title .nd_count {
@@ -153,7 +154,7 @@
   align-items: baseline;
 }
 .buttonicon > i, .btn_toggle_modal i, .btn_reload i{
- 
+
 	margin: 0;
 	display: block;
 	position: absolute;
@@ -366,7 +367,7 @@
 	transition: opacity 0.2s, background-color 0.2s;
 	position: absolute;
 	bottom: 0;
-	left: 0; 
+	left: 0;
 	right: 0;
 	opacity: 1;
 	background-color: rgba(255, 255, 255, 0.8);
@@ -383,7 +384,7 @@
 	font-family: Quicksand;
 }
 #wrtc_modal .video-container.local-user {
-	order: -1; 
+	order: -1;
 }
 #wrtc_modal .video-container:hover .interface-btn,
 #wrtc_modal .video-container:hover .user-name,
@@ -414,7 +415,7 @@
 	margin: 0 2px 0 0;
 	height: 17px;
 }
-.wrtc_text .videoIcon svg, 
+.wrtc_text .videoIcon svg,
 .wrtc_text .textIcon svg,
 #wrtc_textChat .textIcon svg {display: inline-block;margin-bottom: -2px;}
 
@@ -447,7 +448,7 @@
 
 #wrtc_settings label {
 	display: block;
-	margin: 0 0 6px; 
+	margin: 0 0 6px;
 }
 #wrtc_settings select {
 	width: 100%;
