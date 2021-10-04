@@ -200,9 +200,9 @@ const hooks = {
     }
   },
   aceAttribsToClasses: (hook, context) => {
-    if (context.key === 'headingTagId') {
-      return [`headingTagId_${context.value}`];
-    }
+    // if (context.key === 'headingTagId') {
+    //   return [`headingTagId_${context.value}`];
+    // }
   },
   aceEditorCSS: () => {
     const version = clientVars.webrtc.version || 1;
