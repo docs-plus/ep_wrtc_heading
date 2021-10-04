@@ -6,8 +6,6 @@
 			"post": ["ep_etherpad-lite/static"],
 			"client_hooks": {
 				"postAceInit": "ep_wrtc_heading/static/js/index",
-				"collectContentPre": "ep_wrtc_heading/static/js/shared",
-				"aceAttribsToClasses": "ep_wrtc_heading/static/js/index",
 				"aceEditorCSS": "ep_wrtc_heading/static/js/index",
 				"aceEditEvent": "ep_wrtc_heading/static/js/index",
 				"aceSetAuthorStyle": "ep_wrtc_heading/static/js/index",

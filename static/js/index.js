@@ -199,11 +199,11 @@ const hooks = {
       // setTimeout(WrtcRoom.findTags, 250);
     }
   },
-  aceAttribsToClasses: (hook, context) => {
-    // if (context.key === 'headingTagId') {
-    //   return [`headingTagId_${context.value}`];
-    // }
-  },
+  // aceAttribsToClasses: (hook, context) => {
+  //   if (context.key === 'headingTagId') {
+  //     return [`headingTagId_${context.value}`];
+  //   }
+  // },
   aceEditorCSS: () => {
     const version = clientVars.webrtc.version || 1;
     return [`ep_wrtc_heading/static/dist/css/innerLayer.css?v=${version}`];
@@ -230,24 +230,6 @@ const hooks = {
   aceInitialized: (hook, context) => {
     const editorInfo = context.editorInfo;
     editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
-    const tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-    // this is overwrite from ep_heading2
-    editorInfo.ace_doInsertHeading = (level) => {
-      const {documentAttributeManager, rep} = context;
-      if (!(rep.selStart && rep.selEnd)) return;
-      if (level >= 0 && tags[level] === undefined) return;
-      const firstLine = rep.selStart[0];
-      const lastLine = Math.max(firstLine, rep.selEnd[0] - ((rep.selEnd[1] === 0) ? 1 : 0));
-      _(_.range(firstLine, lastLine + 1)).each((i) => {
-        if (level >= 0) {
-          documentAttributeManager.setAttributeOnLine(i, 'heading', tags[level]);
-          documentAttributeManager.setAttributeOnLine(i, 'headingTagId', randomString(16));
-        } else {
-          documentAttributeManager.removeAttributeOnLine(i, 'heading');
-          documentAttributeManager.removeAttributeOnLine(i, 'headingTagId');
-        }
-      });
-    };
   },
   chatNewMessage: (hook, context, callback) => {
     let text = context.text;
@@ -287,14 +269,14 @@ exports.aceInitialized = hooks.aceInitialized;
 exports.chatNewMessage = hooks.chatNewMessage;
 
 exports.acePostWriteDomLineHTML = function (name, context) {
-  const hasHeader = $(context.node).find(':header');
-  if (hasHeader.length) {
-    const headerId = hasHeader.attr('data-id');
-    // FIXME: performance issue
-    setTimeout(() => {
-      WrtcRoom.syncVideoAvatart(headerId);
-    }, 250);
-  }
+  // const hasHeader = $(context.node).find(':header');
+  // if (hasHeader.length) {
+  //   const headerId = hasHeader.find('.videoHeader').attr('data-id');
+  //   // FIXME: performance issue
+  //   setTimeout(() => {
+  //     WrtcRoom.syncVideoAvatart(headerId);
+  //   }, 250);
+  // }
 
   const hasHyperlink = $(context.node).find('a');
   if (hasHyperlink.length > 0) {
@@ -333,10 +315,10 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
     //     processedMarker: true,
     //   };
 
-    Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: [], present: 0}, TEXT: {list: []}, USERS: {}, headerCount: 0});
+    Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
   //   result.push(modifier);
   }
 
   // return result;
-  return [];
+  // return [];
 };
