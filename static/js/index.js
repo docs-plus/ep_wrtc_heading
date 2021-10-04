@@ -287,14 +287,14 @@ exports.aceInitialized = hooks.aceInitialized;
 exports.chatNewMessage = hooks.chatNewMessage;
 
 exports.acePostWriteDomLineHTML = function (name, context) {
-  // const hasHeader = $(context.node).find(':header');
-  // if (hasHeader.length) {
-  //   const headerId = hasHeader.find('.videoHeader').attr('data-id');
-  //   // FIXME: performance issue
-  //   setTimeout(() => {
-  //     WrtcRoom.syncVideoAvatart(headerId);
-  //   }, 250);
-  // }
+  const hasHeader = $(context.node).find(':header');
+  if (hasHeader.length) {
+    const headerId = hasHeader.attr('data-id');
+    // FIXME: performance issue
+    setTimeout(() => {
+      WrtcRoom.syncVideoAvatart(headerId);
+    }, 250);
+  }
 
   const hasHyperlink = $(context.node).find('a');
   if (hasHyperlink.length > 0) {
@@ -333,10 +333,10 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
     //     processedMarker: true,
     //   };
 
-    Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
+    Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: [], present: 0}, TEXT: {list: []}, USERS: {}, headerCount: 0});
   //   result.push(modifier);
   }
 
   // return result;
-  // return [];
+  return [];
 };
