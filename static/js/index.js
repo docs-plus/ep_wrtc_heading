@@ -338,5 +338,5 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
   }
 
   // return result;
-  return [];
+  // return [];
 };
