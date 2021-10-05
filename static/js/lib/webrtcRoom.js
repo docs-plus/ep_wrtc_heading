@@ -167,7 +167,7 @@ const WrtcRoom = (() => {
       target = target.toUpperCase();
       setTimeout(() => {
         roomBtnHandler('JOIN', headerId, target);
-      }, 700);
+      }, 1000);
     }
   }
 
