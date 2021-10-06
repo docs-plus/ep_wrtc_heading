@@ -175,7 +175,9 @@ const WrtcRoom = (() => {
     headId = $(this).attr('data-id') || headId;
     target = $(this).attr('data-join') || target;
     target = target.toLowerCase();
-    const title = Helper.$body_ace_outer().find(`.wbrtc_roomBox.${headId} .titleRoom`).text();
+
+    const title = Helper.$body_ace_outer().find('iframe').contents()
+      .find('#innerdocbody').find(`.heading.${headerId}`).text();
 
     const origin = window.location.origin;
     const pathName = window.location.pathname;
