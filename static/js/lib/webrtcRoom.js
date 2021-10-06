@@ -4,6 +4,8 @@ const WrtcRoom = (() => {
   let socket = null;
   let padId = null;
   let VIDEOCHATLIMIT = 0;
+  let tryToJoinByQueryString = 0;
+
 
   /** --------- Helper --------- */
 
@@ -165,9 +167,19 @@ const WrtcRoom = (() => {
 
     if (join === 'true' && target) {
       target = target.toUpperCase();
-      setTimeout(() => {
-        roomBtnHandler('JOIN', headerId, target);
-      }, 1000);
+
+      if(Helper.wrtcStore.socketState === 'CLOSED' && tryToJoinByQueryString <= 4) {
+        setTimeout(() => {
+          console.warn(`[wrtc]: socket state is ${Helper.wrtcStore.socketState}, try to join again!`);
+          tryToJoinByQueryString++;
+          joinByQueryString();
+        }, 1500);
+      } else if(Helper.wrtcStore.socketState === 'OPEND') {
+        setTimeout(() => roomBtnHandler('JOIN', headerId, target), 1000);
+      } else {
+        console.error(`[wrtc]: We try to join ${tryToJoinByQueryString}th,Joining by query string has problem!`, Helper.wrtcStore.socketState, tryToJoinByQueryString)
+      }
+
     }
   }
 
@@ -256,7 +268,8 @@ const WrtcRoom = (() => {
       $('.header_videochat_icon .icon .userCount').text('');
 
       // check wrtc store
-      $('.header_videochat_icon .icon .userCount').text(room.VIDEO.present);
+      const userPresent = room.VIDEO.present === 0 ? "" : room.VIDEO.present;
+      $('.header_videochat_icon .icon .userCount').text(userPresent);
       // does the current user present in this room
       const currentUserPresent = room.VIDEO.list.find((x) => x.userId === clientVars.userId);
 
