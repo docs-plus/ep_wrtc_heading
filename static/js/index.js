@@ -174,7 +174,6 @@ const hooks = {
     $('#editorcontainer iframe').ready(() => {
       WRTC.appendVideoModalToBody();
       textChat.appendTextChatModalToBody();
-      // setTimeout(WrtcRoom.findTags, 250);
     });
 
     $(window).resize(_.debounce(WrtcRoom.adoptHeaderYRoom, 250));
