@@ -363,22 +363,19 @@ const Helper = (() => {
   });
 
   wrtcPubsub.on('disable room buttons', (headerId, actions, target) => {
-    let btn = findAceHeaderElement(headerId).$inlineIcon();
+    let btn = $("#header_videochat_icon")[0];
     if (!btn) return;
-    btn = btn.querySelector('.btn_roomHandler');
     btn.classList.add('activeLoader');
     btn.setAttribute('disabled', true);
   });
 
   wrtcPubsub.on('enable room buttons', (headerId, action, target) => {
-    let btn = findAceHeaderElement(headerId).$inlineIcon();
+    let btn = $("#header_videochat_icon")[0];
     if (!btn) return;
-    btn = btn.querySelector('.btn_roomHandler');
     const newAction = action === 'JOIN' ? 'LEAVE' : 'JOIN';
     btn.removeAttribute('disabled');
     btn.setAttribute('data-action', newAction);
     btn.classList.remove('activeLoader');
-    // btn.classList.add('activeLoader');
   });
 
   wrtcPubsub.on('updateWrtcToolbarModal', (headerId, roomInfo) => {
