@@ -312,7 +312,7 @@ const videoChat = (() => {
  *	@returns
   */
   function gateway_userJoin(data, roomInfo, showAlert = true, bulkUpdate = false) {
-    console.info('[wrtc]:', data, roomInfo, showAlert);
+    console.info('[wrtc]: gateway user joining,', data, roomInfo, showAlert);
     // If user data does not exist reutrn false
     if (!data) return reachedVideoRoomSize(null, false, false);
 
