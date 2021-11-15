@@ -190,13 +190,13 @@ const hooks = {
     // if (context.callstack.docTextChanged) WrtcRoom.adoptHeaderYRoom();
 
     // apply changes to the other user
-    if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
+    // if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
       // setTimeout(WrtcRoom.findTags, 250);
-    }
+    // }
 
-    if (eventType === 'insertheading') {
+    // if (eventType === 'insertheading') {
       // setTimeout(WrtcRoom.findTags, 250);
-    }
+    // }
   },
   // aceAttribsToClasses: (hook, context) => {
   //   if (context.key === 'headingTagId') {
