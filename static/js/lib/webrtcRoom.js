@@ -18,9 +18,7 @@ const WrtcRoom = (() => {
     });
   }
 
-  function closeTextChat() {
-    $('#wrtc_textChatWrapper .btn_leave').trigger('click');
-  }
+  const closeTextChat = () => $('#wrtc_textChatWrapper .btn_leave').trigger('click');
 
   function joinChatRoom(headerId, userInfo, target) {
     // textChat.userJoin(headerId, userInfo, 'TEXTPLUS');
@@ -182,6 +180,15 @@ const WrtcRoom = (() => {
 
     }
   }
+
+  // if history state has change fire joinQueryString
+  document.addEventListener('onPushState', (event) => {
+    const {state} =  event.detail
+    if(state.type === "hyperLink"){
+      const href= state.href
+      joinByQueryString(href)
+    }
+  });
 
   function shareRoomsLink(headId, target) {
     headId = $(this).attr('data-id') || headId;
