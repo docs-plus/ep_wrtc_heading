@@ -276,21 +276,6 @@ exports.acePostWriteDomLineHTML = function (name, context) {
   //     WrtcRoom.syncVideoAvatart(headerId);
   //   }, 250);
   // }
-
-  const hasHyperlink = $(context.node).find('a');
-  if (hasHyperlink.length > 0) {
-    hasHyperlink.each(function () {
-      const href = $(this).attr('href');
-      if (href.indexOf('header=') >= 0 && href.indexOf('id=') >= 0) {
-        $(this).on('click', function (event) {
-          event.stopImmediatePropagation();
-          event.preventDefault();
-          const href = $(this).attr('href');
-          WrtcRoom.joinByQueryString(href);
-        });
-      }
-    });
-  }
 };
 
 exports.aceDomLineProcessLineAttributes = (name, context) => {
