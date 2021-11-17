@@ -263,7 +263,6 @@ const WrtcRoom = (() => {
       roomBtnHandler(action, headerId, target);
     });
 
-
     // integration with ep_rocketChat
     $(document).on('click', '#toc .itemRow.tocItem', function () {
       const headerId = $(this).attr('sectionid');

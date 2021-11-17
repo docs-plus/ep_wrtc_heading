@@ -219,65 +219,65 @@ const hooks = {
   handleClientMessage_RTC_MESSAGE: (hook, context) => {
     WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
   },
-  aceSelectionChanged: (rep, context) => {
-    if (context.callstack.type === 'insertheading') {
-      // rep = context.rep;
-      // console.log(rep, context)
-      // context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
-    }
-  },
+  // aceSelectionChanged: (rep, context) => {
+  //   if (context.callstack.type === 'insertheading') {
+  //     // rep = context.rep;
+  //     // console.log(rep, context)
+  //     // context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
+  //   }
+  // },
   aceInitialized: (hook, context) => {
     const editorInfo = context.editorInfo;
     editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
   },
-  chatNewMessage: (hook, context, callback) => {
-    let text = context.text;
-    // If the incoming message is a link and the link has the title attribute wrtc
-    if (text.indexOf('href=') > 0) {
-      text = $(text);
-      const href = text.attr('href');
-      const currentPath = location.origin + location.pathname;
-      // If the link is belong to this header
-      if (href.indexOf(currentPath) === 0) {
-        const urlParams = new URLSearchParams(href);
-        const headerId = urlParams.get('id');
-        const target = urlParams.get('target');
-        if (headerId) {
-          text = text.attr({
-            'data-join': target,
-            'data-action': 'JOIN',
-            'data-id': headerId,
-          }).addClass('btn_roomHandler');
-          context.text = jQuery('<div />').append(text.eq(0).clone()).html();
-        }
-      }
-    }
-    callback(context);
-  },
+  // chatNewMessage: (hook, context, callback) => {
+  //   let text = context.text;
+  //   // If the incoming message is a link and the link has the title attribute wrtc
+  //   if (text.indexOf('href=') > 0) {
+  //     text = $(text);
+  //     const href = text.attr('href');
+  //     const currentPath = location.origin + location.pathname;
+  //     // If the link is belong to this header
+  //     if (href.indexOf(currentPath) === 0) {
+  //       const urlParams = new URLSearchParams(href);
+  //       const headerId = urlParams.get('id');
+  //       const target = urlParams.get('target');
+  //       if (headerId) {
+  //         text = text.attr({
+  //           'data-join': target,
+  //           'data-action': 'JOIN',
+  //           'data-id': headerId,
+  //         }).addClass('btn_roomHandler');
+  //         context.text = jQuery('<div />').append(text.eq(0).clone()).html();
+  //       }
+  //     }
+  //   }
+  //   callback(context);
+  // },
 };
 
 exports.postAceInit = hooks.postAceInit;
 exports.aceEditorCSS = hooks.aceEditorCSS;
-exports.aceAttribsToClasses = hooks.aceAttribsToClasses;
+// exports.aceAttribsToClasses = hooks.aceAttribsToClasses;
 exports.aceEditEvent = hooks.aceEditEvent;
 exports.aceSetAuthorStyle = hooks.aceSetAuthorStyle;
 exports.userLeave = hooks.userLeave;
 exports.handleClientMessage_RTC_MESSAGE = hooks.handleClientMessage_RTC_MESSAGE;
-exports.aceSelectionChanged = hooks.aceSelectionChanged;
+// exports.aceSelectionChanged = hooks.aceSelectionChanged;
 exports.aceInitialized = hooks.aceInitialized;
-exports.chatNewMessage = hooks.chatNewMessage;
+// exports.chatNewMessage = hooks.chatNewMessage;
 
-exports.acePostWriteDomLineHTML = function (name, context) {
-  // const hasHeader = $(context.node).find(':header');
-  // if (hasHeader.length) {
-  //   const headerId = hasHeader.find('.videoHeader').attr('data-id');
-  //   // FIXME: performance issue
-  //   setTimeout(() => {
-  //     WrtcRoom.syncVideoAvatart(headerId);
-  //   }, 250);
-  // }
-};
-
+// exports.acePostWriteDomLineHTML = function (name, context) {
+//   const hasHeader = $(context.node).find(':header');
+//   if (hasHeader.length) {
+//     const headerId = hasHeader.find('.videoHeader').attr('data-id');
+//     // FIXME: performance issue
+//     setTimeout(() => {
+//       WrtcRoom.syncVideoAvatart(headerId);
+//     }, 250);
+//   }
+// };
+// TODO: refactor
 exports.aceDomLineProcessLineAttributes = (name, context) => {
   const cls = context.cls;
   // const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
