@@ -81,19 +81,19 @@ const EPwrtcHeading = (() => {
       $('#options-wrtc-heading').is(':checked') ? enableWrtcHeading() : disableWrtcHeading();
     });
 
-    if (browser.chrome || browser.firefox) {
-      padInner.contents().on('copy', (e) => {
-        events.addTextOnClipboard(e, ace, padInner, false);
-      });
+    // if (browser.chrome || browser.firefox) {
+    //   padInner.contents().on('copy', (e) => {
+    //     events.addTextOnClipboard(e, ace, padInner, false);
+    //   });
 
-      padInner.contents().on('cut', (e) => {
-        events.addTextOnClipboard(e, ace, padInner, true);
-      });
+    //   padInner.contents().on('cut', (e) => {
+    //     events.addTextOnClipboard(e, ace, padInner, true);
+    //   });
 
-      padInner.contents().on('paste', (event) => {
-        events.pastOnSelection(event, padInner);
-      });
-    }
+    //   padInner.contents().on('paste', (event) => {
+    //     events.pastOnSelection(event, padInner);
+    //   });
+    // }
 
     window.onerror = (message, source, lineno, colno, error) => {
       console.error('[wrtc]: windows error, close stream');
