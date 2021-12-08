@@ -40,7 +40,7 @@ nd-video span{
 	word-wrap: break-word;
 }
 
-wrt-inline-icon{
+chat-inline-icon{
 	position: absolute;
 	left: -76px;
 	margin-top: .04em;
@@ -49,8 +49,12 @@ wrt-inline-icon{
 	transform: translateY(-50%);
 }
 
-wrt-inline-icon button {
+chat-inline-icon button {
 	cursor: pointer;
+}
+
+h1,h2,h3,h4,h5,h6{
+  position: relative;
 }
 
 /*video icon line*/
@@ -71,7 +75,7 @@ wrt-inline-icon button {
 		padding: 15px 15px 15px 30px!important;
 		margin-right: 10px;
 	}
-	wrt-inline-icon{
+	chat-inline-icon{
 		left: -50px
 	}
 }

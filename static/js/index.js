@@ -282,27 +282,27 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
   const cls = context.cls;
   // const videoHEaderType = /(?:^| )headingTagId_([A-Za-z0-9]*)/.exec(cls);
   const headingType = /(?:^| )headerId:([A-Za-z0-9]*)/.exec(cls);
-  // const result = [];
+  const result = [];
   // if (typeof Helper === 'undefined') return result;
 
   if (headingType) {
     const headerId = headingType[1];
-    //   // if video or textChat modal is open! update modal title
-    //   if (Helper.wrtcStore.components.video.open || Helper.wrtcStore.components.text.open) {
-    //     const $header = Helper.findAceHeaderElement(headerId);
-    //     Helper.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
-    //   }
+      // if video or textChat modal is open! update modal title
+      if (Helper.wrtcStore.components.video.open || Helper.wrtcStore.components.text.open) {
+        const $header = Helper.findAceHeaderElement(headerId);
+        Helper.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
+      }
 
-    //   const modifier = {
-    //     preHtml: `<nd-video class="videoHeader ${headerId}" data-id="${headerId}" data-htag="${headingType[1]}"><wrt-inline-icon headerid="${headerId}"></wrt-inline-icon>`,
-    //     postHtml: '</nd-video>',
-    //     processedMarker: true,
-    //   };
+      const modifier = {
+        preHtml: '',
+        postHtml: `<chat-inline-icon data-headerid="${headerId}"></chat-inline-icon>`,
+        processedMarker: true,
+      };
 
     Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
-  //   result.push(modifier);
+    result.push(modifier);
   }
 
-  // return result;
+  return result;
   // return [];
 };

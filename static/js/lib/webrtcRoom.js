@@ -255,13 +255,24 @@ const WrtcRoom = (() => {
 
     $AceOuter.on('click', '.btn_roomHandler', roomBtnHandler);
 
-    $AceOuter.find('iframe').contents().find('#innerdocbody').on('click', 'wrt-inline-icon', function () {
-      const $btn = this.shadowRoot.querySelector('.btn_roomHandler');
-      const headerId = $btn.getAttribute('data-id');
-      const action = $btn.getAttribute('data-action');
-      const target = $btn.getAttribute('data-join');
-      roomBtnHandler(action, headerId, target);
-    });
+    // $AceOuter.find('iframe').contents().find('#innerdocbody').on('click', 'wrt-inline-icon', function () {
+    //   const $btn = this.shadowRoot.querySelector('.btn_roomHandler');
+    //   const headerId = $btn.getAttribute('data-id');
+    //   const action = $btn.getAttribute('data-action');
+    //   const target = $btn.getAttribute('data-join');
+    //   roomBtnHandler(action, headerId, target);
+    // });
+
+    $AceOuter.find('iframe').contents().find('#innerdocbody')
+      .on('click', 'chat-inline-icon', function () {
+        const headerId = $(this).attr('data-headerid');
+        $(document)
+          .find(`#tocItems .itemRow.tocItem[sectionid='${headerId}']`)
+          .trigger("click");
+      });
+
+
+
 
     // integration with ep_rocketChat
     $(document).on('click', '#toc .itemRow.tocItem', function () {
