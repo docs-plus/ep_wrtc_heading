@@ -28,18 +28,6 @@
 	min-height: 700px;
 }
 
-nd-video{
-	position: relative;
-	width: 100%;
-	word-wrap: break-word;
-	display: block;
-}
-
-nd-video span{
-	width: 100%;
-	word-wrap: break-word;
-}
-
 chat-inline-icon{
 	position: absolute;
 	left: -76px;
@@ -47,6 +35,7 @@ chat-inline-icon{
 	cursor: pointer;
 	top: 50%;
 	transform: translateY(-50%);
+	pointer-events: auto;
 }
 
 chat-inline-icon button {
