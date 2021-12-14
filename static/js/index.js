@@ -283,7 +283,7 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
   const cls = context.cls;
   const headingType = /(?:^| )headerId:([A-Za-z0-9]*)/.exec(cls);
   const result = [];
-  // if (typeof Helper === 'undefined') return result;
+  if (typeof Helper === 'undefined') return result;
 
   if (headingType) {
     const headerType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
