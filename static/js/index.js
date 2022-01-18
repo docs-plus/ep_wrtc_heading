@@ -288,7 +288,7 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
   if (headingType) {
     const headerType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
     const headerId = headingType[1];
-    const htagNum = headerType[1]
+    const htagNum = headerType&&headerType[1]
 
     // if video or textChat modal is open! update modal title
     if (Helper.wrtcStore.components.video.open || Helper.wrtcStore.components.text.open) {
@@ -303,7 +303,7 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
     };
 
     Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
-    if(hTags.includes(htagNum)) result.push(modifier);
+    if(htagNum&&hTags.includes(htagNum)) result.push(modifier);
   }
 
   return result;
