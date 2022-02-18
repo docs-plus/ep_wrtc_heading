@@ -1,6 +1,7 @@
+'use strict';
+
 const _ = require('lodash');
 const videoChat = require('./videoChat');
-const textChat = require('./textChat');
 const Queue = require('better-queue');
 let socketIo = null;
 
@@ -15,9 +16,6 @@ const acceptNewConnection = ({socket, padId, padparticipators, userData, target,
   if (target === 'video') {
     room = videoChat.socketUserJoin(userData, padparticipators);
     _.set(socket, 'ndHolder.video', room.data);
-  } else {
-    room = textChat.socketUserJoin(userData, padparticipators);
-    _.set(socket, 'ndHolder.text', room.data);
   }
 
   if (room.canUserJoin) {
@@ -102,7 +100,8 @@ module.exports.init = (io, {pid, namespace, preservedNamespace}) => {
       socket.ndHolder.video = {userId, padId};
       socket.ndHolder.text = {userId, padId};
       socket.join(padId);
-      callback(padId);
+
+      if (callback) callback(padId);
     });
 
     socket.on('acceptNewCall', (padId, headerId, callback) => {

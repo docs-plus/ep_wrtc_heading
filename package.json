@@ -23,8 +23,7 @@
 		"start": "gulp watch",
 		"build": "gulp build",
 		"build:prod": "gulp build:publish --production",
-		"lint": "eslint --fix .",
-		"lint:dry": "eslint --fix-dry-run ."
+		"lint:fix": "eslint --fix ."
 	},
 	"dependencies": {
 		"bee-queue": "^1.4.0",
@@ -58,11 +57,13 @@
 		"root": true,
 		"extends": "etherpad/plugin",
 		"ignorePatterns": [
-			"/static/dist/",
+      "/static/dist/",
+			"/static/js/lib/adapter.js",
 			"/static/js/lib/getStats.min.js",
 			"/static/js/lib/getUserMediaPolyfill.js",
 			"/static/js/lib/jquery.tmpl.min.js",
-			"/static/js/wrtc.heading.mini.js"
+			"/static/js/wrtc.heading.mini.js",
+      "/static/js/socketIoMin.js"
 		],
 		"globals": {
 			"clientVars": true,

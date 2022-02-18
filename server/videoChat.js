@@ -1,3 +1,5 @@
+'use strict';
+
 const Config = require('../config');
 
 // data Structure
@@ -82,7 +84,6 @@ const socketUserLeave = (data) => {
 
   return result;
 };
-
 
 const socketDisconnect = (data) => {
   const padId = data.padId;

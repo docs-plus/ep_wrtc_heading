@@ -45,7 +45,7 @@ const WRTC = (() => {
 
   var self = {
     // API HOOKS
-    postAceInit: function postAceInit(hook, context, webSocket, docId) {
+    postAceInit: (hookName, context, webSocket, docId) => {
       padId = docId;
       socket = webSocket;
 
@@ -62,9 +62,9 @@ const WRTC = (() => {
 
       self._pad = context.pad || window.pad;
 
-      $(document).on('change', 'select#audioSource', self.audioVideoInputChange);
-      $(document).on('change', 'select#videoSource', self.audioVideoInputChange);
-      $(document).on('change', 'select#audioOutput', self.changeAudioDestination);
+      $(document).on('change', '.select.videoSource', self.audioVideoInputChange);
+      $(document).on('change', '.select.audioSource', self.audioVideoInputChange);
+      $(document).on('change', '.select.audioOutput', self.changeAudioDestination);
 
       $(window).on('unload', () => {
         console.info('[wrtc]: windos unloaded, now hangupAll');
@@ -77,7 +77,7 @@ const WRTC = (() => {
         if (payload.data.headerId === window.headerId) self.receiveMessage(context.data.payload);
       });
     },
-    appendVideoModalToBody: function appendVideoModalToBody() {
+    appendVideoModalToBody: () => {
       const $wrtcVideoModal = $('#wrtcVideoModal').tmpl({
         videoChatLimit: clientVars.webrtc.videoChatLimit,
         headerId: '',
@@ -176,7 +176,7 @@ const WRTC = (() => {
         if ($btnInfo.attr('data-active')) $btnInfo.trigger('click');
       });
     },
-    aceSetAuthorStyle: function aceSetAuthorStyle(context) {
+    aceSetAuthorStyle: (context) => {
       if (context.author) {
         const user = Helper.getUserFromId(context.author);
         if (user) {
@@ -187,7 +187,7 @@ const WRTC = (() => {
         }
       }
     },
-    userLeave: function userLeave(userId, context, callback) {
+    userLeave: (userId, context, callback) => {
       userId = userId || context.userInfo.userId;
       if (userId && pc[userId]) {
         gState = 'LEAVING';
@@ -198,15 +198,16 @@ const WRTC = (() => {
       if (callback) callback();
     },
     // deprecated function
-    handleClientMessage_RTC_MESSAGE: function handleClientMessage_RTC_MESSAGE(hook, context) {
-      if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
+    handleClientMessage_RTC_MESSAGE: (hook, context) => {
+      if (context.payload.data.headerId === window.headerId)
+        self.receiveMessage(context.payload);
     },
     // END OF API HOOKS
-    show: function show() {
+    show: () => {
       $('#pad_title').addClass('f_wrtcActive');
       videoChat.mediaDevices();
     },
-    showUserMediaError: function showUserMediaError(err, userId, headerId) {
+    showUserMediaError: (err, userId, headerId) => {
       // show an error returned from getUserMedia
       let reason;
       // For reference on standard errors returned by getUserMedia:
@@ -271,18 +272,18 @@ const WRTC = (() => {
           }
       );
     },
-    hide: function hide(userId) {
+    hide: (userId) => {
       if (!userId) return false;
       userId = userId.split('.')[1];
       $('#rtcbox').find(`#video_a_${userId}`).parent().remove();
     },
-    activate: function activate(headerId) {
+    activate: (headerId) => {
       self.show();
       self.hangupAll();
       self.getUserMedia(headerId);
       Helper.wrtcStore.userInRoom = true;
     },
-    deactivate: function deactivate(userId, headerId) {
+    deactivate: (userId, headerId) => {
       if (!userId) return false;
       self.hide(userId);
       self.hangupAll(headerId);
@@ -290,7 +291,7 @@ const WRTC = (() => {
       if (Helper.wrtcStore.localstream) Helper.stopStreaming();
       Helper.wrtcStore.userInRoom = false;
     },
-    toggleMuted: function toggleMuted() {
+    toggleMuted: () => {
       const audioTrack = Helper.wrtcStore.localstream.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
@@ -298,14 +299,14 @@ const WRTC = (() => {
       }
       return true; // if there's no audio track, it's muted
     },
-    toggleVideo: function toggleVideo() {
+    toggleVideo: () => {
       const videoTrack = Helper.wrtcStore.localstream.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         return !videoTrack.enabled;
       }
     },
-    setStream: function setStream(userId, stream) {
+    setStream: (userId, stream) => {
       if (!userId) return false;
       const isLocal = userId === Helper.getUserId();
       const videoId = `video_${userId.replace(/\./g, '_')}`;
@@ -326,9 +327,7 @@ const WRTC = (() => {
           'width': videoSizes.small,
           'max-height': videoSizes.small,
         }).on({
-          loadedmetadata: function loadedmetadata() {
-            self.addInterface(userId);
-          },
+          loadedmetadata: () =>  self.addInterface(userId),
         }).appendTo(videoContainer)[0];
 
         video.autoplay = true;
@@ -344,7 +343,7 @@ const WRTC = (() => {
         $(video).parent().remove();
       }
     },
-    addInterface: function addInterface(userId) {
+    addInterface: (userId) => {
       if (!userId) return false;
       const isLocal = userId === Helper.getUserId();
       const videoId = `video_${userId.replace(/\./g, '_')}`;
@@ -364,7 +363,7 @@ const WRTC = (() => {
       });
       let videoEnabled = true;
       var $disableVideo = isLocal ? $("<span class='interface-btn video-btn buttonicon'>").attr('title', 'Disable video').on({
-        click: function click() {
+        click: () => {
           self.toggleVideo();
           videoEnabled = !videoEnabled;
           $disableVideo.attr('title', videoEnabled ? 'Disable video' : 'Enable video').toggleClass('off', !videoEnabled);
@@ -373,7 +372,7 @@ const WRTC = (() => {
 
       let videoEnlarged = false;
       var $largeVideo = $("<span class='interface-btn enlarge-btn buttonicon'>").attr('title', 'Make video larger').on({
-        click: function click() {
+        click: () => {
           videoEnlarged = !videoEnlarged;
 
           if (videoEnlarged) {
@@ -405,12 +404,12 @@ const WRTC = (() => {
     },
     // Sends a stat to the back end. `statName` must be in the
     // approved list on the server side.
-    sendErrorStat: function sendErrorStat(statName) {
+    sendErrorStat: (statName) => {
       const msg = {component: 'pad', type: 'STATS', data: {statName, type: 'RTC_MESSAGE'}};
       socket.emit('acceptNewCall', padId, window.headerId);
       socket.emit('message', msg);
     },
-    sendMessage: function sendMessage(to, data, socketIdTo) {
+    sendMessage: (to, data, socketIdTo) => {
       socket.emit('RTC_MESSAGE', {
         type: 'RTC_MESSAGE',
         payload: {data, to, padId, from: Helper.getUserId(), socket: {from: socket.id, to: socketIdTo}},
@@ -423,7 +422,7 @@ const WRTC = (() => {
       //   payload: {data, to},
       // });
     },
-    receiveMessage: function receiveMessage(msg) {
+    receiveMessage: (msg) => {
       const peer = msg.from; // userId
       const data = msg.data;
       const type = data.type;
@@ -494,12 +493,12 @@ const WRTC = (() => {
         console.error('[wrtc]: unknown message', data);
       }
     },
-    hangupAll: function hangupAll(_headerId) {
+    hangupAll: (_headerId) => {
       Object.keys(pc).forEach((userId) => {
         self.hangup(userId, true, _headerId);
       });
     },
-    hangup: function hangup(userId, notify, headerId) {
+    hangup: function (userId, notify, headerId) {
       notify = arguments.length === 1 ? true : notify;
       if (pc[userId] && userId !== Helper.getUserId()) {
         self.setStream(userId, '');
@@ -508,7 +507,7 @@ const WRTC = (() => {
         if (notify) self.sendMessage(userId, {type: 'hangup', headerId});
       }
     },
-    call: function call(userId, headerId) {
+    call: (userId, headerId) => {
       // if (!localStream) {
       //   callQueue.push(userId);
       //   return;
@@ -540,12 +539,12 @@ const WRTC = (() => {
         }, logError);
       }, logError, constraints);
     },
-    createPeerConnection: function createPeerConnection(userId, headerId) {
+    createPeerConnection: (userId, headerId) => {
       if (pc[userId]) {
         console.warn('WARNING creating PC connection even though one exists', userId);
       }
       pc[userId] = new RTCPeerConnection(pcConfig, pcConstraints);
-      pc[userId].onicecandidate = function (event) {
+      pc[userId].onicecandidate =  (event) => {
         if (event.candidate) {
           self.sendMessage(userId, {
             type: 'icecandidate',
@@ -557,24 +556,22 @@ const WRTC = (() => {
           socket.emit('acceptNewCall', padId, window.headerId);
         }
       };
-      pc[userId].oniceconnectionstatechange = function () {
+      pc[userId].oniceconnectionstatechange = () => {
         console.info('[wrtc]: ICE state: ', pc[userId], pc[userId].iceConnectionState);
 		 	};
-      pc[userId].ontrack = function (event) {
+      pc[userId].ontrack = (event) => {
         console.log(event, 'ontrack');
         remoteStream[userId] = event.streams[0];
         self.setStream(userId, event.streams[0]);
       };
-      pc[userId].onremovestream = function () {
-        self.setStream(userId, '');
-      };
+      pc[userId].onremovestream = () => self.setStream(userId, '');
     },
-    audioVideoInputChange: function audioVideoInputChange() {
+    audioVideoInputChange: () => {
       Helper.stopStreaming(() => {
         self.getUserMedia(window.headerId);
       });
     },
-    attachSinkId: function attachSinkId(element, sinkId) {
+    attachSinkId:  (element, sinkId) => {
       // Attach audio output device to video element using device/sink ID.
       if (element && element[0] && typeof element[0].sinkId !== 'undefined') {
         element[0].setSinkId(sinkId).then(() => {
@@ -584,7 +581,7 @@ const WRTC = (() => {
           if (error.name === 'SecurityError') {
             errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
           }
-          console.error(errorMessage);
+          console.error('[wrtc]: ', error);
           // Jump back to first output device in the list as it's the default.
           audioOutputSelect.selectedIndex = 0;
         });
@@ -593,21 +590,13 @@ const WRTC = (() => {
         $(document).find('#wrtc_settings .select.audioOutputSec').hide();
       }
     },
-    changeAudioDestination: function changeAudioDestination() {
+    changeAudioDestination: () => {
       const audioOutputSelect = document.querySelector('#wrtc_settings .select.audioOutputSec');
       const audioDestination = audioOutputSelect.value;
       const videoElement = localVideoElement;
       self.attachSinkId(videoElement, audioDestination);
     },
-    getUserMedia: function getUserMedia(headerId) {
-      audioInputSelect = document.querySelector('#wrtc_settings .select.audioSource');
-      audioOutputSelect = document.querySelector('#wrtc_settings .select.audioOutputSec');
-      videoSelect = document.querySelector('#wrtc_settings .select.videoSourc');
-
-      const audioSource = audioInputSelect ? audioInputSelect.value : undefined;
-      const videoSource = videoSelect ? videoSelect.value : undefined;
-      const audioOutput = audioOutputSelect ? audioOutputSelect.value : undefined;
-
+    getUserMedia: (headerId) => {
       const mediaConstraints = {
         audio: true,
         video: {
@@ -618,12 +607,18 @@ const WRTC = (() => {
         },
       };
 
-      if (audioSource) {
-        mediaConstraints.audio.deviceId = {exact: audioSource};
-      }
-      if (videoSource) {
-        mediaConstraints.video.deviceId = {exact: videoSource};
-      }
+      audioInputSelect = document.querySelector('.select.audioSource select');
+      audioOutputSelect = document.querySelector('.select.audioOutputSec select');
+      videoSelect = document.querySelector('.select.videoSource select');
+
+      const audioSource = audioInputSelect && audioInputSelect.value;
+      const videoSource = videoSelect && videoSelect.value;
+      const audioOutput = audioOutputSelect && audioOutputSelect.value;
+
+      if (audioSource) mediaConstraints.audio.deviceId = {exact: audioSource};
+
+      if (videoSource) mediaConstraints.video.deviceId = {exact: videoSource};
+
 
       localStorage.setItem('videoSettings', JSON.stringify({microphone: audioSource, speaker: audioOutput, camera: videoSource}));
       $('#wrtc_modal #networkError').removeClass('active').hide();
@@ -645,7 +640,7 @@ const WRTC = (() => {
             self.showUserMediaError(err, Helper.getUserId(), headerId);
           });
     },
-    attemptToReconnect: function attemptToReconnect() {
+    attemptToReconnect: () => {
       reconnected++;
       console.log('[wrtc]: Try reconnecting', reconnected, attemptRonnect);
       if (attemptRonnect <= reconnected) {
@@ -661,7 +656,7 @@ const WRTC = (() => {
 
   // Normalize RTC implementation between browsers
   // var getUserMedia = window.navigator.mediaDevices.getUserMedia
-  var attachMediaStream = function attachMediaStream(element, stream) {
+  const attachMediaStream = (element, stream) => {
     if (typeof element.srcObject !== 'undefined') {
       element.srcObject = stream;
     } else if (typeof element.mozSrcObject !== 'undefined') {
@@ -672,9 +667,10 @@ const WRTC = (() => {
       console.error('Error attaching stream to element.', element);
     }
   };
-  var webrtcDetectedBrowser = 'chrome';
 
-  function cleanupSdp(sdp) {
+  let webrtcDetectedBrowser = 'chrome';
+
+  const cleanupSdp = (sdp) => {
     const bandwidth = {
       screen: 300, // 300kbits minimum
       audio: 256, // 64kbits  minimum
@@ -696,30 +692,31 @@ const WRTC = (() => {
     sdp = CodecsHandler.preferCodec(sdp, bandwidth.videoCodec);
 
     return sdp;
-  }
+  };
 
-  function mergeConstraints(cons1, cons2) {
+  const mergeConstraints = (cons1, cons2) => {
     const merged = cons1;
     for (const name in cons2.mandatory) {
       merged.mandatory[name] = cons2.mandatory[name];
     }
     merged.optional.concat(cons2.optional);
     return merged;
-  }
+  };
 
-  function randomIntFromInterval(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
+  const randomIntFromInterval = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 
-  function logError(error) {
+  const logError = (error) => {
     // if (error && error.message.includes("Failed to set remote answer sdp")) {
     self.attemptToReconnect();
     // } else {
     // socket.emit('acceptNewCall', padId, window.headerId);
     // }
     console.error('[wrtc]: LogError:', error);
-    $('#wrtc_modal #networkError').show().addClass('active').text(`[wrtc]: Error: ${error} ,Reload the session.`);
-  }
+    $('#wrtc_modal #networkError')
+        .show()
+        .addClass('active')
+        .text(`[wrtc]: Error: ${error} ,Reload the session.`);
+  };
 
   self.pc = pc;
   return self;

@@ -1,20 +1,19 @@
 'use strict';
 
 const _ = require('underscore');
-const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 let ioClient = require('ep_wrtc_heading/static/js/socketIoMin');
+
 
 /** **********************************************************************/
 /*                              Plugin                                  */
 /** **********************************************************************/
 
-
 // console.log(nativeHTMLELement)
 
 const EPwrtcHeading = (() => {
-  let padOuter = null;
-  let padInner = null;
-  let outerBody = null;
+  let padOuter;
+  let outerBody;
+  let padInner;
 
   const enableWrtcHeading = () => {
     Helper.wrtcPubsub.emit('plugin enable', true);
@@ -25,16 +24,14 @@ const EPwrtcHeading = (() => {
   };
 
   const init = (ace, padId, userId) => {
+    // socket connection
     const loc = document.location;
     const port = loc.port === '' ? loc.protocol === 'https:' ? 443 : 80 : loc.port;
     let socketURL = clientVars.webrtc.socketRemoteAddress;
-
-
     if (clientVars.webrtc.useEtherpadSocket || loc.hostname === 'localhost') {
       ioClient = io;
       socketURL = `${loc.protocol}//${loc.hostname}:${port}`;
     }
-
     socketURL = `${socketURL}/${clientVars.webrtc.socketNamespace}`;
 
     console.info(`socket address: ${socketURL}`);
@@ -55,9 +52,7 @@ const EPwrtcHeading = (() => {
     // unfortunately when reconnection happen, etherpad break down totally
     // Helper.wrtcPubsub.emit('socket state', 'OPEND');
     socket.on('connect', () => {
-      socket.emit('join pad', padId, userId, () => {
-        // console.info("user has joined to ", padId)
-      });
+      socket.emit('join pad', padId, userId);
       Helper.wrtcPubsub.emit('socket state', 'OPEND');
     });
 
@@ -81,20 +76,7 @@ const EPwrtcHeading = (() => {
       $('#options-wrtc-heading').is(':checked') ? enableWrtcHeading() : disableWrtcHeading();
     });
 
-    // if (browser.chrome || browser.firefox) {
-    //   padInner.contents().on('copy', (e) => {
-    //     events.addTextOnClipboard(e, ace, padInner, false);
-    //   });
-
-    //   padInner.contents().on('cut', (e) => {
-    //     events.addTextOnClipboard(e, ace, padInner, true);
-    //   });
-
-    //   padInner.contents().on('paste', (event) => {
-    //     events.pastOnSelection(event, padInner);
-    //   });
-    // }
-
+    // TODO: refactore
     window.onerror = (message, source, lineno, colno, error) => {
       console.error('[wrtc]: windows error, close stream');
       if (window.headerId) WRTC.deactivate(clientVars.userId, window.headerId);
@@ -116,13 +98,10 @@ const getSocket = () => window.pad && window.pad.socket;
 
 const hooks = {
   postAceInit: (hook, context) => {
-    if (!$('#editorcontainerbox').hasClass('flex-layout')) {
-      $.gritter.add({
-        title: 'Error',
-        text: 'ep_wrtc_heading: Please upgrade to etherpad 1.8.3 for this plugin to work correctly',
-        sticky: true,
-        class_name: 'error',
-      });
+    const videoSettings = localStorage.getItem('videoSettings');
+    if (!videoSettings){
+      const data = JSON.stringify({microphone: null, speaker: null, camera: null})
+      localStorage.setItem('videoSettings', data);
     }
 
     // If the ep_profile_modal plugin is disabled
@@ -155,25 +134,20 @@ const hooks = {
     const padId = window.pad.getPadId() || clientVars.userId;
 
 
-    // init ui native component
-    ace.callWithAce((innerAce) => {});
-
     // TODO: make sure the priority of these components are in line
     // TODO: make sure clientVars contain all data that's necessary
 
-    if (!clientVars.userId || !clientVars.padId) throw new Error("[wrtc]: clientVars doesn't exists");
+    if (!userId || !padId) throw new Error("[wrtc]: clientVars doesn't exists");
 
     const socket = EPwrtcHeading.init(ace, padId, userId);
-    WRTC.postAceInit(hook, context, socket, padId);
     Helper.init(context);
+    WRTC.postAceInit(hook, context, socket, padId);
     videoChat.postAceInit(hook, context, socket, padId);
-    textChat.postAceInit(hook, context, socket, padId);
     WrtcRoom.postAceInit(hook, context, socket, padId);
 
-    // When Editor is ready, append video and textChat modal to body
+    // When Editor is ready, append video  modal to body
     $('#editorcontainer iframe').ready(() => {
       WRTC.appendVideoModalToBody();
-      textChat.appendTextChatModalToBody();
     });
 
     $(window).resize(_.debounce(WrtcRoom.adoptHeaderYRoom, 250));
@@ -183,26 +157,10 @@ const hooks = {
     // ignore these types
     if ('handleClick,idleWorkTimer,setup,importText,setBaseText,setWraps'.includes(eventType)) return;
 
+    // TODO: refactor needed
     // when a new line create
     if (context.callstack.domClean) WrtcRoom.adoptHeaderYRoom();
-
-    // some times init ep_wrtc_heading is not yet in the plugin list
-    // if (context.callstack.docTextChanged) WrtcRoom.adoptHeaderYRoom();
-
-    // apply changes to the other user
-    // if (eventType === 'applyChangesToBase' && context.callstack.selectionAffected) {
-      // setTimeout(WrtcRoom.findTags, 250);
-    // }
-
-    // if (eventType === 'insertheading') {
-      // setTimeout(WrtcRoom.findTags, 250);
-    // }
   },
-  // aceAttribsToClasses: (hook, context) => {
-  //   if (context.key === 'headingTagId') {
-  //     return [`headingTagId_${context.value}`];
-  //   }
-  // },
   aceEditorCSS: () => {
     const version = clientVars.webrtc.version || 1;
     return [`ep_wrtc_heading/static/dist/css/innerLayer.css?v=${version}`];
@@ -212,73 +170,34 @@ const hooks = {
     WRTC.aceSetAuthorStyle(context);
   },
   userLeave: (hook, context) => {
-    WrtcRoom.userLeave(context);
     WRTC.userLeave(null, context);
     return;
   },
   handleClientMessage_RTC_MESSAGE: (hook, context) => {
     WRTC.handleClientMessage_RTC_MESSAGE(hook, context);
   },
-  // aceSelectionChanged: (rep, context) => {
-  //   if (context.callstack.type === 'insertheading') {
-  //     // rep = context.rep;
-  //     // console.log(rep, context)
-  //     // context.documentAttributeManager.setAttributeOnLine(rep.selStart[0], 'headingTagId', randomString(16));
-  //   }
-  // },
-  aceInitialized: (hook, context) => {
-    const editorInfo = context.editorInfo;
-    editorInfo.ace_hasHeaderOnSelection = _(events.hasHeaderOnSelection).bind(context);
-  },
-  // chatNewMessage: (hook, context, callback) => {
-  //   let text = context.text;
-  //   // If the incoming message is a link and the link has the title attribute wrtc
-  //   if (text.indexOf('href=') > 0) {
-  //     text = $(text);
-  //     const href = text.attr('href');
-  //     const currentPath = location.origin + location.pathname;
-  //     // If the link is belong to this header
-  //     if (href.indexOf(currentPath) === 0) {
-  //       const urlParams = new URLSearchParams(href);
-  //       const headerId = urlParams.get('id');
-  //       const target = urlParams.get('target');
-  //       if (headerId) {
-  //         text = text.attr({
-  //           'data-join': target,
-  //           'data-action': 'JOIN',
-  //           'data-id': headerId,
-  //         }).addClass('btn_roomHandler');
-  //         context.text = jQuery('<div />').append(text.eq(0).clone()).html();
-  //       }
-  //     }
-  //   }
-  //   callback(context);
-  // },
 };
 
 exports.postAceInit = hooks.postAceInit;
 exports.aceEditorCSS = hooks.aceEditorCSS;
-// exports.aceAttribsToClasses = hooks.aceAttribsToClasses;
 exports.aceEditEvent = hooks.aceEditEvent;
 exports.aceSetAuthorStyle = hooks.aceSetAuthorStyle;
 exports.userLeave = hooks.userLeave;
 exports.handleClientMessage_RTC_MESSAGE = hooks.handleClientMessage_RTC_MESSAGE;
-// exports.aceSelectionChanged = hooks.aceSelectionChanged;
-exports.aceInitialized = hooks.aceInitialized;
-// exports.chatNewMessage = hooks.chatNewMessage;
 
-// exports.acePostWriteDomLineHTML = function (name, context) {
-//   const hasHeader = $(context.node).find(':header');
-//   if (hasHeader.length) {
-//     const headerId = hasHeader.find('.videoHeader').attr('data-id');
-//     // FIXME: performance issue
-//     setTimeout(() => {
-//       WrtcRoom.syncVideoAvatart(headerId);
-//     }, 250);
-//   }
-// };
-const hTags = ["h1","h2","h3","h4"]
-// TODO: refactor
+// TODO: refactore needed
+exports.acePostWriteDomLineHTML = function (name, context) {
+  const hasHeader = $(context.node).find(':header');
+  if (hasHeader.length) {
+    const headerId = hasHeader.find('.videoHeader').attr('data-id');
+    // FIXME: performance issue
+    setTimeout(() => {
+      WrtcRoom.syncVideoAvatart(headerId);
+    }, 250);
+  }
+};
+const hTags = ['h1', 'h2', 'h3', 'h4'];
+// TODO: refactor needed
 exports.aceDomLineProcessLineAttributes = (name, context) => {
   const cls = context.cls;
   const headingType = /(?:^| )headerId:([A-Za-z0-9]*)/.exec(cls);
@@ -288,10 +207,10 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
   if (headingType) {
     const headerType = /(?:^| )heading:([A-Za-z0-9]*)/.exec(cls);
     const headerId = headingType[1];
-    const htagNum = headerType&&headerType[1]
+    const htagNum = headerType && headerType[1];
 
     // if video or textChat modal is open! update modal title
-    if (Helper.wrtcStore.components.video.open || Helper.wrtcStore.components.text.open) {
+    if (Helper.wrtcStore.components.video.open) {
       const $header = Helper.findAceHeaderElement(headerId);
       Helper.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
     }
@@ -302,10 +221,17 @@ exports.aceDomLineProcessLineAttributes = (name, context) => {
       processedMarker: true,
     };
 
-    Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
-    if(htagNum&&hTags.includes(htagNum)) result.push(modifier);
+    Helper.wrtcStore.rooms.set(
+        headerId,
+        {
+          VIDEO: {list: []},
+          TEXT: {list: []},
+          USERS: {},
+          headerCount: 0,
+        }
+    );
+    if (htagNum && hTags.includes(htagNum)) result.push(modifier);
   }
 
   return result;
-  // return [];
 };

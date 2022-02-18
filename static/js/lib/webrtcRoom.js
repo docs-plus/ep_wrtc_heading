@@ -4,41 +4,27 @@ const WrtcRoom = (() => {
   let socket = null;
   let padId = null;
   let VIDEOCHATLIMIT = 0;
-  let tryToJoinByQueryString = 0;
+  let tryTojoinWithQueryString = 0;
 
 
-  /** --------- Helper --------- */
+  /** ---------d Helper --------- */
 
-  function scroll2Header(headerId) {
-    const padContainer = Helper.$body_ace_outer().find('iframe').contents().find('#innerdocbody');
-    padContainer.find(`.videoHeader.${headerId}`).each(function scrolling() {
-      this.scrollIntoView({
-        behavior: 'smooth',
-      });
-    });
-  }
+  const joinChatRoom = (headerId, userInfo, target) => {
 
-  const closeTextChat = () => $('#wrtc_textChatWrapper .btn_leave').trigger('click');
+  };
 
-  function joinChatRoom(headerId, userInfo, target) {
-    // textChat.userJoin(headerId, userInfo, 'TEXTPLUS');
-    videoChat.userJoin(headerId, userInfo, 'PLUS');
-    closeTextChat();
-  }
+  const leaveChatRoom = (headerId, userInfo, target) => {
 
-  function leaveChatRoom(headerId, userInfo, target) {
-    // textChat.userLeave(headerId, userInfo, 'TEXTPLUS');
-    videoChat.userLeave(headerId, userInfo, 'PLUS');
-    closeTextChat();
-  }
+  };
 
   /**
-	 *
-	 * @param {string} actions @enum (JOIN|LEAVE|RELOAD|SHARELINK|USERPROFILEMODAL|JOINBYQUERY)
-	 * @param {string} headerId
-	 * @param {string} target @enum (chatRoom|video|text)
-	 */
+    *
+    * @param {string} actions @enum (JOIN|LEAVE|RELOAD|SHARELINK|USERPROFILEMODAL|JOINBYQUERY)
+    * @param {string} headerId
+    * @param {string} target @enum (chatRoom|video)
+  */
   function roomBtnHandler(actions, headerId, target) {
+
     if (typeof actions !== 'string') {
       actions.preventDefault();
       // no idea! but in somecases! this function fire twice!
@@ -81,7 +67,10 @@ const WrtcRoom = (() => {
       // show the alert that user must reload the page
       $.gritter.add({
         title: 'Video chat no longer responds',
-        text: 'The socket is disconnected and we can no longer make a stable call, please go to stable internet and then reload the page.',
+        text: `
+          The socket is disconnected and we can no longer make a stable call,
+          please go to stable internet and then reload the page.
+        `,
         sticky: false,
         class_name: 'error',
         time: '15000',
@@ -91,36 +80,11 @@ const WrtcRoom = (() => {
 
     if (actions === 'JOIN') {
       Helper.wrtcPubsub.currentOpenRoom = userInfo;
-      switch (target) {
-        case 'PLUS':
-          Helper.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
-          joinChatRoom(headerId, userInfo, target);
-          break;
-        case 'VIDEO':
-          Helper.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
-          videoChat.userJoin(headerId, userInfo, target);
-          break;
-        case 'TEXT':
-          textChat.userJoin(headerId, userInfo, target);
-          break;
-        default:
-          return false;
-      }
+      Helper.wrtcPubsub.emit('disable room buttons', headerId, actions, target);
+      videoChat.userJoin(headerId, userInfo, target);
     } else if (actions === 'LEAVE') {
       Helper.wrtcPubsub.currentOpenRoom = null;
-      switch (target) {
-        case 'PLUS':
-          leaveChatRoom(headerId, userInfo, target);
-          break;
-        case 'VIDEO':
-          videoChat.userLeave(headerId, userInfo, target);
-          break;
-        case 'TEXT':
-          textChat.userLeave(headerId, userInfo, target);
-          break;
-        default:
-          return false;
-      }
+      videoChat.userLeave(headerId, userInfo, target);
     } else if (actions === 'RELOAD') {
       videoChat.reloadSession(headerId, userInfo, target, actions);
     } else if (actions === 'SHARELINK') {
@@ -129,11 +93,11 @@ const WrtcRoom = (() => {
       showUserProfileModal(headerId);
     } else if (actions === 'JOINBYQUERY') {
       const href = $(this).attr('href');
-      joinByQueryString(href);
+      joinWithQueryString(href);
     }
   }
 
-  function joinByQueryString(url) {
+  const joinWithQueryString = (url) => {
     url = url || window.location.href;
     const urlParams = new URLSearchParams(url);
     const headerId = urlParams.get('id');
@@ -161,47 +125,52 @@ const WrtcRoom = (() => {
       return false;
     }
 
-    if (headerId) scroll2Header(headerId);
+    // FIXME: this function move to helper and refactor
+    // if (headerId) scroll2Header(headerId);
 
     if (join === 'true' && target) {
       target = target.toUpperCase();
 
-      if(Helper.wrtcStore.socketState === 'CLOSED' && tryToJoinByQueryString <= 4) {
+      if (Helper.wrtcStore.socketState === 'CLOSED' && tryTojoinWithQueryString <= 4) {
         setTimeout(() => {
-          console.warn(`[wrtc]: socket state is ${Helper.wrtcStore.socketState}, try to join again!`);
-          tryToJoinByQueryString++;
-          joinByQueryString();
+          console.warn(`
+            [wrtc]: socket state is ${Helper.wrtcStore.socketState}, try to join again!
+          `);
+          tryTojoinWithQueryString++;
+          joinWithQueryString();
         }, 1500);
-      } else if(Helper.wrtcStore.socketState === 'OPEND') {
+      } else if (Helper.wrtcStore.socketState === 'OPEND') {
         setTimeout(() => roomBtnHandler('JOIN', headerId, target), 1000);
       } else {
-        console.error(`[wrtc]: We try to join ${tryToJoinByQueryString}th,Joining by query string has problem!`, Helper.wrtcStore.socketState, tryToJoinByQueryString)
+        console.error(`
+          [wrtc]: We try to join ${tryTojoinWithQueryString}th,
+          Joining by query string has problem!
+        `, Helper.wrtcStore.socketState, tryTojoinWithQueryString);
       }
-
     }
-  }
+  };
 
   // if history state has change fire joinQueryString
   document.addEventListener('onPushState', (event) => {
-    const {state} =  event.detail
-    if(state.type === "hyperLink"){
-      const href= state.href
-      joinByQueryString(href)
+    const {state} = event.detail;
+    if (state.type === 'hyperLink') {
+      const href = state.href;
+      joinWithQueryString(href);
     }
   });
 
-  function shareRoomsLink(headId, target) {
+  // TODO: need refactor with helper and native create share link
+  const shareRoomsLink = (headId, target) => {
     headId = $(this).attr('data-id') || headId;
     target = $(this).attr('data-join') || target;
     target = target.toLowerCase();
 
     const title = Helper.$body_ace_outer().find('iframe').contents()
-      .find('#innerdocbody').find(`.heading.${headerId}`).text();
+        .find('#innerdocbody').find(`.heading.${headId}`).text();
 
     const origin = window.location.origin;
     const pathName = window.location.pathname;
     const link = `${origin + pathName}?header=${Helper.slugify(title)}&id=${headId}&target=${target}&join=true`;
-
     const $temp = $('<input>');
     $('body').append($temp);
     $temp.val(link).select();
@@ -215,21 +184,23 @@ const WrtcRoom = (() => {
       class_name: 'copyLinkToClipboard',
       time: '3000',
     });
-  }
+  };
 
-  function getHeaderRoomY($element) {
+  const getHeaderRoomY = ($element) => {
     const height = $element.outerHeight();
     const paddingTop = Helper.$body_ace_outer().find('iframe[name="ace_inner"]').css('padding-top');
     const aceOuterPadding = parseInt(paddingTop, 10);
     const offsetTop = Math.ceil($element.offset().top + aceOuterPadding);
     return offsetTop + height / 2 - 22;
-  }
+  };
 
+  // TODO: need refactore and use bridge strategy
   function showUserProfileModal(headerId) {
     const userId = $(this).attr('data-id') || headerId;
     const user = window.clientVars.ep_profile_list[userId];
     if (!user) return false;
-    const imageUrl = user.imageUrl || `/static/getUserProfileImage/${userId}/${padId}?t=${new Date().getTime()}`;
+    const staticImage = `/static/getUserProfileImage/${userId}/${padId}?t=${new Date().getTime()}`;
+    const imageUrl = user.imageUrl || staticImage;
     $('#ep_profile_users_profile_name').text(user.userName);
     $('#ep_profile_users_profile_desc').text(user.about);
     $('#ep_profile_users_profile_homepage').attr({
@@ -250,12 +221,21 @@ const WrtcRoom = (() => {
     });
   }
 
-  function activeEventListener() {
+  const activeEventListener = () => {
     const $AceOuter = Helper.$body_ace_outer();
 
     $AceOuter.on('click', '.btn_roomHandler', roomBtnHandler);
+    $(document).on('click', '.btn_roomHandler, .wrtc_roomLink', roomBtnHandler);
 
-    // $AceOuter.find('iframe').contents().find('#innerdocbody').on('click', 'wrt-inline-icon', function () {
+    $(document).on('mouseenter', '.video-container.local-user', () => {
+      $(document).find('#wrtc_modal #networkStatus').addClass('active');
+    }).on('mouseleave', '.video-container.local-user', () => {
+      $(document).find('#wrtc_modal #networkStatus').removeClass('active');
+    });
+
+
+    // $AceOuter.find('iframe').contents()
+    // .find('#innerdocbody').on('click', 'wrt-inline-icon', function () {
     //   const $btn = this.shadowRoot.querySelector('.btn_roomHandler');
     //   const headerId = $btn.getAttribute('data-id');
     //   const action = $btn.getAttribute('data-action');
@@ -263,16 +243,14 @@ const WrtcRoom = (() => {
     //   roomBtnHandler(action, headerId, target);
     // });
 
+    // TODO: refactore, this need to change and use paddInner variable
     $AceOuter.find('iframe').contents().find('#innerdocbody')
-      .on('click', 'chat-inline-icon', function () {
-        const headerId = $(this).attr('data-headerid');
-        $(document)
-          .find(`#tocItems .itemRow.tocItem[sectionid='${headerId}']`)
-          .trigger("click");
-      });
-
-
-
+        .on('click', 'chat-inline-icon', function () {
+          const headerId = $(this).attr('data-headerid');
+          $(document)
+              .find(`#tocItems .itemRow.tocItem[sectionid='${headerId}']`)
+              .trigger('click');
+        });
 
     // integration with ep_rocketChat
     $(document).on('click', '#toc .itemRow.tocItem', function () {
@@ -285,7 +263,7 @@ const WrtcRoom = (() => {
       $('.header_videochat_icon .icon .userCount').text('');
 
       // check wrtc store
-      const userPresent = room.VIDEO.present === 0 ? "" : room.VIDEO.present;
+      const userPresent = room.VIDEO.present === 0 ? '' : room&&room.VIDEO.present&&0;
       $('.header_videochat_icon .icon .userCount').text(userPresent);
       // does the current user present in this room
       const currentUserPresent = room.VIDEO.list.find((x) => x.userId === clientVars.userId);
@@ -293,24 +271,16 @@ const WrtcRoom = (() => {
       if (currentUserPresent) $('.header_videochat_icon .icon').addClass('active');
     });
 
-    $(document).on('click', '.btn_roomHandler, .wrtc_roomLink', roomBtnHandler);
 
-    $(document).on('mouseenter', '.video-container.local-user', () => {
-      $(document).find('#wrtc_modal #networkStatus').addClass('active');
-    }).on('mouseleave', '.video-container.local-user', () => {
-      $(document).find('#wrtc_modal #networkStatus').removeClass('active');
-    });
-
-    $(document).on('click', '#werc_toolbar p, .textChatToolbar b', function click() {
-      const headerId = $(this).attr('data-id');
-      scroll2Header(headerId);
-    });
+    // FIXME: this function move to helper and refactor
+    // $(document).on('click', '#werc_toolbar p, .textChatToolbar b', function click() {
+    //   const headerId = $(this).attr('data-id');
+    //   scroll2Header(headerId);
+    // });
 
     $(document).on('click', '#werc_toolbar .btn_enlarge', function click() {
       if (!$(this).attr('active')) return true;
-
       $(this).toggleClass('large');
-
       $('#wrtc_modal .video-container .enlarge-btn').each(function trigger() {
         $(this).trigger('click');
       });
@@ -321,12 +291,16 @@ const WrtcRoom = (() => {
       const offset = $(this).position();
       const $box = $(document).find('#wrtc_settings');
       const width = $box.outerWidth();
-      $box.css({left: `${offset.left - width}px`, top: `${offset.top + 4}px`}).toggleClass('active');
+      $box.css({
+        left: `${offset.left - width}px`,
+        top: `${offset.top + 4}px`
+      })
+      .toggleClass('active');
     });
-  }
+  };
 
-  var self = {
-    joinByQueryString,
+  let self = {
+    joinWithQueryString,
     roomBtnHandler,
     aceSetAuthorStyle: function aceSetAuthorStyle(context) {
       if (context.author) {
@@ -334,44 +308,35 @@ const WrtcRoom = (() => {
         if (user) {
           // sync user info
           const userName = user.name || 'anonymous';
-          Helper.$body_ace_outer().find(`.wrtc_content.textChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(userName);
-          Helper.$body_ace_outer().find(`.wrtc_content.videoChat ul li[data-id='${user.userId}']`).css({'border-color': user.colorId}).text(userName);
+          Helper.$body_ace_outer()
+              .find(`.wrtc_content.videoChat ul li[data-id='${user.userId}']`)
+              .css({'border-color': user.colorId}).text(userName);
         }
       }
     },
-    userLeave: function userLeave(context, callback) {
-      // Deprecated, we use socket disconnect
-    },
-    postAceInit: function postAceInit(hook, context, webSocket, docId) {
+    postAceInit: (hook, context, webSocket, docId) => {
       socket = webSocket;
       padId = docId;
       VIDEOCHATLIMIT = clientVars.webrtc.videoChatLimit;
       Helper.wrtcPubsub.emit('componentsFlow', 'room', 'init', true);
 
       socket.on('userJoin', (data, roomInfo, target) => {
-        if (target === 'video') {
-          videoChat.gateway_userJoin(data, roomInfo, false);
-        } else {
-          textChat.addUserToRoom(data, roomInfo, target);
-        }
+        videoChat.gateway_userJoin(data, roomInfo, false);
       });
 
       socket.on('userLeave', (data, roomInfo, target) => {
-        if (target === 'video') {
-          videoChat.gateway_userLeave(data, roomInfo, target);
-        } else {
-          textChat.removeUserFromRoom(data, roomInfo, target);
-        }
+        videoChat.gateway_userLeave(data, roomInfo, target);
       });
 
       activeEventListener();
 
       // check if there is a join request in URI queryString
+      // TODO: refactore check if the plugin is ready to use then try to join
       setTimeout(() => {
-        joinByQueryString();
+        joinWithQueryString();
       }, 500);
     },
-    adoptHeaderYRoom: function adoptHeaderYRoom() {
+    adoptHeaderYRoom: () => {
       // Set all video_heading to be inline with their target REP
       const $padOuter = Helper.$body_ace_outer();
       if (!$padOuter) return;
@@ -392,7 +357,7 @@ const WrtcRoom = (() => {
         $el.css({top: `${Helper.getHeaderRoomY($headingEl) - 16}px`});
       });
     },
-    appendVideoIcon: function appendVideoIcon(headerId, options = {createAgain: false}) {
+    appendVideoIcon: (headerId, options = {createAgain: false}) => {
       if (!headerId) return false;
 
       const roomExist = Helper.wrtcStore.rooms.has(headerId);
@@ -422,7 +387,7 @@ const WrtcRoom = (() => {
           videoChatLimit: VIDEOCHATLIMIT,
         };
 
-        Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, TEXT: {list: []}, USERS: {}, headerCount: 0});
+        Helper.wrtcStore.rooms.set(headerId, {VIDEO: {list: []}, USERS: {}, headerCount: 0});
 
         const box = $('#wrtcLinesIcons').tmpl(data);
         target.find('#wrtcVideoIcons').append(box);

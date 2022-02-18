@@ -4,22 +4,17 @@ const uglify = require('gulp-uglify-es').default;
 const mode = require('gulp-mode')();
 const sourcemaps = require('gulp-sourcemaps');
 const htmlmin = require('gulp-htmlmin');
-const rename = require('gulp-rename');
 const bump = require('gulp-bump');
 const git = require('gulp-git');
 const cleanCSS = require('gulp-clean-css');
 
-
 const jsfiles = [
   './static/js/lib/adapter.js',
   './static/js/lib/getUserMediaPolyfill.js',
-  './static/js/lib/jquery.tmpl.min.js',
+  // './static/js/lib/jquery.tmpl.min.js',
   './static/js/lib/getStats.min.js',
-  // './static/js/lib/components.js',
   './static/js/lib/helpers.js',
-  './static/js/lib/copyPasteEvents.js',
   './static/js/lib/codecsHandler.js',
-  './static/js/lib/textChat.js',
   './static/js/lib/videoChat.js',
   './static/js/lib/webrtcRoom.js',
   './static/js/lib/webrtc.js',
@@ -67,6 +62,7 @@ gulp.task('git:psuh', () => git.push('origin', (err) => {
 }));
 
 gulp.task('watch', () => {
+  console.log('whasdjhaksjhd');
   gulp.watch([...jsfiles, ...cssFiles, ...htmlFiles], gulp.series(['js', 'css', 'html']));
 });
 

@@ -32,43 +32,44 @@ const videoChat = (() => {
   const stopWatchNetwork = () => clearInterval(networkInterval);
 
   function mediaDevices() {
-    navigator.mediaDevices.enumerateDevices().then((data) => {
-      let videoSettings = localStorage.getItem('videoSettings') || {microphone: null, speaker: null, camera: null};
+    navigator.mediaDevices.enumerateDevices().then((deviceInputs) => {
+      const videoSettings = localStorage.getItem('videoSettings');
+      const {microphone, speaker, camera} = JSON.parse(videoSettings);
 
-      if (typeof videoSettings === 'string') {
-        videoSettings = JSON.parse(videoSettings);
-      }
-
-      const audioInputSection = document.querySelector('#wrtc_settings .select.audioSource');
-      const audioOutputSection = document.querySelector('#wrtc_settings .select.audioOutputSec');
-      const videoSection = document.querySelector('#wrtc_settings .select.videoSource');
+      const audioInputSection = document.querySelector('.select.audioSource select');
+      const audioOutputSection = document.querySelector('.select.audioOutputSec select');
+      const videoSection = document.querySelector('.select.videoSource select');
 
       const audioInputElement = document.createElement('select');
       const audioOutputElement = document.createElement('select');
       const videoElement = document.createElement('select');
 
-      for (let i = 0; i !== data.length; ++i) {
-        const deviceInfo = data[i];
+      for (const deviceInfo of deviceInputs) {
         const option = document.createElement('option');
-        option.value = deviceInfo.deviceId;
-        if (deviceInfo.kind === 'audioinput') {
-          option.text = deviceInfo.label || `microphone ${audioInputSection ? audioInputSection.length + 1 : '1'}`;
-          if (videoSettings.microphone === deviceInfo.deviceId) option.selected = true;
+        const {deviceId, label, kind} = deviceInfo;
+        option.value = deviceId;
+        if (kind === 'audioinput') {
+          option.text = label || `microphone ${audioInputSection ? audioInputSection.length + 1 : '1'}`;
+          if (microphone === deviceId) option.selected = true;
           audioInputElement.appendChild(option);
-        } else if (deviceInfo.kind === 'audiooutput') {
-          option.text = deviceInfo.label || `speaker ${audioOutputSection ? audioOutputSection.length + 1 : '1'}`;
-          if (videoSettings.speaker === deviceInfo.deviceId) option.selected = true;
+        } else if (kind === 'audiooutput') {
+          option.text = label || `speaker ${audioOutputSection ? audioOutputSection.length + 1 : '1'}`;
+          if (speaker === deviceId) option.selected = true;
           audioOutputElement.appendChild(option);
-        } else if (deviceInfo.kind === 'videoinput') {
-          option.text = deviceInfo.label || `camera ${videoSection ? videoSection.length + 1 : '1'}`;
-          if (videoSettings.camera === deviceInfo.deviceId) option.selected = true;
+        } else if (kind === 'videoinput') {
+          option.text = label || `camera ${videoSection ? videoSection.length + 1 : '1'}`;
+          if (camera === deviceId) option.selected = true;
           videoElement.appendChild(option);
         }
       }
 
-      audioInputSection.appendChild(audioInputElement);
-      audioOutputSection.appendChild(audioOutputElement);
-      videoSection.appendChild(videoElement);
+      $(audioInputSection).remove();
+      $(audioOutputSection).remove();
+      $(videoSection).remove();
+
+      $('.select.audioSource').append(audioInputElement);
+      $('.select.audioOutputSec').append(audioOutputElement);
+      $('.select.videoSource').append(videoElement);
     });
   }
 
@@ -98,7 +99,6 @@ const videoChat = (() => {
         VIDEOCHATLIMIT,
       };
       $(`.header_videochat_icon[data-id='${headerId}'] .icon`).removeClass('active');
-      Helper.notifyNewUserJoined('PLUS', msg, 'LEAVE');
     }
 
     if (data.userId === clientVars.userId) {
@@ -122,7 +122,6 @@ const videoChat = (() => {
       Helper.wrtcPubsub.emit('componentsFlow', 'video', 'open', false);
 
       Helper.stopStreaming();
-      socket.removeListener(`receiveTextMessage:${data.headerId}`);
     }
 
     if (cb && typeof cb === 'function') cb();
@@ -136,6 +135,7 @@ const videoChat = (() => {
 
   function addUserToRoom(data, roomInfo) {
     if (!data || !data.userId) return false;
+
     const headerId = data.headerId;
     const headerTitle = Helper.findAceHeaderElement(headerId).text;
 
@@ -151,23 +151,9 @@ const videoChat = (() => {
     $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text(userCount);
     if (userCount === 0) $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text('');
 
-    if (data.action === 'JOIN') {
-      // notify, a user join the video-chat room
-      const msg = {
-        time: new Date(),
-        userId: data.userId,
-        userName: user.name || data.name || 'anonymous',
-        headerId,
-        userCount,
-        headerTitle,
-        VIDEOCHATLIMIT,
-      };
-
-      Helper.notifyNewUserJoined('PLUS', msg, 'JOIN');
-    }
-
     $(`.header_videochat_icon[data-id='${headerId}'] .icon`).addClass('active');
 
+    // if the current request is from current user
     if (data.userId === clientVars.userId) {
       window.headerId = data.headerId;
 
@@ -196,14 +182,6 @@ const videoChat = (() => {
 
       // update modal title, attributes and inline avatart
       Helper.wrtcPubsub.emit('updateWrtcToolbarModal', headerId, roomInfo);
-
-      // if videochat active and new message send to chat! open header textchat modal
-      socket.on(`receiveTextMessage:${headerId}`, (headingId, msg) => {
-        const active = $(document).find('#wrtc_textChatWrapper').hasClass('active');
-        if (headingId === headerId && !active) {
-          textChat.userJoin(headerId, data, 'TEXT');
-        }
-      });
     }
 
     Helper.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'VIDEO', roomInfo, () => {});
@@ -242,6 +220,7 @@ const videoChat = (() => {
   }
 
   function userJoin(headerId, userInfo, $joinButton) {
+
     if (!userInfo || !userInfo.userId) {
       Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
       return false;
@@ -335,7 +314,7 @@ const videoChat = (() => {
     padId = docId;
     VIDEOCHATLIMIT = 2000; // clientVars.webrtc.videoChatLimit;
     Helper.wrtcPubsub.emit('componentsFlow', 'video', 'init', true);
-    // mediaDevices();
+    mediaDevices();
 
     socket.on('userLatancy', (data) => {
       if (Helper.getUserId() !== data.userId) {

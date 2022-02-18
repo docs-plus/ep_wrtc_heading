@@ -1,3 +1,5 @@
+'use strict';
+
 const eejs = require('ep_etherpad-lite/node/eejs/');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 const log4js = require('ep_etherpad-lite/node_modules/log4js');
@@ -6,10 +8,22 @@ const stats = require('ep_etherpad-lite/node/stats');
 const packageJson = require('./package.json');
 const Config = require('./config');
 // Make sure any updates to this are reflected in README
-const statErrorNames = ['Abort', 'Hardware', 'NotFound', 'NotSupported', 'Permission', 'SecureConnection', 'Unknown'];
+const statErrorNames = [
+  'Abort',
+  'Hardware',
+  'NotFound',
+  'NotSupported',
+  'Permission',
+  'SecureConnection',
+  'Unknown',
+];
+
 if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.hasOwnProperty('useEtherpadSocket')) {
   Config.update('USE_ETHERPAD_SOCKET', settings.ep_wrtc_heading.useEtherpadSocket);
 }
+
+let io;
+
 const useEtherpadSocket = Config.get('USE_ETHERPAD_SOCKET');
 const socketNamespace = Config.get('SOCKET_NAMESPACE');
 // TODO: support etherpad socket
@@ -30,7 +44,8 @@ exports.eejsBlock_mySettings = (hookName, args, cb) => {
 
 exports.eejsBlock_scripts = (hookName, args, cb) => {
   args.content += eejs.require('ep_wrtc_heading/static/dist/templates/webrtcComponent.mini.html', {}, module);
-  args.content += `<script src='../static/plugins/ep_wrtc_heading/static/dist/js/wrtc.heading.mini.js?v=${packageJson.version}' defer></script>`;
+  const src = '../static/plugins/ep_wrtc_heading/static/dist/js/wrtc.heading.mini.js?v=${packageJson.version}';
+  args.content += `<script src='${src}' defer></script>`;
   return cb();
 };
 
@@ -40,41 +55,43 @@ exports.eejsBlock_styles = (hookName, args, cb) => {
 };
 
 exports.clientVars = (hook, context, callback) => {
-  let enabled = true;
+  const enabled = true;
   let remoteSocketAddress = Config.get('CLIENT_SOCKET_REMOTE_ADDRESS');
-
-  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.enabled === false) {
-    enabled = settings.ep_wrtc_heading.enabled;
-  }
-
-  let iceServers = [{urls: [Config.get('GOOGLE_STUN_SERVER')]}];
-  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.iceServers) {
-    iceServers = settings.ep_wrtc_heading.iceServers;
-  }
-
+  const iceServers = [{urls: [Config.get('GOOGLE_STUN_SERVER')]}];
   const video = {sizes: {}, codec: Config.get('VIDEO_CODEC')};
-  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.video && settings.ep_wrtc_heading.video.sizes) {
-    video.sizes = {
-      large: settings.ep_wrtc_heading.video.sizes.large,
-      small: settings.ep_wrtc_heading.video.sizes.small,
-    };
-  }
 
-  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoChatLimit) {
-    Config.update('VIDEO_CHAT_LIMIT', settings.ep_wrtc_heading.videoChatLimit);
-  }
+  if (settings.ep_wrtc_heading) {
+    let {
+      enabled,
+      video,
+      videoChatLimit,
+      videoCodec,
+      displayInlineAvatar,
+      socketAddress,
+    } = settings.ep_wrtc_heading;
 
-  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.videoCodec) {
-    video.codec = settings.ep_wrtc_heading.videoCodec;
-  }
-
-  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.hasOwnProperty('socketAddress')) {
-    remoteSocketAddress = settings.ep_wrtc_heading.socketAddress;
-    Config.update('CLIENT_SOCKET_REMOTE_ADDRESS', remoteSocketAddress);
-  }
-
-  if (settings.ep_wrtc_heading && settings.ep_wrtc_heading.hasOwnProperty('displayInlineAvatar')) {
-    Config.update('DISPLAY_INLINE_AVATAR', settings.ep_wrtc_heading.displayInlineAvatar);
+    if (enabled === false) {
+      enabled = settings.ep_wrtc_heading.enabled;
+    }
+    if (videoCodec) {
+      video.codec = videoCodec;
+    }
+    if (video && video.sizes) {
+      video.sizes = {
+        large: video.sizes.large,
+        small: video.sizes.small,
+      };
+    }
+    if (videoChatLimit) {
+      Config.update('VIDEO_CHAT_LIMIT', videoChatLimit);
+    }
+    if (socketAddress) {
+      remoteSocketAddress = socketAddress;
+      Config.update('CLIENT_SOCKET_REMOTE_ADDRESS', remoteSocketAddress);
+    }
+    if (displayInlineAvatar) {
+      Config.update('DISPLAY_INLINE_AVATAR', displayInlineAvatar);
+    }
   }
 
   const result = {

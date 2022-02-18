@@ -1,10 +1,12 @@
+'use strict';
+
 const db = require('ep_etherpad-lite/node/db/DB');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 
 if (settings && !settings.ep_wrtc_heading.useEtherpadSocket) {
   try {
     db.init();
-  } catch (error) {
+  } catch (e) {
     console.error(`exception thrown: ${e.message}`);
     if (e.stack) console.log(e.stack);
   }
