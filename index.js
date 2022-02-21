@@ -3,8 +3,8 @@
 const eejs = require('ep_etherpad-lite/node/eejs/');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 const log4js = require('ep_etherpad-lite/node_modules/log4js');
-const statsLogger = log4js.getLogger('stats');
 const stats = require('ep_etherpad-lite/node/stats');
+const statsLogger = log4js.getLogger('stats');
 const packageJson = require('./package.json');
 const Config = require('./config');
 // Make sure any updates to this are reflected in README
@@ -31,7 +31,7 @@ exports.socketio = (hookName, args, cb) => {
   if (settings.ep_wrtc_heading && useEtherpadSocket) {
     console.info('[wrtc]: use etherpad socket system');
     io = args.io.of(`/${socketNamespace}`);
-    const opt = {pid: process.pid, namespace: socketNamespace, preservedNamespace: {}};
+    const opt = { pid: process.pid, namespace: socketNamespace, preservedNamespace: {} };
     require('./server/ws.router').init(io, opt);
   }
   return cb();
@@ -57,8 +57,8 @@ exports.eejsBlock_styles = (hookName, args, cb) => {
 exports.clientVars = (hook, context, callback) => {
   const enabled = true;
   let remoteSocketAddress = Config.get('CLIENT_SOCKET_REMOTE_ADDRESS');
-  const iceServers = [{urls: [Config.get('GOOGLE_STUN_SERVER')]}];
-  const video = {sizes: {}, codec: Config.get('VIDEO_CODEC')};
+  const iceServers = [{ urls: [Config.get('GOOGLE_STUN_SERVER')] }];
+  const video = { sizes: {}, codec: Config.get('VIDEO_CODEC') };
 
   if (settings.ep_wrtc_heading) {
     let {

@@ -1,7 +1,6 @@
 // CodecsHandler.js
-'use strict';
 
-var CodecsHandler = (function () {
+const CodecsHandler = (function () {
   function preferCodec(sdp, codecName) {
     const info = splitLines(sdp);
 

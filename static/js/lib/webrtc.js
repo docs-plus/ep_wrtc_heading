@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
 const WRTC = (() => {
   const attemptRonnect = 60;
   let reconnected = 0;
-  const videoSizes = {large: '260px', small: '160px'};
+  const videoSizes = { large: '260px', small: '160px' };
   const pcConfig = {};
   let audioInputSelect = null;
   let videoSelect = null;
@@ -86,22 +85,25 @@ const WRTC = (() => {
       $('body').prepend($wrtcVideoModal);
 
       $(document).on('click', '#wrtc_modal .btn_toggle_modal', function () {
-        const $parent = $(this).parent().parent();
+        const $parent = $(this).parent()
+          .parent();
         const action = $(this).attr('data-action');
         const videoBox = $('#wrtc_modal .videoWrapper').innerHeight();
 
-        $(this).find('.fa_arrow-from-top').toggle();
-        $(this).find('.fa_arrow-to-top').toggle();
+        $(this).find('.fa_arrow-from-top')
+          .toggle();
+        $(this).find('.fa_arrow-to-top')
+          .toggle();
 
         if (action === 'collapse') {
-          $(this).attr({'data-action': 'expand'});
+          $(this).attr({ 'data-action': 'expand' });
           $parent.find('.btn_enlarge').removeAttr('active');
           $('#wrtc_modal').css({
             transform: `translate(-50%, -${videoBox}px)`,
           });
         } else {
-          $(this).attr({'data-action': 'collapse'});
-          $parent.find('.btn_enlarge').attr({active: true});
+          $(this).attr({ 'data-action': 'collapse' });
+          $parent.find('.btn_enlarge').attr({ active: true });
           $('#wrtc_modal').css({
             transform: 'translate(-50%, 0)',
           });
@@ -124,7 +126,7 @@ const WRTC = (() => {
           $this.removeAttr('data-active');
           return true;
         } else {
-          $this.attr({'data-active': true});
+          $this.attr({ 'data-active': true });
           $modal.show();
         }
 
@@ -164,7 +166,8 @@ const WRTC = (() => {
                   'bytesReceived': bytesToSize(result.audio.bytesReceived),
                 },
               };
-              $(document).find('#wrtc_settings .wrtc_info').html(`<pre>${JSON.stringify(statistic, undefined, 2)}</pre>`);
+              $(document).find('#wrtc_settings .wrtc_info')
+                .html(`<pre>${JSON.stringify(statistic, undefined, 2)}</pre>`);
             }, 1000);
           })();
         }
@@ -175,17 +178,6 @@ const WRTC = (() => {
         const $btnInfo = $('#wrtc_settings .btn_info');
         if ($btnInfo.attr('data-active')) $btnInfo.trigger('click');
       });
-    },
-    aceSetAuthorStyle: (context) => {
-      if (context.author) {
-        const user = Helper.getUserFromId(context.author);
-        if (user) {
-          const userName = user.name || 'anonymous';
-          $(`#video_${user.userId.replace(/\./g, '_')}`).css({
-            'border-color': user.colorId,
-          }).siblings('.user-name').text(userName);
-        }
-      }
     },
     userLeave: (userId, context, callback) => {
       userId = userId || context.userInfo.userId;
@@ -198,9 +190,8 @@ const WRTC = (() => {
       if (callback) callback();
     },
     // deprecated function
-    handleClientMessage_RTC_MESSAGE: (hook, context) => {
-      if (context.payload.data.headerId === window.headerId)
-        self.receiveMessage(context.payload);
+    handleClientMessage_RTC_MESSAGE: (hookName, context) => {
+      if (context.payload.data.headerId === window.headerId) self.receiveMessage(context.payload);
     },
     // END OF API HOOKS
     show: () => {
@@ -215,44 +206,44 @@ const WRTC = (() => {
       // However keep in mind that we add our own errors in getUserMediaPolyfill
       console.error(`[wrtc]: mediaError, ${err}`);
       switch (err.name) {
-        case 'CustomNotSupportedError':
-          reason = 'Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>' + 'To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera.' + '<a href="http://www.webrtc.org/" target="_new">Find out more</a>';
-          self.sendErrorStat('NotSupported');
-          break;
-        case 'CustomSecureConnectionError':
+      case 'CustomNotSupportedError':
+        reason = 'Sorry, your browser does not support WebRTC. (or you have it disabled in your settings).<br><br>' + 'To participate in this audio/video chat you have to user a browser with WebRTC support like Chrome, Firefox or Opera.' + '<a href="http://www.webrtc.org/" target="_new">Find out more</a>';
+        self.sendErrorStat('NotSupported');
+        break;
+      case 'CustomSecureConnectionError':
+        reason = 'Sorry, you need to install SSL certificates for your Etherpad instance to use WebRTC';
+        self.sendErrorStat('SecureConnection');
+        break;
+      case 'NotAllowedError':
+        // For certain (I suspect older) browsers, `NotAllowedError` indicates either an insecure connection or the user rejecting camera permissions.
+        // The error for both cases appears to be identical, so our best guess at telling them apart is to guess whether we are in a secure context.
+        // (webrtc is considered secure for https connections or on localhost)
+        if (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          reason = 'Sorry, you need to give us permission to use your camera and microphone';
+          self.sendErrorStat('Permission');
+        } else {
           reason = 'Sorry, you need to install SSL certificates for your Etherpad instance to use WebRTC';
           self.sendErrorStat('SecureConnection');
-          break;
-        case 'NotAllowedError':
-          // For certain (I suspect older) browsers, `NotAllowedError` indicates either an insecure connection or the user rejecting camera permissions.
-          // The error for both cases appears to be identical, so our best guess at telling them apart is to guess whether we are in a secure context.
-          // (webrtc is considered secure for https connections or on localhost)
-          if (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-            reason = 'Sorry, you need to give us permission to use your camera and microphone';
-            self.sendErrorStat('Permission');
-          } else {
-            reason = 'Sorry, you need to install SSL certificates for your Etherpad instance to use WebRTC';
-            self.sendErrorStat('SecureConnection');
-          }
-          break;
-        case 'NotFoundError':
-          reason = "Sorry, we couldn't find a suitable camera on your device. If you have a camera, make sure it set up correctly and refresh this website to retry.";
-          self.sendErrorStat('NotFound');
-          break;
-        case 'NotReadableError':
-          // `err.message` might give useful info to the user (not necessarily useful for other error messages)
-          reason = `Sorry, a hardware error occurred that prevented access to your camera and/or microphone:<br><br>${err.message}`;
-          self.sendErrorStat('Hardware');
-          break;
-        case 'AbortError':
-          // `err.message` might give useful info to the user (not necessarily useful for other error messages)
-          reason = `Sorry, an error occurred (probably not hardware related) that prevented access to your camera and/or microphone:<br><br>${err.message}`;
-          self.sendErrorStat('Abort');
-          break;
-        default:
-          // `err` as a string might give useful info to the user (not necessarily useful for other error messages)
-          reason = `Sorry, there was an unknown Error:<br><br>${err}`;
-          self.sendErrorStat('Unknown');
+        }
+        break;
+      case 'NotFoundError':
+        reason = "Sorry, we couldn't find a suitable camera on your device. If you have a camera, make sure it set up correctly and refresh this website to retry.";
+        self.sendErrorStat('NotFound');
+        break;
+      case 'NotReadableError':
+        // `err.message` might give useful info to the user (not necessarily useful for other error messages)
+        reason = `Sorry, a hardware error occurred that prevented access to your camera and/or microphone:<br><br>${err.message}`;
+        self.sendErrorStat('Hardware');
+        break;
+      case 'AbortError':
+        // `err.message` might give useful info to the user (not necessarily useful for other error messages)
+        reason = `Sorry, an error occurred (probably not hardware related) that prevented access to your camera and/or microphone:<br><br>${err.message}`;
+        self.sendErrorStat('Abort');
+        break;
+      default:
+        // `err` as a string might give useful info to the user (not necessarily useful for other error messages)
+        reason = `Sorry, there was an unknown Error:<br><br>${err}`;
+        self.sendErrorStat('Unknown');
       }
       $.gritter.add({
         title: 'Error',
@@ -264,18 +255,20 @@ const WRTC = (() => {
       userId = userId || clientVars.userId;
       headerId = headerId || window.headerId;
       videoChat.userLeave(
+        headerId,
+        {
           headerId,
-          {
-            headerId,
-            padId,
-            userId,
-          }
+          padId,
+          userId,
+        },
       );
     },
     hide: (userId) => {
       if (!userId) return false;
       userId = userId.split('.')[1];
-      $('#rtcbox').find(`#video_a_${userId}`).parent().remove();
+      $('#rtcbox').find(`#video_a_${userId}`)
+        .parent()
+        .remove();
     },
     activate: (headerId) => {
       self.show();
@@ -318,17 +311,21 @@ const WRTC = (() => {
         const videoContainer = $("<div class='video-container'>").css({
           'width': videoSizes.small,
           'max-height': videoSizes.small,
-        }).appendTo($('#wrtc_modal .videoWrapper'));
+        })
+          .appendTo($('#wrtc_modal .videoWrapper'));
         const userName = user.name || 'anonymous';
         videoContainer.append($('<div class="user-name">').text(userName));
 
-        video = $('<video playsinline>').attr('id', videoId).css({
-          'border-color': user.colorId,
-          'width': videoSizes.small,
-          'max-height': videoSizes.small,
-        }).on({
-          loadedmetadata: () =>  self.addInterface(userId),
-        }).appendTo(videoContainer)[0];
+        video = $('<video playsinline>').attr('id', videoId)
+          .css({
+            'border-color': user.colorId,
+            'width': videoSizes.small,
+            'max-height': videoSizes.small,
+          })
+          .on({
+            loadedmetadata: () => self.addInterface(userId),
+          })
+          .appendTo(videoContainer)[0];
 
         video.autoplay = true;
         if (isLocal) {
@@ -340,7 +337,8 @@ const WRTC = (() => {
       if (stream) {
         attachMediaStream(video, stream);
       } else if (video) {
-        $(video).parent().remove();
+        $(video).parent()
+          .remove();
       }
     },
     addInterface: (userId) => {
@@ -349,49 +347,54 @@ const WRTC = (() => {
       const videoId = `video_${userId.replace(/\./g, '_')}`;
       const $video = $(`#${videoId}`);
 
-      var $mute = $("<span class='interface-btn audio-btn buttonicon'>").attr('title', 'Mute').on({
-        click: function click() {
-          let muted;
-          if (isLocal) {
-            muted = self.toggleMuted();
-          } else {
-            $video[0].muted = !$video[0].muted;
-            muted = $video[0].muted;
-          }
-          $mute.attr('title', muted ? 'Unmute' : 'Mute').toggleClass('muted', muted);
-        },
-      });
+      var $mute = $("<span class='interface-btn audio-btn buttonicon'>").attr('title', 'Mute')
+        .on({
+          click: function click() {
+            let muted;
+            if (isLocal) {
+              muted = self.toggleMuted();
+            } else {
+              $video[0].muted = !$video[0].muted;
+              muted = $video[0].muted;
+            }
+            $mute.attr('title', muted ? 'Unmute' : 'Mute').toggleClass('muted', muted);
+          },
+        });
       let videoEnabled = true;
-      var $disableVideo = isLocal ? $("<span class='interface-btn video-btn buttonicon'>").attr('title', 'Disable video').on({
-        click: () => {
-          self.toggleVideo();
-          videoEnabled = !videoEnabled;
-          $disableVideo.attr('title', videoEnabled ? 'Disable video' : 'Enable video').toggleClass('off', !videoEnabled);
-        },
-      }) : null;
+      var $disableVideo = isLocal ? $("<span class='interface-btn video-btn buttonicon'>").attr('title', 'Disable video')
+        .on({
+          click: () => {
+            self.toggleVideo();
+            videoEnabled = !videoEnabled;
+            $disableVideo.attr('title', videoEnabled ? 'Disable video' : 'Enable video').toggleClass('off', !videoEnabled);
+          },
+        }) : null;
 
       let videoEnlarged = false;
-      var $largeVideo = $("<span class='interface-btn enlarge-btn buttonicon'>").attr('title', 'Make video larger').on({
-        click: () => {
-          videoEnlarged = !videoEnlarged;
+      var $largeVideo = $("<span class='interface-btn enlarge-btn buttonicon'>").attr('title', 'Make video larger')
+        .on({
+          click: () => {
+            videoEnlarged = !videoEnlarged;
 
-          if (videoEnlarged) {
-            enlargedVideos.add(userId);
-          } else {
-            enlargedVideos.delete(userId);
-          }
+            if (videoEnlarged) {
+              enlargedVideos.add(userId);
+            } else {
+              enlargedVideos.delete(userId);
+            }
 
-          $largeVideo.attr('title', videoEnlarged ? 'Make video smaller' : 'Make video larger').toggleClass('large', videoEnlarged);
+            $largeVideo.attr('title', videoEnlarged ? 'Make video smaller' : 'Make video larger').toggleClass('large', videoEnlarged);
 
-          const videoSize = $(document).find('#wrtc_modal .ndbtn.btn_enlarge').hasClass('large') ? videoSizes.large : videoSizes.small;
-          $video.parent().css({'width': videoSize, 'max-height': videoSize});
-          $video.css({'width': videoSize, 'max-height': videoSize});
-        },
-      });
+            const videoSize = $(document).find('#wrtc_modal .ndbtn.btn_enlarge')
+              .hasClass('large') ? videoSizes.large : videoSizes.small;
+            $video.parent().css({ 'width': videoSize, 'max-height': videoSize });
+            $video.css({ 'width': videoSize, 'max-height': videoSize });
+          },
+        });
 
-      if ($(document).find('#wrtc_modal .ndbtn.btn_enlarge').hasClass('large')) {
-        $video.parent().css({'width': videoSizes.large, 'max-height': videoSizes.large});
-        $video.css({'width': videoSizes.large, 'max-height': videoSizes.large});
+      if ($(document).find('#wrtc_modal .ndbtn.btn_enlarge')
+        .hasClass('large')) {
+        $video.parent().css({ 'width': videoSizes.large, 'max-height': videoSizes.large });
+        $video.css({ 'width': videoSizes.large, 'max-height': videoSizes.large });
       }
 
       if (isLocal) localVideoElement = $video;
@@ -399,20 +402,25 @@ const WRTC = (() => {
       const $networkLatancy = $("<div class='latency'></div>");
 
       $(`#interface_${videoId}`).remove();
-      $("<div class='interface-container'>").attr('id', `interface_${videoId}`).append($mute).append($disableVideo).append($largeVideo).append($networkLatancy).insertAfter($video);
+      $("<div class='interface-container'>").attr('id', `interface_${videoId}`)
+        .append($mute)
+        .append($disableVideo)
+        .append($largeVideo)
+        .append($networkLatancy)
+        .insertAfter($video);
       self.changeAudioDestination();
     },
     // Sends a stat to the back end. `statName` must be in the
     // approved list on the server side.
     sendErrorStat: (statName) => {
-      const msg = {component: 'pad', type: 'STATS', data: {statName, type: 'RTC_MESSAGE'}};
+      const msg = { component: 'pad', type: 'STATS', data: { statName, type: 'RTC_MESSAGE' } };
       socket.emit('acceptNewCall', padId, window.headerId);
       socket.emit('message', msg);
     },
     sendMessage: (to, data, socketIdTo) => {
       socket.emit('RTC_MESSAGE', {
         type: 'RTC_MESSAGE',
-        payload: {data, to, padId, from: Helper.getUserId(), socket: {from: socket.id, to: socketIdTo}},
+        payload: { data, to, padId, from: Helper.getUserId(), socket: { from: socket.id, to: socketIdTo } },
       }, (data) => {
         // console.log('coming data', data);
       });
@@ -466,7 +474,7 @@ const WRTC = (() => {
           pc[peer].createAnswer((desc) => {
             desc.sdp = cleanupSdp(desc.sdp);
             pc[peer].setLocalDescription(desc, () => {
-              self.sendMessage(peer, {type: 'answer', answer: desc, headerId: data.headerId});
+              self.sendMessage(peer, { type: 'answer', answer: desc, headerId: data.headerId });
             }, logError);
           }, logError, sdpConstraints);
         }, logError);
@@ -498,13 +506,13 @@ const WRTC = (() => {
         self.hangup(userId, true, _headerId);
       });
     },
-    hangup: function (userId, notify, headerId) {
+    hangup(userId, notify, headerId) {
       notify = arguments.length === 1 ? true : notify;
       if (pc[userId] && userId !== Helper.getUserId()) {
         self.setStream(userId, '');
         pc[userId].close();
         delete pc[userId];
-        if (notify) self.sendMessage(userId, {type: 'hangup', headerId});
+        if (notify) self.sendMessage(userId, { type: 'hangup', headerId });
       }
     },
     call: (userId, headerId) => {
@@ -512,7 +520,7 @@ const WRTC = (() => {
       //   callQueue.push(userId);
       //   return;
       // }
-      let constraints = {optional: [], mandatory: {}};
+      let constraints = { optional: [], mandatory: {} };
       // temporary measure to remove Moz* constraints in Chrome
       if (webrtcDetectedBrowser === 'chrome') {
         for (const prop in constraints.mandatory) {
@@ -525,7 +533,6 @@ const WRTC = (() => {
 
       if (!pc[userId]) self.createPeerConnection(userId, headerId);
 
-
       // pc[userId].addStream(localStream);
 
       Helper.wrtcStore.localstream.getTracks().forEach((track) => {
@@ -535,7 +542,7 @@ const WRTC = (() => {
       pc[userId].createOffer((desc) => {
         desc.sdp = cleanupSdp(desc.sdp);
         pc[userId].setLocalDescription(desc, () => {
-          self.sendMessage(userId, {type: 'offer', offer: desc, headerId});
+          self.sendMessage(userId, { type: 'offer', offer: desc, headerId });
         }, logError);
       }, logError, constraints);
     },
@@ -544,7 +551,7 @@ const WRTC = (() => {
         console.warn('WARNING creating PC connection even though one exists', userId);
       }
       pc[userId] = new RTCPeerConnection(pcConfig, pcConstraints);
-      pc[userId].onicecandidate =  (event) => {
+      pc[userId].onicecandidate = (event) => {
         if (event.candidate) {
           self.sendMessage(userId, {
             type: 'icecandidate',
@@ -571,23 +578,25 @@ const WRTC = (() => {
         self.getUserMedia(window.headerId);
       });
     },
-    attachSinkId:  (element, sinkId) => {
+    attachSinkId: (element, sinkId) => {
       // Attach audio output device to video element using device/sink ID.
       if (element && element[0] && typeof element[0].sinkId !== 'undefined') {
         element[0].setSinkId(sinkId).then(() => {
           // console.info(`Success, audio output device attached: ${sinkId}`);
-        }).catch((error) => {
-          let errorMessage = error;
-          if (error.name === 'SecurityError') {
-            errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
-          }
-          console.error('[wrtc]: ', error);
-          // Jump back to first output device in the list as it's the default.
-          audioOutputSelect.selectedIndex = 0;
-        });
+        })
+          .catch((error) => {
+            let errorMessage = error;
+            if (error.name === 'SecurityError') {
+              errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+            }
+            console.error('[wrtc]: ', error);
+            // Jump back to first output device in the list as it's the default.
+            audioOutputSelect.selectedIndex = 0;
+          });
       } else {
         console.warn('Browser does not support output device selection.');
-        $(document).find('#wrtc_settings .select.audioOutputSec').hide();
+        $(document).find('#wrtc_settings .select.audioOutputSec')
+          .hide();
       }
     },
     changeAudioDestination: () => {
@@ -602,7 +611,7 @@ const WRTC = (() => {
         video: {
           width: 320,
           height: 240,
-          frameRate: {ideal: 15, max: 30},
+          frameRate: { ideal: 15, max: 30 },
           facingMode: 'user',
         },
       };
@@ -615,30 +624,31 @@ const WRTC = (() => {
       const videoSource = videoSelect && videoSelect.value;
       const audioOutput = audioOutputSelect && audioOutputSelect.value;
 
-      if (audioSource) mediaConstraints.audio.deviceId = {exact: audioSource};
+      if (audioSource) mediaConstraints.audio.deviceId = { exact: audioSource };
 
-      if (videoSource) mediaConstraints.video.deviceId = {exact: videoSource};
+      if (videoSource) mediaConstraints.video.deviceId = { exact: videoSource };
 
-
-      localStorage.setItem('videoSettings', JSON.stringify({microphone: audioSource, speaker: audioOutput, camera: videoSource}));
-      $('#wrtc_modal #networkError').removeClass('active').hide();
+      localStorage.setItem('videoSettings', JSON.stringify({ microphone: audioSource, speaker: audioOutput, camera: videoSource }));
+      $('#wrtc_modal #networkError').removeClass('active')
+        .hide();
 
       window.navigator.mediaDevices
-          .getUserMedia(mediaConstraints)
-          .then((stream) => {
-            Helper.wrtcStore.localstream = stream;
-            self.setStream(Helper.getUserId(), stream);
-            self._pad.collabClient.getConnectedUsers().forEach((user) => {
-              if (user.userId !== Helper.getUserId()) {
-                if (pc[user.userId]) {
-                  self.hangup(user.userId, false, headerId);
-                }
-                self.call(user.userId, headerId);
+        .getUserMedia(mediaConstraints)
+        .then((stream) => {
+          Helper.wrtcStore.localstream = stream;
+          self.setStream(Helper.getUserId(), stream);
+          self._pad.collabClient.getConnectedUsers().forEach((user) => {
+            if (user.userId !== Helper.getUserId()) {
+              if (pc[user.userId]) {
+                self.hangup(user.userId, false, headerId);
               }
-            });
-          }).catch((err) => {
-            self.showUserMediaError(err, Helper.getUserId(), headerId);
+              self.call(user.userId, headerId);
+            }
           });
+        })
+        .catch((err) => {
+          self.showUserMediaError(err, Helper.getUserId(), headerId);
+        });
     },
     attemptToReconnect: () => {
       reconnected++;
@@ -668,7 +678,7 @@ const WRTC = (() => {
     }
   };
 
-  let webrtcDetectedBrowser = 'chrome';
+  const webrtcDetectedBrowser = 'chrome';
 
   const cleanupSdp = (sdp) => {
     const bandwidth = {
@@ -713,9 +723,9 @@ const WRTC = (() => {
     // }
     console.error('[wrtc]: LogError:', error);
     $('#wrtc_modal #networkError')
-        .show()
-        .addClass('active')
-        .text(`[wrtc]: Error: ${error} ,Reload the session.`);
+      .show()
+      .addClass('active')
+      .text(`[wrtc]: Error: ${error} ,Reload the session.`);
   };
 
   self.pc = pc;

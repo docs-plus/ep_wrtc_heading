@@ -24,11 +24,11 @@ exports.getLatestId = async (key) => {
   const result = await db.findKeys(key, ':*').catch((error) => {
     throw new Error(`[repository]: getLatestId has an error,${error.message}`);
   });
-  return result.length ? Number(result.pop().split(':').pop()) : 0;
+  return result.length ? Number(result.pop().split(':')
+    .pop()) : 0;
 };
 
-
-exports.getLastMessages = async (key, lastMessageId, {limit, offset}) => {
+exports.getLastMessages = async (key, lastMessageId, { limit, offset }) => {
   const results = [];
   const rowOfIds = [];
 

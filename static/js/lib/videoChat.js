@@ -1,5 +1,3 @@
-'use strict';
-
 const videoChat = (() => {
   let socket = null;
   let padId = null;
@@ -34,7 +32,7 @@ const videoChat = (() => {
   function mediaDevices() {
     navigator.mediaDevices.enumerateDevices().then((deviceInputs) => {
       const videoSettings = localStorage.getItem('videoSettings');
-      const {microphone, speaker, camera} = JSON.parse(videoSettings);
+      const { microphone, speaker, camera } = JSON.parse(videoSettings);
 
       const audioInputSection = document.querySelector('.select.audioSource select');
       const audioOutputSection = document.querySelector('.select.audioOutputSec select');
@@ -46,7 +44,7 @@ const videoChat = (() => {
 
       for (const deviceInfo of deviceInputs) {
         const option = document.createElement('option');
-        const {deviceId, label, kind} = deviceInfo;
+        const { deviceId, label, kind } = deviceInfo;
         option.value = deviceId;
         if (kind === 'audioinput') {
           option.text = label || `microphone ${audioInputSection ? audioInputSection.length + 1 : '1'}`;
@@ -73,7 +71,7 @@ const videoChat = (() => {
     });
   }
 
-  const isUserMediaAvailable = () => window.navigator.mediaDevices.getUserMedia({audio: true, video: true});
+  const isUserMediaAvailable = () => window.navigator.mediaDevices.getUserMedia({ audio: true, video: true });
 
   function removeUserFromRoom(data, roomInfo, cb) {
     if (!data || !roomInfo || !data.userId) return false;
@@ -102,7 +100,8 @@ const videoChat = (() => {
     }
 
     if (data.userId === clientVars.userId) {
-      Helper.$body_ace_outer().find(`#wrtcVideoIcons #${headerId}`).removeClass('active');
+      Helper.$body_ace_outer().find(`#wrtcVideoIcons #${headerId}`)
+        .removeClass('active');
       WRTC.deactivate(data.userId, data.headerId);
       stopWatchNetwork();
       window.headerId = null;
@@ -115,7 +114,8 @@ const videoChat = (() => {
       $('#wrtc_modal').css({
         transform: 'translate(-50%, -100%)',
         opacity: 0,
-      }).attr({'data-active': false});
+      })
+        .attr({ 'data-active': false });
 
       WRTC.deactivate(data.userId, data.headerId);
 
@@ -162,13 +162,13 @@ const videoChat = (() => {
       const videoBtn = Helper.findAceHeaderElement(headerId).$inlineIcon();
       if (videoBtn) videoBtn.querySelector('.btn_roomHandler').classList.add('active');
 
-
       WRTC.activate(data.headerId, user.userId);
 
       $('#wrtc_modal').css({
         transform: 'translate(-50%, 0)',
         opacity: 1,
-      }).attr({'data-active': true});
+      })
+        .attr({ 'data-active': true });
 
       Helper.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
       Helper.wrtcPubsub.emit('componentsFlow', 'video', 'open', true);
@@ -188,7 +188,8 @@ const videoChat = (() => {
   }
 
   function createSession(headerId, userInfo, $joinButton) {
-    Helper.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
+    Helper.$body_ace_outer().find('button.btn_joinChat_chatRoom')
+      .removeClass('active');
     $joinBtn = $joinButton;
     isUserMediaAvailable().then((stream) => {
       // stop last stream
@@ -207,20 +208,20 @@ const videoChat = (() => {
           socket.emit('userJoin', padId, padparticipators, userInfo, 'video', gateway_userJoin);
         });
       });
-    }).catch((err) => {
-      console.error(err);
-      Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
-      Helper.wrtcPubsub.emit('componentsFlow', 'video', 'open', false);
-      Helper.stopStreaming();
-      socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
-        gateway_userLeave(_userData, roomInfo);
+    })
+      .catch((err) => {
+        console.error(err);
+        Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+        Helper.wrtcPubsub.emit('componentsFlow', 'video', 'open', false);
+        Helper.stopStreaming();
+        socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
+          gateway_userLeave(_userData, roomInfo);
+        });
+        WRTC.showUserMediaError(err, Helper.getUserId(), headerId);
       });
-      WRTC.showUserMediaError(err, Helper.getUserId(), headerId);
-    });
   }
 
   function userJoin(headerId, userInfo, $joinButton) {
-
     if (!userInfo || !userInfo.userId) {
       Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
       return false;
@@ -325,9 +326,9 @@ const videoChat = (() => {
         if (data.latency > 300) color = pingos.colors.danger;
 
         $(document)
-            .find(`#${videoId} .latency`)
-            .css({color})
-            .text(`${Math.ceil(data.latency)}ms`);
+          .find(`#${videoId} .latency`)
+          .css({ color })
+          .text(`${Math.ceil(data.latency)}ms`);
       }
     });
     socket.on('pongol', (data) => {
@@ -349,9 +350,9 @@ const videoChat = (() => {
       if (pingos.avg > 300) color = pingos.colors.danger;
 
       $(document)
-          .find('.video-container.local-user .latency')
-          .css({color})
-          .text(`${Math.ceil(pingos.avg)}ms`);
+        .find('.video-container.local-user .latency')
+        .css({ color })
+        .text(`${Math.ceil(pingos.avg)}ms`);
 
       // $(document).find('#networkStatus').html(`RTT: ${pingos.latency}ms, min: ${pingos.LMin}ms, max: ${pingos.LMax}ms, avg:${pingos.avg}ms`);
 
@@ -359,7 +360,7 @@ const videoChat = (() => {
     });
     socket.on('reloadVideoSession', (headerId) => {
       if (currentRoom.headerId !== headerId) return false;
-      const target = 'PLUS';
+      const target = 'VIDEO';
       const userInfo = {
         padId: clientVars.padId || window.pad.getPadId(),
         userId: clientVars.userId || window.pad.getUserId(),

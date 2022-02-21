@@ -8,11 +8,11 @@ let socketIo = null;
 const roomStatus = {};
 const maxTryToWaitAcceptNewCall = 3;
 
-const acceptNewConnection = ({socket, padId, padparticipators, userData, target, callback}) => {
+const acceptNewConnection = ({ socket, padId, padparticipators, userData, target, callback }) => {
   let room = null;
   console.info('process webrtc connection');
   // assign user socket id
-  Object.assign(userData, {socketId: socket.id});
+  Object.assign(userData, { socketId: socket.id });
   if (target === 'video') {
     room = videoChat.socketUserJoin(userData, padparticipators);
     _.set(socket, 'ndHolder.video', room.data);
@@ -27,41 +27,41 @@ const acceptNewConnection = ({socket, padId, padparticipators, userData, target,
 };
 
 const q = new Queue(
-    (({socket, padId, padparticipators, userData, target, callback, retry}, cb) => {
-      // Some processing here ...
+  (({ socket, padId, padparticipators, userData, target, callback, retry }, cb) => {
+    // Some processing here ...
 
-      // Firt check if the room has accept call Prop
-      if (!_.has(roomStatus, `${padId}.${userData.headerId}.acceptCall`)) {
-        // if the Header does not exist create and set 'acceptCall' to false, for next request are comming throw
-        _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
-        console.info(`Create room, accept call Prop. ${padId}.${userData.headerId}.acceptCall`);
-        // in this case we have to process the request for the first time
-        acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
-        return cb();
-      }
+    // Firt check if the room has accept call Prop
+    if (!_.has(roomStatus, `${padId}.${userData.headerId}.acceptCall`)) {
+      // if the Header does not exist create and set 'acceptCall' to false, for next request are comming throw
+      _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
+      console.info(`Create room, accept call Prop. ${padId}.${userData.headerId}.acceptCall`);
+      // in this case we have to process the request for the first time
+      acceptNewConnection({ socket, padparticipators, padId, userData, target, callback, retry });
+      return cb();
+    }
 
-      // otherwise check the room that can accept new call
-      // if it is, then `acceptNewConnection` otherwise push the request at the end of queue
-      if (_.get(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false)) {
-        console.info(`room ready to accept new call. ${padId}.${userData.headerId}.acceptCal`);
-        _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
-        acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
+    // otherwise check the room that can accept new call
+    // if it is, then `acceptNewConnection` otherwise push the request at the end of queue
+    if (_.get(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false)) {
+      console.info(`room ready to accept new call. ${padId}.${userData.headerId}.acceptCal`);
+      _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, false);
+      acceptNewConnection({ socket, padparticipators, padId, userData, target, callback, retry });
+    } else {
+      console.info(`room not ready to accept new call. ${padId}.${userData.headerId}.acceptCal`);
+      if (retry < maxTryToWaitAcceptNewCall) {
+        q.push({ socket, padparticipators, padId, userData, target, callback, retry: retry += 1 });
+        console.info(`put the request in queue for next call. [retry]: ${retry}, [maxTryToWaitAcceptNewCall]: ${maxTryToWaitAcceptNewCall}`);
       } else {
-        console.info(`room not ready to accept new call. ${padId}.${userData.headerId}.acceptCal`);
-        if (retry < maxTryToWaitAcceptNewCall) {
-          q.push({socket, padparticipators, padId, userData, target, callback, retry: retry += 1});
-          console.info(`put the request in queue for next call. [retry]: ${retry}, [maxTryToWaitAcceptNewCall]: ${maxTryToWaitAcceptNewCall}`);
-        } else {
-          _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, true);
-          console.info(`unfortunately after ${retry} try, request must be terminate!`);
-          acceptNewConnection({socket, padparticipators, padId, userData, target, callback, retry});
-          callback(null, null, target);
-        }
+        _.set(roomStatus, `${padId}.${userData.headerId}.acceptCall`, true);
+        console.info(`unfortunately after ${retry} try, request must be terminate!`);
+        acceptNewConnection({ socket, padparticipators, padId, userData, target, callback, retry });
+        callback(null, null, target);
       }
+    }
 
-      return cb(null, true);
-    }),
-    {afterProcessDelay: 2000}
+    return cb(null, true);
+  }),
+  { afterProcessDelay: 2000 },
 );
 
 /**
@@ -89,16 +89,16 @@ const handleRTCMessage = (socket, client, payload) => {
   socketIo.to(padId).emit('RTC_MESSAGE', msg);
 };
 
-module.exports.init = (io, {pid, namespace, preservedNamespace}) => {
+module.exports.init = (io, { pid, namespace, preservedNamespace }) => {
   console.info(`Socket[${pid}] with namespace:${namespace} has loaded!`);
   socketIo = io;
   io.on('connection', (socket) => {
     console.info(`Client[${pid}] connected .. user ${socket.id} .. namespace ${namespace}`);
 
     socket.on('join pad', (padId, userId, callback) => {
-      socket.ndHolder = {video: {}, text: {}};
-      socket.ndHolder.video = {userId, padId};
-      socket.ndHolder.text = {userId, padId};
+      socket.ndHolder = { video: {}, text: {} };
+      socket.ndHolder.video = { userId, padId };
+      socket.ndHolder.text = { userId, padId };
       socket.join(padId);
 
       if (callback) callback(padId);
@@ -114,7 +114,7 @@ module.exports.init = (io, {pid, namespace, preservedNamespace}) => {
 
     socket.on('userJoin', (padId, padparticipators, userData, target, callback) => {
       if (target === 'video') {
-        q.push({socket, padId, padparticipators, userData, target, callback, retry: 0});
+        q.push({ socket, padId, padparticipators, userData, target, callback, retry: 0 });
       } else {
         let room = null;
         if (target === 'text') {
@@ -140,23 +140,23 @@ module.exports.init = (io, {pid, namespace, preservedNamespace}) => {
       if (!room.data || !room.info) return callback(null, null, target);
 
       socket.broadcast
-          .to(padId)
-          .emit('userLeave', room.data, room.info, target);
+        .to(padId)
+        .emit('userLeave', room.data, room.info, target);
       callback(room.data, room.info, target);
     });
 
     socket.on('getTextMessages', async (padId, headId, pagination, callback) => {
       // get last message id, then get last newest message, then send to client
       const messages = await textChat
-          .getMessages(padId, headId, pagination)
-          .catch((error) => {
-            throw new Error(
-                `[socket]: get text messages has an error, ${error.message}`
-            );
-          });
+        .getMessages(padId, headId, pagination)
+        .catch((error) => {
+          throw new Error(
+            `[socket]: get text messages has an error, ${error.message}`,
+          );
+        });
 
       callback(messages);
-    }
+    },
     );
 
     socket.on('sendTextMessage', async (padId, headId, message, callback) => {
@@ -164,23 +164,23 @@ module.exports.init = (io, {pid, namespace, preservedNamespace}) => {
       // combine message with messageId then past back to user
       // then broad cast to pad
       const messageId = await textChat
-          .save(padId, headId, message)
-          .catch((error) => {
-            throw new Error(
-                `[socket]: send text message has an error, ${error.message}`
-            );
-          });
+        .save(padId, headId, message)
+        .catch((error) => {
+          throw new Error(
+            `[socket]: send text message has an error, ${error.message}`,
+          );
+        });
 
       socket.broadcast
-          .to(padId)
-          .emit(`receiveTextMessage:${headId}`, headId, message);
+        .to(padId)
+        .emit(`receiveTextMessage:${headId}`, headId, message);
       callback(message, messageId);
     });
 
     socket.on('pingil', (padId, headerId, userId, latency) => {
       const room = videoChat.getRoom(padId, headerId);
-      if (room && room.length) room.map((user) => socket.broadcast.to(user.socketId).emit('userLatancy', {padId, headerId, userId, latency}));
-      socket.emit('pongol', {padId, headerId, userId, latency});
+      if (room && room.length) room.map((user) => socket.broadcast.to(user.socketId).emit('userLatancy', { padId, headerId, userId, latency }));
+      socket.emit('pongol', { padId, headerId, userId, latency });
     });
 
     socket.on('reloadVideoSession', (padId, headerId) => {
@@ -196,7 +196,7 @@ module.exports.init = (io, {pid, namespace, preservedNamespace}) => {
       if (!userData || !userData.text || !userData.video) return false;
 
       const targetRoom = Object.keys(userData).filter(
-          (room) => userData[room].headerId && room
+        (room) => userData[room].headerId && room,
       );
 
       targetRoom.forEach((chatRoom) => {
@@ -213,7 +213,7 @@ module.exports.init = (io, {pid, namespace, preservedNamespace}) => {
 
     socket.on('RTC_MESSAGE', (context) => {
       if (context.type === 'RTC_MESSAGE') {
-        Object.assign(context, {client: {id: socket.id.split('#')[1]}});
+        Object.assign(context, { client: { id: socket.id.split('#')[1] } });
         handleRTCMessage(socket, context.client, context.payload);
       }
     });

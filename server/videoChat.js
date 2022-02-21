@@ -97,7 +97,6 @@ const socketDisconnect = (data) => {
 
   if (!rooms.has(roomKey)) return result;
 
-
   // remove user in that room
   rooms.set(roomKey, rooms.get(roomKey).filter((x) => !(x.userId === data.userId)));
 
