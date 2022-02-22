@@ -1,0 +1,7 @@
+static/dist
+static/js/lib/jquery.tmpl.min.js
+static/js/socketIoMin.js
+static/js/lib/adapter.js
+static/js/lib/codecsHandler.js
+static/js/lib/getStats.min.js
+static/js/lib/getUserMediaPolyfill.js

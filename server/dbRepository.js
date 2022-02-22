@@ -1,12 +1,14 @@
+'use strict';
+
 const db = require('ep_etherpad-lite/node/db/DB');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 
 if (settings && !settings.ep_wrtc_heading.useEtherpadSocket) {
   try {
     db.init();
-  } catch (error) {
+  } catch (e) {
     console.error(`exception thrown: ${e.message}`);
-    if (e.stack) console.log(e.stack);
+    if (e.stack) console.error(e.stack);
   }
 }
 
@@ -22,11 +24,11 @@ exports.getLatestId = async (key) => {
   const result = await db.findKeys(key, ':*').catch((error) => {
     throw new Error(`[repository]: getLatestId has an error,${error.message}`);
   });
-  return result.length ? Number(result.pop().split(':').pop()) : 0;
+  return result.length ? Number(result.pop().split(':')
+    .pop()) : 0;
 };
 
-
-exports.getLastMessages = async (key, lastMessageId, {limit, offset}) => {
+exports.getLastMessages = async (key, lastMessageId, { limit, offset }) => {
   const results = [];
   const rowOfIds = [];
 

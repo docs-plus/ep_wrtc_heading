@@ -1,3 +1,5 @@
+'use strict';
+
 const Config = require('../config');
 
 // data Structure
@@ -14,7 +16,7 @@ const getRoom = (padId, headerId) => {
   return rooms.get(roomKey);
 };
 
-const socketUserJoin = (data, padparticipators) => {
+const socketUserJoin = (data, participators) => {
   const padId = data.padId;
   const headerId = data.headerId;
   const roomKey = `${padId}:${headerId}`;
@@ -46,7 +48,10 @@ const socketUserJoin = (data, padparticipators) => {
 
   // clear participator, check if the current users are sync with room object
   // TODO: This one does not work, I think i have to move it up!
-  rooms.set(roomKey, rooms.get(roomKey).filter((x) => padparticipators.includes(x.userId)));
+  rooms.set(
+    roomKey,
+    rooms.get(roomKey).filter((x) => participators.includes(x.userId)),
+  );
 
   return {
     canUserJoin,
@@ -83,7 +88,6 @@ const socketUserLeave = (data) => {
   return result;
 };
 
-
 const socketDisconnect = (data) => {
   const padId = data.padId;
   const headerId = data.headerId;
@@ -95,7 +99,6 @@ const socketDisconnect = (data) => {
   };
 
   if (!rooms.has(roomKey)) return result;
-
 
   // remove user in that room
   rooms.set(roomKey, rooms.get(roomKey).filter((x) => !(x.userId === data.userId)));

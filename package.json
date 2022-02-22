@@ -23,8 +23,7 @@
 		"start": "gulp watch",
 		"build": "gulp build",
 		"build:prod": "gulp build:publish --production",
-		"lint": "eslint --fix .",
-		"lint:dry": "eslint --fix-dry-run ."
+		"lint:fix": "eslint --fix ."
 	},
 	"dependencies": {
 		"bee-queue": "^1.4.0",
@@ -34,13 +33,12 @@
 		"socket.io-client": "^4.2.0",
 		"underscore": "^1.13.1"
 	},
+  "engines": {
+    "node": ">=12.17.0"
+  },
 	"devDependencies": {
-		"eslint": "^7.32.0",
-		"eslint-config-etherpad": "^2.0.0",
-		"eslint-plugin-mocha": "^9.0.0",
-		"eslint-plugin-node": "^11.1.0",
-		"eslint-plugin-prefer-arrow": "^1.2.3",
-		"eslint-plugin-promise": "^5.1.0",
+		"eslint": "^8.9.0",
+		"eslint-config-etherpad": "^3.0.1",
 		"gulp": "^4.0.2",
 		"gulp-bump": "^3.2.0",
 		"gulp-clean-css": "^4.3.0",
@@ -52,31 +50,8 @@
 		"gulp-rename": "^2.0.0",
 		"gulp-sourcemaps": "^2.6.5",
 		"gulp-uglify-es": "^2.0.0",
-		"husky": "^7.0.2"
-	},
-	"eslintConfig": {
-		"root": true,
-		"extends": "etherpad/plugin",
-		"ignorePatterns": [
-			"/static/dist/",
-			"/static/js/lib/getStats.min.js",
-			"/static/js/lib/getUserMediaPolyfill.js",
-			"/static/js/lib/jquery.tmpl.min.js",
-			"/static/js/wrtc.heading.mini.js"
-		],
-		"globals": {
-			"clientVars": true,
-			"WRTC": true,
-			"WrtcRoom": true,
-			"io": true,
-			"browser": true,
-			"Helper": true,
-			"videoChat": true,
-			"events": true,
-			"$": true,
-			"CodecsHandler": true,
-			"textChat": true
-		}
+		"husky": "^7.0.2",
+		"typescript": "^4.5.5"
 	},
 	"husky": {
 		"pre-commit": "npm run lint"

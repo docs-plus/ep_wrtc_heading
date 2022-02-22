@@ -22,7 +22,7 @@ const videoChat = (() => {
     interavCheck: 1000,
   };
 
-  const startWatchNetwork = function startWatchNetwork() {
+  const startWatchNetwork = () => {
     networkInterval = setInterval(() => {
       pingos.startTime = Date.now();
       socket.emit('pingil', padId, window.headerId, Helper.getUserId(), pingos.avg);
@@ -31,50 +31,52 @@ const videoChat = (() => {
 
   const stopWatchNetwork = () => clearInterval(networkInterval);
 
-  function mediaDevices() {
-    navigator.mediaDevices.enumerateDevices().then((data) => {
-      let videoSettings = localStorage.getItem('videoSettings') || {microphone: null, speaker: null, camera: null};
+  const mediaDevices = () => {
+    navigator.mediaDevices.enumerateDevices().then((deviceInputs) => {
+      const videoSettings = localStorage.getItem('videoSettings');
+      const { microphone, speaker, camera } = JSON.parse(videoSettings);
 
-      if (typeof videoSettings === 'string') {
-        videoSettings = JSON.parse(videoSettings);
-      }
-
-      const audioInputSection = document.querySelector('#wrtc_settings .select.audioSource');
-      const audioOutputSection = document.querySelector('#wrtc_settings .select.audioOutputSec');
-      const videoSection = document.querySelector('#wrtc_settings .select.videoSource');
+      const audioInputSection = document.querySelector('.select.audioSource select');
+      const audioOutputSection = document.querySelector('.select.audioOutputSec select');
+      const videoSection = document.querySelector('.select.videoSource select');
 
       const audioInputElement = document.createElement('select');
       const audioOutputElement = document.createElement('select');
       const videoElement = document.createElement('select');
 
-      for (let i = 0; i !== data.length; ++i) {
-        const deviceInfo = data[i];
+      for (const deviceInfo of deviceInputs) {
         const option = document.createElement('option');
-        option.value = deviceInfo.deviceId;
-        if (deviceInfo.kind === 'audioinput') {
-          option.text = deviceInfo.label || `microphone ${audioInputSection ? audioInputSection.length + 1 : '1'}`;
-          if (videoSettings.microphone === deviceInfo.deviceId) option.selected = true;
+        const { deviceId, label, kind } = deviceInfo;
+        option.value = deviceId;
+        if (kind === 'audioinput') {
+          option.text = label || `microphone ${audioInputSection ? audioInputSection.length + 1 : '1'}`;
+          if (microphone === deviceId) option.selected = true;
           audioInputElement.appendChild(option);
-        } else if (deviceInfo.kind === 'audiooutput') {
-          option.text = deviceInfo.label || `speaker ${audioOutputSection ? audioOutputSection.length + 1 : '1'}`;
-          if (videoSettings.speaker === deviceInfo.deviceId) option.selected = true;
+        } else if (kind === 'audiooutput') {
+          option.text = label || `speaker ${audioOutputSection ? audioOutputSection.length + 1 : '1'}`;
+          if (speaker === deviceId) option.selected = true;
           audioOutputElement.appendChild(option);
-        } else if (deviceInfo.kind === 'videoinput') {
-          option.text = deviceInfo.label || `camera ${videoSection ? videoSection.length + 1 : '1'}`;
-          if (videoSettings.camera === deviceInfo.deviceId) option.selected = true;
+        } else if (kind === 'videoinput') {
+          option.text = label || `camera ${videoSection ? videoSection.length + 1 : '1'}`;
+          if (camera === deviceId) option.selected = true;
           videoElement.appendChild(option);
         }
       }
 
-      audioInputSection.appendChild(audioInputElement);
-      audioOutputSection.appendChild(audioOutputElement);
-      videoSection.appendChild(videoElement);
+      $(audioInputSection).remove();
+      $(audioOutputSection).remove();
+      $(videoSection).remove();
+
+      $('.select.audioSource').append(audioInputElement);
+      $('.select.audioOutputSec').append(audioOutputElement);
+      $('.select.videoSource').append(videoElement);
     });
-  }
+  };
 
-  const isUserMediaAvailable = () => window.navigator.mediaDevices.getUserMedia({audio: true, video: true});
+  const isUserMediaAvailable = () => window.navigator.mediaDevices
+    .getUserMedia({ audio: true, video: true });
 
-  function removeUserFromRoom(data, roomInfo, cb) {
+  const removeUserFromRoom = (data, roomInfo, cb) => {
     if (!data || !roomInfo || !data.userId) return false;
     const headerId = data.headerId;
     const headerTitle = Helper.findAceHeaderElement(headerId).text;
@@ -98,11 +100,11 @@ const videoChat = (() => {
         VIDEOCHATLIMIT,
       };
       $(`.header_videochat_icon[data-id='${headerId}'] .icon`).removeClass('active');
-      Helper.notifyNewUserJoined('PLUS', msg, 'LEAVE');
     }
 
     if (data.userId === clientVars.userId) {
-      Helper.$body_ace_outer().find(`#wrtcVideoIcons #${headerId}`).removeClass('active');
+      Helper.$bodyAceOuter().find(`#wrtcVideoIcons #${headerId}`)
+        .removeClass('active');
       WRTC.deactivate(data.userId, data.headerId);
       stopWatchNetwork();
       window.headerId = null;
@@ -115,7 +117,8 @@ const videoChat = (() => {
       $('#wrtc_modal').css({
         transform: 'translate(-50%, -100%)',
         opacity: 0,
-      }).attr({'data-active': false});
+      })
+        .attr({ 'data-active': false });
 
       WRTC.deactivate(data.userId, data.headerId);
 
@@ -127,17 +130,16 @@ const videoChat = (() => {
 
     if (cb && typeof cb === 'function') cb();
 
-    Helper.wrtcPubsub.emit('update store', data, headerId, 'LEAVE', 'VIDEO', roomInfo, () => {});
+    Helper.wrtcPubsub.emit('update store', data, headerId, 'LEAVE', 'VIDEO', roomInfo);
 
     Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
 
     WRTC.userLeave(data.userId);
-  }
+  };
 
-  function addUserToRoom(data, roomInfo) {
+  const addUserToRoom = (data, roomInfo) => {
     if (!data || !data.userId) return false;
     const headerId = data.headerId;
-    const headerTitle = Helper.findAceHeaderElement(headerId).text;
 
     const user = Helper.getUserFromId(data.userId);
     // some user may session does exist but the user info does not available in all over the current pad
@@ -151,21 +153,6 @@ const videoChat = (() => {
     $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text(userCount);
     if (userCount === 0) $(`.header_videochat_icon[data-id='${headerId}'] .icon .userCount`).text('');
 
-    if (data.action === 'JOIN') {
-      // notify, a user join the video-chat room
-      const msg = {
-        time: new Date(),
-        userId: data.userId,
-        userName: user.name || data.name || 'anonymous',
-        headerId,
-        userCount,
-        headerTitle,
-        VIDEOCHATLIMIT,
-      };
-
-      Helper.notifyNewUserJoined('PLUS', msg, 'JOIN');
-    }
-
     $(`.header_videochat_icon[data-id='${headerId}'] .icon`).addClass('active');
 
     if (data.userId === clientVars.userId) {
@@ -176,13 +163,13 @@ const videoChat = (() => {
       const videoBtn = Helper.findAceHeaderElement(headerId).$inlineIcon();
       if (videoBtn) videoBtn.querySelector('.btn_roomHandler').classList.add('active');
 
-
       WRTC.activate(data.headerId, user.userId);
 
       $('#wrtc_modal').css({
         transform: 'translate(-50%, 0)',
         opacity: 1,
-      }).attr({'data-active': true});
+      })
+        .attr({ 'data-active': true });
 
       Helper.wrtcPubsub.emit('enable room buttons', headerId, 'JOIN', $joinBtn);
       Helper.wrtcPubsub.emit('componentsFlow', 'video', 'open', true);
@@ -194,23 +181,16 @@ const videoChat = (() => {
 
       currentRoom = data;
 
-      // update modal title, attributes and inline avatart
+      // update modal title, attributes and inline avatar
       Helper.wrtcPubsub.emit('updateWrtcToolbarModal', headerId, roomInfo);
-
-      // if videochat active and new message send to chat! open header textchat modal
-      socket.on(`receiveTextMessage:${headerId}`, (headingId, msg) => {
-        const active = $(document).find('#wrtc_textChatWrapper').hasClass('active');
-        if (headingId === headerId && !active) {
-          textChat.userJoin(headerId, data, 'TEXT');
-        }
-      });
     }
 
-    Helper.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'VIDEO', roomInfo, () => {});
-  }
+    Helper.wrtcPubsub.emit('update store', data, headerId, 'JOIN', 'VIDEO', roomInfo);
+  };
 
-  function createSession(headerId, userInfo, $joinButton) {
-    Helper.$body_ace_outer().find('button.btn_joinChat_chatRoom').removeClass('active');
+  const createSession = (headerId, userInfo, $joinButton) => {
+    Helper.$bodyAceOuter().find('button.btn_joinChat_chatRoom')
+      .removeClass('active');
     $joinBtn = $joinButton;
     isUserMediaAvailable().then((stream) => {
       // stop last stream
@@ -218,30 +198,31 @@ const videoChat = (() => {
         Helper.wrtcStore.localstream = stream;
       });
 
-      const padparticipators = window.pad.collabClient.getConnectedUsers().map((x) => x.userId);
+      const participators = window.pad.collabClient.getConnectedUsers().map((x) => x.userId);
 
       if (!currentRoom.userId) {
-        return socket.emit('userJoin', padId, padparticipators, userInfo, 'video', gateway_userJoin);
+        return socket.emit('userJoin', padId, participators, userInfo, 'video', gateway_userJoin);
       }
       // If the user has already joined the video chat, make suer leave that room then join to the new chat room
       socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
         gateway_userLeave(_userData, roomInfo, () => {
-          socket.emit('userJoin', padId, padparticipators, userInfo, 'video', gateway_userJoin);
+          socket.emit('userJoin', padId, participators, userInfo, 'video', gateway_userJoin);
         });
       });
-    }).catch((err) => {
-      console.error(err);
-      Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
-      Helper.wrtcPubsub.emit('componentsFlow', 'video', 'open', false);
-      Helper.stopStreaming();
-      socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
-        gateway_userLeave(_userData, roomInfo);
+    })
+      .catch((err) => {
+        console.error(err);
+        Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
+        Helper.wrtcPubsub.emit('componentsFlow', 'video', 'open', false);
+        Helper.stopStreaming();
+        socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
+          gateway_userLeave(_userData, roomInfo);
+        });
+        WRTC.showUserMediaError(err, Helper.getUserId(), headerId);
       });
-      WRTC.showUserMediaError(err, Helper.getUserId(), headerId);
-    });
-  }
+  };
 
-  function userJoin(headerId, userInfo, $joinButton) {
+  const userJoin = (headerId, userInfo, $joinButton) => {
     if (!userInfo || !userInfo.userId) {
       Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
       return false;
@@ -254,40 +235,42 @@ const videoChat = (() => {
     }
 
     createSession(headerId, userInfo, $joinButton);
-  }
-  // depricate
-  function reloadCurrentSession(headerId, userInfo, $joinButton) {
+  };
+  // deprecate
+  const reloadCurrentSession = (headerId, userInfo, $joinButton) => {
     if (!userInfo || !userInfo.userId) {
       Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
       return false;
     }
 
     createSession(headerId, userInfo, $joinButton, 'RELOAD');
-  }
+  };
 
-  function reloadSession(headerId, userInfo, $joinButton) {
+  const reloadSession = (headerId, userInfo, $joinButton) => {
     if (!userInfo || !userInfo.userId) {
       Helper.wrtcPubsub.emit('enable room buttons', headerId, 'LEAVE', $joinBtn);
       return false;
     }
     socket.emit('reloadVideoSession', padId, headerId);
-  }
+  };
 
-  function userLeave(headerId, data, $joinButton) {
+  const userLeave = (headerId, data, $joinButton) => {
     $joinBtn = $joinButton;
     socket.emit('userLeave', padId, data, 'video', gateway_userLeave);
-  }
+  };
 
-  function reachedVideoRoomSize(roomInfo, showAlert, isBulkUpdate) {
+  const reachedVideoRoomSize = (roomInfo, showAlert, isBulkUpdate) => {
     if (roomInfo && roomInfo.present <= VIDEOCHATLIMIT) return true;
 
     showAlert = showAlert || true;
     if (showAlert && !isBulkUpdate) {
       $.gritter.add({
         title: 'Video chat Limitation',
-        text: `The video chat room has reached its limit. \r\n The size of this video chat room is ${VIDEOCHATLIMIT}.
-				(If this seems wrong, please share the problem with the support team.)
-				`,
+        text: `
+          The video chat room has reached its limit. \r\n
+          The size of this video chat room is ${VIDEOCHATLIMIT}.
+          (If this seems wrong, please share the problem with the support team.)
+        `,
         sticky: false,
         class_name: 'error',
         time: '5000',
@@ -295,7 +278,7 @@ const videoChat = (() => {
     }
 
     return false;
-  }
+  };
 
   /**
   *
@@ -308,12 +291,12 @@ const videoChat = (() => {
   * @param {Object} roomInfo
   * @param {Boolean} showAlert
   * @param {Boolean} bulkUpdate
- *
- *	@returns
+  *
+  * @returns
   */
-  function gateway_userJoin(data, roomInfo, showAlert = true, bulkUpdate = false) {
+  const gateway_userJoin = (data, roomInfo, showAlert = true, bulkUpdate = false) => {
     console.info('[wrtc]: gateway user joining,', data, roomInfo, showAlert);
-    // If user data does not exist reutrn false
+    // If user data does not exist return false
     if (!data) return reachedVideoRoomSize(null, false, false);
 
     // if user data exist then check room size
@@ -324,20 +307,20 @@ const videoChat = (() => {
     }
     Helper.stopStreaming();
     return false;
-  }
+  };
 
-  function gateway_userLeave(data, roomInfo, cb) {
+  const gateway_userLeave = (data, roomInfo, cb) => {
     removeUserFromRoom(data, roomInfo, cb);
-  }
+  };
 
-  function postAceInit(hook, context, webSocket, docId) {
+  const postAceInit = (hookName, context, webSocket, docId) => {
     socket = webSocket;
     padId = docId;
     VIDEOCHATLIMIT = 2000; // clientVars.webrtc.videoChatLimit;
     Helper.wrtcPubsub.emit('componentsFlow', 'video', 'init', true);
     // mediaDevices();
 
-    socket.on('userLatancy', (data) => {
+    socket.on('userLatency', (data) => {
       if (Helper.getUserId() !== data.userId) {
         const videoId = `interface_video_${data.userId.replace(/\./g, '_')}`;
 
@@ -346,21 +329,20 @@ const videoChat = (() => {
         if (data.latency > 300) color = pingos.colors.danger;
 
         $(document)
-            .find(`#${videoId} .latency`)
-            .css({color})
-            .text(`${Math.ceil(data.latency)}ms`);
+          .find(`#${videoId} .latency`)
+          .css({ color })
+          .text(`${Math.ceil(data.latency)}ms`);
       }
     });
     socket.on('pongol', (data) => {
       pingos.latency = Date.now() - pingos.startTime;
 
-      if (pingos.LMin <= pingos.latency && pingos.latency >= pingos.LMax) pingos.LMax = pingos.latency; else pingos.LMin = pingos.latency;
+      if (pingos.LMin <= pingos.latency && pingos.latency >= pingos.LMax) { pingos.LMax = pingos.latency; } else { pingos.LMin = pingos.latency; }
 
-      // console.log( 'Websocket RTT: ' + pingos.latency + ' ms', "min:", pingos.LMin, "max", pingos.LMax, "avg:", pingos.avg );
-
-      if (pingos.LineAvg.length < 4) { pingos.LineAvg.push((pingos.LMax + pingos.LMin) / 2); } else {
+      if (pingos.LineAvg.length < 4) {
+        pingos.LineAvg.push((pingos.LMax + pingos.LMin) / 2);
+      } else {
         pingos.avg = pingos.LineAvg.reduce((a, b) => a + b) / pingos.LineAvg.length;
-        // console.log(pingos.LineAvg)
         pingos.LineAvg = [];
         pingos.LMax = 0;
       }
@@ -370,11 +352,9 @@ const videoChat = (() => {
       if (pingos.avg > 300) color = pingos.colors.danger;
 
       $(document)
-          .find('.video-container.local-user .latency')
-          .css({color})
-          .text(`${Math.ceil(pingos.avg)}ms`);
-
-      // $(document).find('#networkStatus').html(`RTT: ${pingos.latency}ms, min: ${pingos.LMin}ms, max: ${pingos.LMax}ms, avg:${pingos.avg}ms`);
+        .find('.video-container.local-user .latency')
+        .css({ color })
+        .text(`${Math.ceil(pingos.avg)}ms`);
 
       // Helper.wrtcPubsub.emit('update network information', pingos);
     });
@@ -392,7 +372,7 @@ const videoChat = (() => {
       Helper.wrtcPubsub.emit('disable room buttons', headerId, 'JOIN', target);
       createSession(headerId, userInfo, target);
     });
-  }
+  };
 
   return {
     postAceInit,
