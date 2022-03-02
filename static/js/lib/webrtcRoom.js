@@ -302,6 +302,11 @@ const WrtcRoom = (() => {
       const headerId = $(this).attr('sectionid');
       const room = Helper.wrtcStore.rooms.get(headerId);
 
+      if (!room) {
+        console.error(`[wrtc]: room does not founded!`, headerId, room);
+        return false;
+      }
+
       // clear the button
       $('.header_videochat_icon').attr('data-id', headerId);
       $('.header_videochat_icon .icon').removeClass('active');
@@ -463,6 +468,7 @@ const WrtcRoom = (() => {
       self.adoptHeaderYRoom();
     },
     syncVideoAvatars: (headerId) => {
+      if (!socket) return false;
       socket.emit('getVideoRoomInfo', padId, headerId, (result) => {
         if (result) Helper.inlineAvatar.ROOM(headerId, result);
       });
