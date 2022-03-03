@@ -24,7 +24,7 @@
 	box-shadow: 0 1px 3px 1px rgba(60,64,67,.15);
 	overflow: inherit;
 	outline: none;
-	min-height: 700px;
+	min-height: 100vh;
 }
 
 #innerdocbody::before{
