@@ -1,5 +1,3 @@
-'use strict';
-
 const Config = require('../config');
 
 // data Structure
@@ -49,8 +47,8 @@ const socketUserJoin = (data, participators) => {
   // clear participator, check if the current users are sync with room object
   // TODO: This one does not work, I think i have to move it up!
   rooms.set(
-    roomKey,
-    rooms.get(roomKey).filter((x) => participators.includes(x.userId)),
+      roomKey,
+      rooms.get(roomKey).filter((x) => participators.includes(x.userId)),
   );
 
   return {

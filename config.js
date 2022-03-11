@@ -1,5 +1,3 @@
-'use strict';
-
 const settings = {
   VIDEO_CHAT_LIMIT: 2000,
   TEXT_CHAT_KEY: 'WRTC:TEXT:',

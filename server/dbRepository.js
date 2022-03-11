@@ -1,5 +1,3 @@
-'use strict';
-
 const db = require('ep_etherpad-lite/node/db/DB');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 
@@ -25,10 +23,10 @@ exports.getLatestId = async (key) => {
     throw new Error(`[repository]: getLatestId has an error,${error.message}`);
   });
   return result.length ? Number(result.pop().split(':')
-    .pop()) : 0;
+      .pop()) : 0;
 };
 
-exports.getLastMessages = async (key, lastMessageId, { limit, offset }) => {
+exports.getLastMessages = async (key, lastMessageId, {limit, offset}) => {
   const results = [];
   const rowOfIds = [];
 

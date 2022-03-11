@@ -5,13 +5,13 @@
 			"pre": ["ep_etherpad-lite/webaccess", "ep_page_view/page_view"],
 			"post": ["ep_etherpad-lite/static"],
 			"client_hooks": {
-				"postAceInit": "ep_wrtc_heading/static/js/index",
-				"aceEditorCSS": "ep_wrtc_heading/static/js/index",
-				"aceEditEvent": "ep_wrtc_heading/static/js/index",
-				"userLeave": "ep_wrtc_heading/static/js/index",
-				"acePostWriteDomLineHTML": "ep_wrtc_heading/static/js/index",
-				"handleClientMessage_RTC_MESSAGE": "ep_wrtc_heading/static/js/index",
-				"aceDomLineProcessLineAttributes": "ep_wrtc_heading/static/js/index"
+				"postAceInit": "ep_wrtc_heading/static/dist/bundle",
+				"aceEditorCSS": "ep_wrtc_heading/static/dist/bundle",
+				"aceEditEvent": "ep_wrtc_heading/static/dist/bundle",
+				"userLeave": "ep_wrtc_heading/static/dist/bundle",
+				"handleClientMessage_RTC_MESSAGE": "ep_wrtc_heading/static/dist/bundle",
+				"acePostWriteDomLineHTML": "ep_wrtc_heading/static/dist/bundle",
+				"aceDomLineProcessLineAttributes": "ep_wrtc_heading/static/dist/bundle"
 			},
 			"hooks": {
 				"socketio": "ep_wrtc_heading/index",

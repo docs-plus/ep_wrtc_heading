@@ -1,5 +1,3 @@
-'use strict';
-
 const eejs = require('ep_etherpad-lite/node/eejs/');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 const log4js = require('ep_etherpad-lite/node_modules/log4js');
@@ -37,7 +35,7 @@ const socketNamespace = Config.get('SOCKET_NAMESPACE');
 // TODO: support etherpad socket
 exports.socketio = (hookName, args, cb) => {
   if (settings.ep_wrtc_heading && useEtherpadSocket) {
-    console.info('[wrtc]: use etherpad socket system');
+    console.info('[wrtc]: use etherpad socket system, socketNamespace: ', socketNamespace);
     io = args.io.of(`/${socketNamespace}`);
     const opt = {
       pid: process.pid,
@@ -56,10 +54,7 @@ exports.eejsBlock_mySettings = (hookName, args, cb) => {
 
 exports.eejsBlock_scripts = (hookName, args, cb) => {
   const html = 'ep_wrtc_heading/static/dist/templates/webrtcComponent.mini.html';
-  const js = `../static/plugins/ep_wrtc_heading/static/dist/js/wrtc.heading.mini.js?`;
   args.content += eejs.require(html, {}, module);
-  const src = `${js}v=${packageJson.version}`;
-  args.content += `<script src='${src}' defer></script>`;
   return cb();
 };
 
@@ -71,11 +66,11 @@ exports.eejsBlock_styles = (hookName, args, cb) => {
 exports.clientVars = (hookName, context, callback) => {
   const enabled = true;
   let remoteSocketAddress = Config.get('CLIENT_SOCKET_REMOTE_ADDRESS');
-  const iceServers = [{ urls: [Config.get('GOOGLE_STUN_SERVER')] }];
-  const video = { sizes: {}, codec: Config.get('VIDEO_CODEC') };
+  const iceServers = [{urls: [Config.get('GOOGLE_STUN_SERVER')]}];
+  const video = {sizes: {}, codec: Config.get('VIDEO_CODEC')};
 
   if (settings.ep_wrtc_heading) {
-    let { enabled } = settings.ep_wrtc_heading;
+    let {enabled} = settings.ep_wrtc_heading;
     const {
       video,
       videoChatLimit,

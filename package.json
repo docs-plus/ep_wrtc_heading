@@ -1,7 +1,7 @@
 {
 	"name": "ep_wrtc_heading",
 	"description": "Video Headings Plugin for Etherpad",
-	"version": "0.41.30",
+	"version": "0.50.0",
 	"author": {
 		"name": "Hossein Marzban",
 		"email": "marzban98@gmail.com"
@@ -23,22 +23,27 @@
 		"start": "gulp watch",
 		"build": "gulp build",
 		"build:prod": "gulp build:publish --production",
-		"lint:fix": "eslint --fix ."
+		"lint:fix": "eslint --fix .",
+		"rollup:build": "rollup -c rollup.config.js",
+		"rollup:watch": "rollup -c rollup.config.js --watch"
 	},
 	"dependencies": {
 		"bee-queue": "^1.4.0",
 		"better-queue": "^3.8.10",
 		"debug": "^4.3.2",
+		"getstats": "github:muaz-khan/getStats",
 		"lodash": "^4.17.21",
-		"socket.io-client": "^4.2.0",
 		"underscore": "^1.13.1"
 	},
-  "engines": {
-    "node": ">=12.17.0"
-  },
 	"devDependencies": {
-		"eslint": "^8.9.0",
-		"eslint-config-etherpad": "^3.0.1",
+		"@babel/core": "^7.17.5",
+		"@babel/preset-env": "^7.16.11",
+		"@rollup/plugin-babel": "^5.3.1",
+		"@rollup/plugin-commonjs": "^21.0.2",
+		"@rollup/plugin-node-resolve": "^13.1.3",
+		"babel": "^6.23.0",
+		"eslint": "^8.10.0",
+		"eslint-config-etherpad": "^3.0.7",
 		"gulp": "^4.0.2",
 		"gulp-bump": "^3.2.0",
 		"gulp-clean-css": "^4.3.0",
@@ -51,9 +56,9 @@
 		"gulp-sourcemaps": "^2.6.5",
 		"gulp-uglify-es": "^2.0.0",
 		"husky": "^7.0.2",
-		"typescript": "^4.5.5"
-	},
-	"husky": {
-		"pre-commit": "npm run lint"
+		"rollup": "^2.69.0",
+		"rollup-plugin-terser": "^7.0.2",
+		"socket.io-client": "^3.1.1",
+		"typescript": "^4.6.2"
 	}
 }

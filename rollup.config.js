@@ -1,8 +1,12 @@
-import resolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import babel from "@rollup/plugin-babel";
-import { terser } from "rollup-plugin-terser";
-import { rollup } from "rollup";
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable node/no-unpublished-import */
+/* eslint-disable node/no-unsupported-features/es-syntax */
+
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import babel from '@rollup/plugin-babel';
+import {terser} from 'rollup-plugin-terser';
+// import {rollup} from 'rollup';
 
 export default {
   input: './static/js/index.js',
@@ -12,11 +16,11 @@ export default {
     sourcemap: true,
     strict: true,
     compact: true,
-    minifyInternalExports: true
+    minifyInternalExports: true,
   },
   watch: {
     include: './static/js/**',
-    clearScreen: false
+    clearScreen: false,
   },
   plugins: [
     resolve({
@@ -24,10 +28,10 @@ export default {
     }),
     commonjs(),
     babel({
-      include: ["**.js", "node_modules/**"],
-      babelHelpers: "bundled",
-      presets: ["@babel/preset-env"],
+      include: ['**.js', 'node_modules/**'],
+      babelHelpers: 'bundled',
+      presets: ['@babel/preset-env'],
     }),
-    // terser()
+    terser(),
   ],
 };
