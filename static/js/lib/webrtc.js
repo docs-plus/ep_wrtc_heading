@@ -21,17 +21,6 @@ import WRTC from './webrtc';
 
 import * as CodecsHandler from './codecsHandler';
 
-const logError = (error) => {
-  // if (error && error.message.includes("Failed to set remote answer sdp")) {
-  self.attemptToReconnect();
-  // } else {
-  // socket.emit('acceptNewCall', padId, window.headerId);
-  console.error('[wrtc]: LogError:', error);
-  // }
-  $('#wrtc_modal #networkError').show()
-      .addClass('active')
-      .text(`[wrtc]: Error: ${error} ,Reload the session.`);
-};
 
 // Normalize RTC implementation between browsers
 // var getUserMedia = window.navigator.mediaDevices.getUserMedia
@@ -758,6 +747,18 @@ export default (() => {
         self.getUserMedia(window.headerId);
       }, randomIntFromInterval(200, 1000));
     },
+  };
+
+  const logError = (error) => {
+    // if (error && error.message.includes("Failed to set remote answer sdp")) {
+    self.attemptToReconnect();
+    // } else {
+    // socket.emit('acceptNewCall', padId, window.headerId);
+    console.error('[wrtc]: LogError:', error);
+    // }
+    $('#wrtc_modal #networkError').show()
+        .addClass('active')
+        .text(`[wrtc]: Error: ${error} ,Reload the session.`);
   };
 
   self.pc = pc;
