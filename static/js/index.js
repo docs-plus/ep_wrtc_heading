@@ -159,6 +159,9 @@ export const aceEditEvent = (hookName, context) => {
 
 export const aceEditorCSS = () => {
   const version = clientVars.webrtc.version || 1;
+  if ($('body').hasClass('mobileView')) {
+    return [`ep_wrtc_heading/static/dist/css/innerLayer_mobile.css?v=${version}`];
+  }
   return [`ep_wrtc_heading/static/dist/css/innerLayer.css?v=${version}`];
 };
 
@@ -203,9 +206,11 @@ export const aceDomLineProcessLineAttributes = (hookName, context) => {
       Helper.wrtcPubsub.emit('updateWrtcToolbarTitleModal', $header.text, headerId);
     }
 
+    const mobileAttr = $('body').hasClass('mobileView') ? 'mobile' : 'desktop';
+
     const modifier = {
       preHtml: '',
-      postHtml: `<chat-inline-icon data-headerid="${headerId}"></chat-inline-icon>`,
+      postHtml: `<chat-inline-icon data-headerid="${headerId}" ${mobileAttr}></chat-inline-icon>`,
       processedMarker: true,
     };
 
