@@ -210,7 +210,7 @@ export const aceDomLineProcessLineAttributes = (hookName, context) => {
 
     const modifier = {
       preHtml: '',
-      postHtml: `<chat-inline-icon data-headerid="${headerId}" ${mobileAttr}></chat-inline-icon>`,
+      postHtml: `<chat-inline-icon headerid="${headerId}" ${mobileAttr}></chat-inline-icon>`,
       processedMarker: true,
     };
 
