@@ -294,7 +294,7 @@ export default (() => {
         .contents()
         .find('#innerdocbody')
         .on('click', 'chat-inline-icon', function () {
-          const headerId = $(this).attr('data-headerid');
+          const headerId = $(this).attr('headerid');
           $(document)
               .find('#header_videochat_icon')
               .attr({
