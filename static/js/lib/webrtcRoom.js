@@ -1,6 +1,5 @@
 import * as Helper from './helpers';
-
-import videoChat from './videoChat';
+import * as videoChat from './videoChat';
 
 const showGeneralOverlay = () => {
   $('#ep_profile_general_overlay').addClass('ep_profile_formModal_overlay_show');
@@ -127,64 +126,6 @@ export default (() => {
     });
   }
 
-  const joinByQueryString = (url) => {
-    url = url || window.location.href;
-    const urlParams = new URLSearchParams(url);
-    const headerId = urlParams.get('id');
-    let target = urlParams.get('target');
-    const join = urlParams.get('join');
-
-    if (!headerId) return true;
-
-    const inComeURL = new URL(url);
-    const inComePadName = inComeURL.pathname.split('/').pop();
-    const currentPadName = location.pathname.split('/').pop();
-
-    // check if header id belong to this pad
-    // then if it's not check padName
-
-    if (!Helper.wrtcStore.rooms.get(headerId)) {
-      if (inComePadName !== currentPadName) return (window.location.href = url);
-      $.gritter.add({
-        title: 'Error',
-        text: 'The header seems not to exist anymore!',
-        time: 3000,
-        sticky: false,
-        class_name: 'error',
-      });
-      return false;
-    }
-
-    if (headerId) scroll2Header(headerId);
-
-    if (join === 'true' && target) {
-      target = target.toUpperCase();
-
-      if (
-        Helper.wrtcStore.socketState === 'CLOSED' &&
-        tryToJoinByQueryString <= 4
-      ) {
-        setTimeout(() => {
-          console.warn(
-              `[wrtc]: socket state is ${Helper.wrtcStore.socketState}, try to join again!`
-          );
-          tryToJoinByQueryString++;
-          joinByQueryString();
-        }, 1500);
-      } else if (Helper.wrtcStore.socketState === 'OPENED') {
-        setTimeout(() => roomBtnHandler('JOIN', headerId, target), 1000);
-      } else {
-        console.error(`
-          [wrtc]: We try to join ${tryToJoinByQueryString}th,
-          Joining by query string has problem!
-        `,
-        Helper.wrtcStore.socketState,
-        tryToJoinByQueryString
-        );
-      }
-    }
-  };
-
   /**
    *
    * @param {string} actions @enum (JOIN|LEAVE|RELOAD|SHARELINK|USERPROFILEMODAL|JOINBYQUERY)
@@ -264,6 +205,64 @@ export default (() => {
       joinByQueryString(href);
     }
   }
+
+  const joinByQueryString = (url) => {
+    url = url || window.location.href;
+    const urlParams = new URLSearchParams(url);
+    const headerId = urlParams.get('id');
+    let target = urlParams.get('target');
+    const join = urlParams.get('join');
+
+    if (!headerId) return true;
+
+    const inComeURL = new URL(url);
+    const inComePadName = inComeURL.pathname.split('/').pop();
+    const currentPadName = location.pathname.split('/').pop();
+
+    // check if header id belong to this pad
+    // then if it's not check padName
+
+    if (!Helper.wrtcStore.rooms.get(headerId)) {
+      if (inComePadName !== currentPadName) return (window.location.href = url);
+      $.gritter.add({
+        title: 'Error',
+        text: 'The header seems not to exist anymore!',
+        time: 3000,
+        sticky: false,
+        class_name: 'error',
+      });
+      return false;
+    }
+
+    if (headerId) scroll2Header(headerId);
+
+    if (join === 'true' && target) {
+      target = target.toUpperCase();
+
+      if (
+        Helper.wrtcStore.socketState === 'CLOSED' &&
+        tryToJoinByQueryString <= 4
+      ) {
+        setTimeout(() => {
+          console.warn(
+              `[wrtc]: socket state is ${Helper.wrtcStore.socketState}, try to join again!`
+          );
+          tryToJoinByQueryString++;
+          joinByQueryString();
+        }, 1500);
+      } else if (Helper.wrtcStore.socketState === 'OPENED') {
+        setTimeout(() => roomBtnHandler('JOIN', headerId, target), 1000);
+      } else {
+        console.error(`
+          [wrtc]: We try to join ${tryToJoinByQueryString}th,
+          Joining by query string has problem!
+        `,
+        Helper.wrtcStore.socketState,
+        tryToJoinByQueryString
+        );
+      }
+    }
+  };
 
   // if history state has change fire joinQueryString
   document.addEventListener('onPushState', (event) => {

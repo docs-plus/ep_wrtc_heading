@@ -1,3 +1,5 @@
 static/dist
 static/js/lib/adapter.js
 static/js/lib/getUserMediaPolyfill.js
+rollup.config.js
+gulpfile.js

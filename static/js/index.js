@@ -1,11 +1,11 @@
-import _ from 'lodash';
+import debounce from 'lodash-es/debounce';
 import ioClient from 'socket.io-client';
 import './lib/getUserMediaPolyfill';
 import './lib/adapter';
 import * as Helper from './lib/helpers';
 import WRTC from './lib/webrtc';
 import WrtcRoom from './lib/webrtcRoom';
-import videoChat from './lib/videoChat';
+import * as videoChat from './lib/videoChat';
 
 const getSocket = () => window.pad && window.pad.socket;
 
@@ -144,7 +144,7 @@ export const postAceInit = (hookName, context) => {
   $target.prepend('<div id="wbrtc_avatarCol" class="usersIconList"></div>');
 
 
-  $(window).resize(_.debounce(WrtcRoom.adoptHeaderYRoom, 250));
+  $(window).resize(debounce(WrtcRoom.adoptHeaderYRoom, 250));
 };
 
 export const aceEditEvent = (hookName, context) => {

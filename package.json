@@ -30,10 +30,8 @@
 	"dependencies": {
 		"bee-queue": "^1.4.0",
 		"better-queue": "^3.8.10",
-		"debug": "^4.3.2",
 		"getstats": "github:muaz-khan/getStats",
-		"lodash": "^4.17.21",
-		"underscore": "^1.13.1"
+		"lodash-es": "^4.17.21"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.17.5",

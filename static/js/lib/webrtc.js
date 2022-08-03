@@ -15,9 +15,9 @@
  */
 
 import * as Helper from './helpers';
-import videoChat from './videoChat';
 import getStats from 'getstats';
-import WRTC from './webrtc';
+import * as videoChat from './videoChat';
+
 
 import * as CodecsHandler from './codecsHandler';
 
@@ -716,7 +716,7 @@ export default (() => {
             // socket.emit('userLeave', padId, currentRoom, 'video', (_userData, roomInfo) => {
             //   gatewayUserLeave(_userData, roomInfo);
             // });
-            WRTC.showUserMediaError(err, Helper.getUserId(), headerId);
+            self.showUserMediaError(err, Helper.getUserId(), headerId);
           });
 
 

@@ -1,6 +1,3 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable node/no-unpublished-require */
-
 const gulp = require('gulp');
 const concat = require('gulp-concat');
 const htmlmin = require('gulp-htmlmin');

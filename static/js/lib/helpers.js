@@ -1,5 +1,5 @@
-import videoChat from './videoChat';
-import WRTC from './webrtc';
+import * as videoChat from './videoChat';
+
 const avatarUrl = '../static/plugins/ep_profile_modal/static/img/user.png';
 
 const getAvatarUrl = (userId) => {
