@@ -174,7 +174,7 @@ module.exports.init = (io, {pid, namespace, preservedNamespace}) => {
 
       socket.broadcast
           .to(userData.video.padId)
-          .emit('userLeave', room.data, room.roomInfo, 'video');
+          .emit('userLeave', room?.data, room?.roomInfo, 'video');
     });
 
     socket.on('RTC_MESSAGE', (context) => {
